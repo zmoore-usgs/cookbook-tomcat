@@ -1,0 +1,22 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+
+platforms:
+  - name: cida-centos-6.6-vbox
+    driver:
+      box: usgs-wsi-centos-6.6-vbox
+      box_url: ftp://ftpext.usgs.gov/pub/er/wi/middleton/dblodgett/boxes/virtualbox/opscode_centos-6.6_chef-provisionerless.box
+  - name: cida-centos-6.6-vmware
+    driver:
+      box: usgs-wsi-centos-6.6-vmware
+      box_url: ftp://ftpext.usgs.gov/pub/er/wi/middleton/dblodgett/boxes/vmware/opscode_centos-6.6_chef-provisionerless.box
+
+suites:
+  - name: default
+    run_list:
+      - recipe[wsi_tomcat::default]
+    attributes:
