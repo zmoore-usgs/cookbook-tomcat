@@ -13,7 +13,7 @@ checksum = node[:wsi_tomcat][:file][:checksum]
 
 remote_file archive_download_path do
   owner user_name
-  checksum ""
+  checksum checksum
   source mirrors
   action :create_if_missing
 end
