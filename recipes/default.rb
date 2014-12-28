@@ -9,3 +9,5 @@ include_recipe "wsi_tomcat::create_group"
 include_recipe "wsi_tomcat::create_user"
 
 include_recipe "wsi_tomcat::get_tomcat"
+
+include_recipe "wsi_tomcat::commons_daemon"
