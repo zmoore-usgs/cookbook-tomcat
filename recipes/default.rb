@@ -2,7 +2,7 @@
 # Cookbook Name:: wsi_tomcat
 # Recipe:: default
 #
-include_recipe "java"
+include_recipe "wsi_tomcat::install_deps"
 
 include_recipe "wsi_tomcat::create_group"
 
