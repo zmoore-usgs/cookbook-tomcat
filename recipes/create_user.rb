@@ -10,6 +10,7 @@ user_name = node[:wsi_tomcat][:user][:name]
 home_dir = node[:wsi_tomcat][:user][:home_dir]
 
 directory home_dir do
+  owner user_name
   action :create
 end
 
