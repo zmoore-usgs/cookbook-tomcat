@@ -5,9 +5,9 @@
 #
 # Description: Sets up the tomcat user, home directory, etc
 
-group_name = node[:cida_tomcat][:group][:name] || "tomcat"
-user_name = node[:cida_tomcat][:user][:name] || "tomcat"
-home_dir = node[:cida_tomcat][:user][:home_dir] || "/opt/" + user_name
+group_name = node[:wsi_tomcat][:group][:name]
+user_name = node[:wsi_tomcat][:user][:name]
+home_dir = node[:wsi_tomcat][:user][:home_dir]
 
 directory home_dir do
   action :create
