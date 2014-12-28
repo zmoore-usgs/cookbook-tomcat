@@ -5,17 +5,39 @@
 #
 # Description: Gets and unpacks apache tomcat tarball
 
-archive_download_path = "/opt/apache-tomcat-" + node[:wsi_tomcat][:version] + ".tar.gz"
+tomcat_version = node[:wsi_tomcat][:version]
+tomcat_unpack_dir = "/opt/apache-tomcat-#{tomcat_version}"
+archive_download_path = tomcat_unpack_dir + ".tar.gz"
 group_name = node[:wsi_tomcat][:group][:name]
 user_name = node[:wsi_tomcat][:user][:name]
 mirrors = node[:wsi_tomcat][:file][:mirrors]
 checksum = node[:wsi_tomcat][:file][:checksum]
+tomcat_base_dir = "/opt/" + user_name
 
 remote_file archive_download_path do
   owner user_name
   checksum checksum
   source mirrors
   action :create_if_missing
+  notifies :run, "execute[unpack tomcat binary]", :immediately
+  notifies :run, "execute[gain rights for base dir]", :immediately
 end
 
+execute "unpack tomcat binary" do
+  cwd "/opt"
+  command "/bin/tar xvf #{archive_download_path} -C /opt/"
+  creates tomcat_unpack_dir
+  action :nothing
+end
 
+execute "gain rights for base dir" do
+  command "chown -R #{user_name}:#{group_name} #{tomcat_unpack_dir}"
+  user 'root'
+  action :nothing
+end
+
+link "/opt/tomcat" do
+  owner user_name
+  group group_name
+  to tomcat_unpack_dir
+end
