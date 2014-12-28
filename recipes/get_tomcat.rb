@@ -24,8 +24,8 @@ remote_file archive_download_path do
 end
 
 execute "unpack tomcat binary" do
-  cwd "/opt"
   command "/bin/tar xvf #{archive_download_path} -C /opt/"
+  cwd "/opt"
   creates tomcat_unpack_dir
   action :nothing
 end
