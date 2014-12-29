@@ -10,8 +10,8 @@ tomcat_unpack_dir = "/opt/apache-tomcat-#{tomcat_version}"
 archive_download_path = tomcat_unpack_dir + ".tar.gz"
 group_name = node[:wsi_tomcat][:group][:name]
 user_name = node[:wsi_tomcat][:user][:name]
-mirrors = node[:wsi_tomcat][:file][:mirrors]
-checksum = node[:wsi_tomcat][:file][:checksum]
+mirrors = node[:wsi_tomcat][:file][:archive][:mirrors]
+checksum = node[:wsi_tomcat][:file][:archive][:checksum]
 tomcat_base_dir = "/opt/" + user_name
 
 remote_file archive_download_path do
