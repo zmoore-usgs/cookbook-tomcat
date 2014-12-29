@@ -15,8 +15,7 @@ directory "Create BCDP build dir" do
   path unpack_directory
   owner user_name
   group group_name
-  action :create
-  only_if do not ::File.exists?("#{tomcat_home}/bin/jsvc") end
+  only_if do not ::File.exist?("#{tomcat_home}/bin/jsvc") end
 end
 
 execute "Unpack BCDP source" do
@@ -24,7 +23,7 @@ execute "Unpack BCDP source" do
   group group_name
   command "/bin/tar xvf #{tomcat_home}/bin/commons-daemon-native.tar.gz --strip=1 -C #{unpack_directory}"
   not_if "test -n \"$(ls -A #{unpack_directory})\""
-  only_if do not ::File.exists?("#{tomcat_home}/bin/jsvc") end
+  only_if do not ::File.exist?("#{tomcat_home}/bin/jsvc") end
 end
 
 execute "Run configure on BCDP source" do
@@ -32,7 +31,7 @@ execute "Run configure on BCDP source" do
   user user_name
   group group_name
   cwd work_directory
-  not_if { File.exists?("#{work_directory}/config.status") || File.exists?("#{tomcat_home}/bin/jsvc") }
+  not_if { File.exist?("#{work_directory}/config.status") || File.exist?("#{tomcat_home}/bin/jsvc") }
 end
 
 execute "Run make on BCDP source" do
@@ -40,12 +39,12 @@ execute "Run make on BCDP source" do
   user user_name
   group group_name
   cwd work_directory
-  not_if { File.exists?("#{work_directory}/jsvc") || File.exists?("#{tomcat_home}/bin/jsvc") }
+  not_if { File.exist?("#{work_directory}/jsvc") || File.exist?("#{tomcat_home}/bin/jsvc") }
 end
 
 execute "Copy executable to tomcat bin" do
   command "/bin/cp #{work_directory}/jsvc  #{tomcat_home}/bin"
-  only_if do not ::File.exists?("#{tomcat_home}/bin/jsvc") end
+  only_if do not ::File.exist?("#{tomcat_home}/bin/jsvc") end
 end
 
 file "set permissions on BCDP binary" do
@@ -53,11 +52,12 @@ file "set permissions on BCDP binary" do
   mode 0555
   user user_name
   group group_name
-  only_if do ::File.exists?("#{tomcat_home}/bin/jsvc") end
+  only_if do ::File.exist?("#{tomcat_home}/bin/jsvc") end
 end
 
 directory "Delete BCDP build dir" do
   path unpack_directory
   recursive true
   action :delete
+  only_if do ::File.exist?("#{tomcat_home}/bin/jsvc") end
 end

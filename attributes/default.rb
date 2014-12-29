@@ -9,19 +9,42 @@ default[:wsi_tomcat][:version_base] = default[:wsi_tomcat][:version] .split(".")
 
 # Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
 tomcat_url_fragment                   = "tomcat/tomcat-#{wsi_tomcat.version_base}/v#{wsi_tomcat.version}/bin/apache-tomcat-#{wsi_tomcat.version}.tar.gz"
-default[:wsi_tomcat][:file][:mirrors] = [
+default[:wsi_tomcat][:file][:archive][:mirrors] = [
   "http://mirror.olnevhost.net/pub/apache/#{tomcat_url_fragment}",
   "http://apache.mirrors.lucidnetworks.net/#{tomcat_url_fragment}",
   "http://www.webhostingreviewjam.com/mirror/apache/#{tomcat_url_fragment}",
   "http://mirror.nexcess.net/apache/#{tomcat_url_fragment}"
 ]
-
 # Chef will verify the SHA256 checksum of the downloaded archive
 # Generate SHA256 checksum for a file:
 # http://www.openoffice.org/download/checksums.html#hash_win
 # http://www.openoffice.org/download/checksums.html#hash_linux
 # http://www.openoffice.org/download/checksums.html#hash_mac
-default[:wsi_tomcat][:file][:checksum] = "1ce390049ed23143e3db0c94781c1e88a4d1b39ceb471c0af088a0c326d637cb"
+default[:wsi_tomcat][:file][:archive][:checksum] = "1ce390049ed23143e3db0c94781c1e88a4d1b39ceb471c0af088a0c326d637cb"
 
+# These directories will be added to the tomcat base directory 
+default[:wsi_tomcat][:file][:base_dir][:include] = [
+  "instance",
+  "heapdumps",
+  "data",
+  "run",
+  "share",
+  "ssl",
+  "ssltmp",
+  "archives"
+]
+
+# These directories/files will be removed from the tomcat base directory
+default[:wsi_tomcat][:file][:base_dir][:exclude] = [
+  "temp",
+  "work",
+  "webapps",
+  "LICENSE",
+  "NOTICE",
+  "RELEASE-NOTES",
+  "RUNNING.txt"
+]
+
+# JAVA Installation Options
 # https://supermarket.chef.io/cookbooks/java
 default[:java][:jdk_version]         = "7"
