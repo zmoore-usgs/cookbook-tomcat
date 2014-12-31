@@ -22,6 +22,17 @@ default[:wsi_tomcat][:file][:archive][:mirrors] = [
 # http://www.openoffice.org/download/checksums.html#hash_mac
 default[:wsi_tomcat][:file][:archive][:checksum] = "1ce390049ed23143e3db0c94781c1e88a4d1b39ceb471c0af088a0c326d637cb"
 
+default[:wsi_tomcat][:instances] = {
+  "default" => {
+    :port => 8080,
+    :ssl => false
+  },
+  "test"  => {
+    :port => 8081,
+    :ssl  => true
+  }
+}
+
 # JAVA Installation Options
 # https://supermarket.chef.io/cookbooks/java
-default[:java][:jdk_version]         = "7"
+default[:java][:jdk_version] = "7"

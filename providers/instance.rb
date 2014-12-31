@@ -23,10 +23,11 @@ action :delete do
 end
 
 def load_current_resource 
-  @current_resource.name         = @new_resource.name
-  @current_resource.home         = @new_resource.home
-  @current_resource.port_number  = @new_resource.port_number
-  @@current_resource.ssl_enabled = @new_resource.ssl_enabled
+  @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource.name)
+  @current_resource.name(@new_resource.name)
+  @current_resource.home(@new_resource.home)
+  @current_resource.port(@new_resource.port)
+  @current_resource.ssl(@new_resource.ssl)
   
   if instance_exists?(@current_resource.home, @current_resource.name)
     @current_resource.exists     = true
@@ -35,11 +36,15 @@ end
 
 def instance_exists?(home, name)
   Chef::Log.debug "Checking to see if Tomcat instance '#{name}' exists"
-  File.exists?(File.expand_path(home, name))
+  ::File.exists?(::File.expand_path(name, home))
 end
 
 def create_tomcat_instance
-    
+  name = current_resource.name
+  home = current_resource.home
+  port = current_resource.port
+  ssl  = current_resource.ssl
+  puts "Creating Instance #{name}"
 end
 
 def delete_tomcat_instance
