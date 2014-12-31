@@ -12,10 +12,30 @@
 user_name = node[:wsi_tomcat][:user][:name]
 group_name = node[:wsi_tomcat][:group][:name]
 tomcat_home = node[:wsi_tomcat][:user][:home_dir]
-include_home_dirs = node[:wsi_tomcat][:file][:base_dir][:include]
-exclude_home_dirs = node[:wsi_tomcat][:file][:base_dir][:exclude]
+create_home_dirs = [
+  "instance",
+  "heapdumps",
+  "data",
+  "run",
+  "share",
+  "ssl",
+  "ssltmp",
+  "archives"
+]
+delete_home_dirs = [
+  "temp",
+  "work",
+  "webapps"
 
-include_home_dirs.each do |dir|
+]
+delete_home_files = [
+  "LICENSE",
+  "NOTICE",
+  "RELEASE-NOTES",
+  "RUNNING.txt"
+]
+
+create_home_dirs.each do |dir|
   directory "create directory #{dir} in tomcat home" do
     path ::File.expand_path(dir, tomcat_home)
     owner user_name
@@ -24,19 +44,21 @@ include_home_dirs.each do |dir|
   end
 end
 
-exclude_home_dirs.each do |path|
-  full_path  = File.expand_path(path, tomcat_home);
-  if File.directory?(full_path)
-    directory "remove directory #{full_path} in tomcat home" do
-      path full_path
-      recursive true
-      action :delete
-    end
-  elsif File.file?(full_path)
-    file "remove file #{full_path} in tomcat home" do
-      path full_path
-      action :delete
-    end
+delete_home_dirs.each do |dir|
+  full_path  = File.expand_path(dir, tomcat_home);
+  
+  directory "remove directory #{full_path} in tomcat home" do
+    path full_path
+    recursive true
+    action :delete
   end
+end
 
+delete_home_files.each do |file|
+  full_path  = File.expand_path(file, tomcat_home);
+
+  file "remove file #{full_path} in tomcat home" do
+    path full_path
+    action :delete
+  end
 end

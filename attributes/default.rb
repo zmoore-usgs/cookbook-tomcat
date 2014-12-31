@@ -22,29 +22,6 @@ default[:wsi_tomcat][:file][:archive][:mirrors] = [
 # http://www.openoffice.org/download/checksums.html#hash_mac
 default[:wsi_tomcat][:file][:archive][:checksum] = "1ce390049ed23143e3db0c94781c1e88a4d1b39ceb471c0af088a0c326d637cb"
 
-# These directories will be added to the tomcat base directory 
-default[:wsi_tomcat][:file][:base_dir][:include] = [
-  "instance",
-  "heapdumps",
-  "data",
-  "run",
-  "share",
-  "ssl",
-  "ssltmp",
-  "archives"
-]
-
-# These directories/files will be removed from the tomcat base directory
-default[:wsi_tomcat][:file][:base_dir][:exclude] = [
-  "temp",
-  "work",
-  "webapps",
-  "LICENSE",
-  "NOTICE",
-  "RELEASE-NOTES",
-  "RUNNING.txt"
-]
-
 # JAVA Installation Options
 # https://supermarket.chef.io/cookbooks/java
 default[:java][:jdk_version]         = "7"
