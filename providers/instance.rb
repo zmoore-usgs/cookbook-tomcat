@@ -61,7 +61,7 @@ def create_tomcat_instance
   instance_webapps_path = ::File.expand_path("webapps", instance_home)
   instance_bin_path     = ::File.expand_path("bin", instance_home)
   instance_conf_path    = ::File.expand_path("conf", instance_home)
-  tomcat_init_script    = "tomcat-initscript-#{name}.sh"
+  tomcat_init_script    = "tomcat-#{name}"
   instance_conf_files   = [
     "catalina.policy",
     "catalina.properties",
@@ -158,6 +158,12 @@ def create_tomcat_instance
     not_if ::File.exists?(::File.expand_path("tomcat-juli.jar", instance_bin_path))
   end
   
+  execute "Chkconfig the init script for this instance" do
+    user "root"
+    group "root"
+    command "/sbin/chkconfig --level 234 #{tomcat_init_script} on"
+    not_if "chkconfig | grep -q '#{tomcat_init_script}'"
+  end
   new_resource.updated_by_last_action(true)
 end
 
