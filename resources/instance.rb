@@ -30,4 +30,5 @@ attribute :server_opts,
     "XX:+CMSIncrementalMode",
     "XX:HeapDumpPath=$CATALINA_HOME/heapdumps/#{node.fqdn}/#{r.name}"
     ]}
+    
 attr_accessor :exists

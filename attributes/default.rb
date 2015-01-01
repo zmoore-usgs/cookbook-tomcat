@@ -38,17 +38,17 @@ default[:wsi_tomcat][:instances] = {
       :port => 8444
     },
     :user => {
-      :tomcat_admin_pass => "tomcat_admin",
-      :tomcat_script_pass => "tomcat_script",
-      :tomcat_jmx_pass => "tomcat_jmx"
+      :tomcat_admin_pass => "tomcat-admin",
+      :tomcat_script_pass => "tomcat-script",
+      :tomcat_jmx_pass => "tomcat-jmx"
     }
   },
   "test"  => {
     :port => 8081,
     :user => {
-      :tomcat_admin_pass => "tomcat_admin",
-      :tomcat_script_pass => "tomcat_script",
-      :tomcat_jmx_pass => "tomcat_jmx"
+      :tomcat_admin_pass => "tomcat-admin",
+      :tomcat_script_pass => "tomcat-script",
+      :tomcat_jmx_pass => "tomcat-jmx"
     }
   }
 }

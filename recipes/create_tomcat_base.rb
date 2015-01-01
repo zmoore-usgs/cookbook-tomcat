@@ -5,8 +5,6 @@
 #
 # Description: Creates the Tomcat base directory structure
 #
-# TODO This recipe should be refactored since it's using
-# resource cloning
 # http://scottwb.com/blog/2014/01/24/defeating-the-infamous-chef-3694-warning/
 
 user_name            = node[:wsi_tomcat][:user][:name]
@@ -123,4 +121,21 @@ cookbook_file "Install #{tomcat_init_script} script" do
   owner "root"
   group "root"
   mode 0755
+end
+
+template "#{tomcat_home}/.bash_profile" do
+  source ".bash_profile.erb"
+  owner user_name
+  group group_name
+  mode 0644
+end
+
+template "#{tomcat_home}/.bashrc" do
+  source ".bashrc.erb"
+  owner user_name
+  group group_name
+  mode 0644
+  variables(
+    :tomcat_home => tomcat_home
+  )
 end
