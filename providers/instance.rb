@@ -45,13 +45,17 @@ def instance_exists?(name)
 end
 
 def create_tomcat_instance
-  name           = current_resource.name
-  port           = current_resource.port
-  ssl            = current_resource.ssl
-  tomcat_user    = node[:wsi_tomcat][:user][:name]
-  tomcat_group   = node[:wsi_tomcat][:group][:name]
-  instances_home = ::File.expand_path("instance", current_resource.tomcat_home)
-  instance_home  = ::File.expand_path(name, instances_home)
+  name                  = current_resource.name
+  port                  = current_resource.port
+  ssl                   = current_resource.ssl
+  tomcat_user           = node[:wsi_tomcat][:user][:name]
+  tomcat_group          = node[:wsi_tomcat][:group][:name]
+  manager_archive_name  = node[:wsi_tomcat][:archive][:manager_name]
+  archives_home         = ::File.expand_path("archives", current_resource.tomcat_home)
+  manager_archive_path  = ::File.expand_path(manager_archive_name, archives_home)
+  instances_home        = ::File.expand_path("instance", current_resource.tomcat_home)
+  instance_home         = ::File.expand_path(name, instances_home)
+  instance_webapps_path = ::File.expand_path("webapps", instance_home)
   Chef::Log.info "Creating Instance #{name}"
   
   Chef::Log.info "Creating Instance Directory #{instance_home}"
@@ -69,6 +73,14 @@ def create_tomcat_instance
       group tomcat_group
       action :create
     end
+  end
+  
+  execute "Create manager application for #{name}" do
+    cwd instance_webapps_path
+    user tomcat_user
+    group tomcat_group
+    command "/bin/tar -xvf #{manager_archive_path}"
+    not_if ::File.exists?(::File.expand_path("manager", instance_webapps_path))
   end
   
   new_resource.updated_by_last_action(true)

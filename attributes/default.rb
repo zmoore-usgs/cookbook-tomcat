@@ -33,6 +33,8 @@ default[:wsi_tomcat][:instances] = {
   }
 }
 
+default[:wsi_tomcat][:archive][:manager_name] = "manager_war.tar.gz"
+
 # JAVA Installation Options
 # https://supermarket.chef.io/cookbooks/java
 default[:java][:jdk_version] = "7"

@@ -12,6 +12,9 @@
 user_name = node[:wsi_tomcat][:user][:name]
 group_name = node[:wsi_tomcat][:group][:name]
 tomcat_home = node[:wsi_tomcat][:user][:home_dir]
+manager_archive_name = node[:wsi_tomcat][:archive][:manager_name]
+archives_dir = File.expand_path("archives", tomcat_home)
+
 create_home_dirs = [
   "instance",
   "heapdumps",
@@ -26,7 +29,6 @@ delete_home_dirs = [
   "temp",
   "work",
   "webapps"
-
 ]
 delete_home_files = [
   "LICENSE",
@@ -42,6 +44,14 @@ create_home_dirs.each do |dir|
     group group_name
     only_if { File.exists?(tomcat_home)}
   end
+end
+
+execute "archive manager webapp" do
+  command "/bin/tar -czvf #{File.expand_path(manager_archive_name, archives_dir)} manager"
+  user user_name
+  group group_name
+  cwd File.expand_path("webapps", tomcat_home)
+  not_if { File.exists?(File.expand_path(manager_archive_name, archives_dir))}
 end
 
 delete_home_dirs.each do |dir|
