@@ -2,6 +2,10 @@ def whyrun_supported?
   true
 end
 
+use_inline_resources
+
+
+
 action :create do
   if @current_resource.exists
     Chef::Log.info "Tomcat instance #{ @new_resource } already exists - nothing to do."
@@ -25,29 +29,58 @@ end
 def load_current_resource 
   @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.home(@new_resource.home)
   @current_resource.port(@new_resource.port)
   @current_resource.ssl(@new_resource.ssl)
-  
-  if instance_exists?(@current_resource.home, @current_resource.name)
+  @current_resource.tomcat_home(@new_resource.tomcat_home)
+  if instance_exists?(@current_resource.name)
     @current_resource.exists     = true
   end
 end
 
-def instance_exists?(home, name)
+def instance_exists?(name)
   Chef::Log.debug "Checking to see if Tomcat instance '#{name}' exists"
-  ::File.exists?(::File.expand_path(name, home))
+  instances_home = ::File.expand_path("instance", current_resource.tomcat_home)
+  instance_home = ::File.expand_path(name, instances_home)
+  ::File.exists?(instance_home) && ::File.directory?(instance_home)
 end
 
 def create_tomcat_instance
-  name = current_resource.name
-  home = current_resource.home
-  port = current_resource.port
-  ssl  = current_resource.ssl
-  puts "Creating Instance #{name}"
+  name           = current_resource.name
+  port           = current_resource.port
+  ssl            = current_resource.ssl
+  tomcat_user    = node[:wsi_tomcat][:user][:name]
+  tomcat_group   = node[:wsi_tomcat][:group][:name]
+  instances_home = ::File.expand_path("instance", current_resource.tomcat_home)
+  instance_home  = ::File.expand_path(name, instances_home)
+  Chef::Log.info "Creating Instance #{name}"
+  
+  Chef::Log.info "Creating Instance Directory #{instance_home}"
+  directory instance_home do
+    owner tomcat_user
+    group tomcat_group
+    action :create
+  end
+  
+  # Create the required directories in the instance directory
+  %w{bin conf lib logs temp webapps work}.each do |dir|
+    Chef::Log.info "Creating Instance subdirectory #{dir}"
+    directory ::File.expand_path(dir, instance_home) do
+      owner tomcat_user
+      group tomcat_group
+      action :create
+    end
+  end
+  
+  new_resource.updated_by_last_action(true)
 end
 
 def delete_tomcat_instance
-  
+  instances_home = ::File.expand_path("instance", current_resource.tomcat_home)
+  instance_home  = ::File.expand_path(name, instances_home)
+  directory instance_home do
+    recursive true
+    action :delete
+  end
+  new_resource.updated_by_last_action(true)
 end
 

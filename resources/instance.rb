@@ -12,8 +12,8 @@ attribute :port,
 attribute :ssl,
   :kind_of => [ TrueClass, FalseClass ],
   :default => false
-attribute :home,
+attribute :tomcat_home,
   :kind_of => String,
-  :default => "/opt/tomcat"
+  :default => node[:wsi_tomcat][:user][:home_dir]
   
 attr_accessor :exists  
