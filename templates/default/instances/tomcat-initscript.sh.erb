@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# !!!!!!! This file created by Chef !!!!!!! 
+# Any edits to this file will be overwritten
+
+# description: Tomcat <%= @instance_name %> Instance Start/Stop/Restart
+# processname: tomcat
+# chkconfig: 234 20 80
+
+# /bin/su -s /bin/bash tomcat -- <%= @tomcat_home %>/bin/tomcat "$@" <%= @instance_name %>
+
+case $1 in
+start)
+/bin/su -s /bin/bash tomcat -- <%= @tomcat_home %>/bin/tomcat start <%= @instance_name %>
+;;
+stop)
+/bin/su -s /bin/bash tomcat -- <%= @tomcat_home %>/bin/tomcat stop <%= @instance_name %>
+;;
+restart)
+/bin/su -s /bin/bash tomcat -- <%= @tomcat_home %>/bin/tomcat stop <%= @instance_name %>
+/bin/su -s /bin/bash tomcat -- <%= @tomcat_home %>/bin/tomcat start <%= @instance_name %>
+;;
+esac
+exit 0

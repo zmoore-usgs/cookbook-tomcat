@@ -50,16 +50,18 @@ def create_tomcat_instance
   port                  = current_resource.port
   ssl                   = current_resource.ssl
   server_opts           = current_resource.server_opts
+  tomcat_home           = current_resource.tomcat_home
   tomcat_user           = node[:wsi_tomcat][:user][:name]
   tomcat_group          = node[:wsi_tomcat][:group][:name]
   manager_archive_name  = node[:wsi_tomcat][:archive][:manager_name]
-  archives_home         = ::File.expand_path("archives", current_resource.tomcat_home)
+  archives_home         = ::File.expand_path("archives", tomcat_home)
   manager_archive_path  = ::File.expand_path(manager_archive_name, archives_home)
-  instances_home        = ::File.expand_path("instance", current_resource.tomcat_home)
+  instances_home        = ::File.expand_path("instance", tomcat_home)
   instance_home         = ::File.expand_path(name, instances_home)
   instance_webapps_path = ::File.expand_path("webapps", instance_home)
   instance_bin_path     = ::File.expand_path("bin", instance_home)
   instance_conf_path    = ::File.expand_path("conf", instance_home)
+  tomcat_init_script    = "tomcat-initscript-#{name}.sh"
   instance_conf_files   = [
     "catalina.policy",
     "catalina.properties",
@@ -126,6 +128,18 @@ def create_tomcat_instance
     :server_opts => server_opts
     )
     mode 0744
+  end
+  
+  template "Install #{tomcat_init_script} script" do
+    path "/etc/init.d/#{tomcat_init_script}"
+    source "instances/tomcat-initscript.sh.erb"
+    owner "root"
+    group "root"
+    variables(
+    :instance_name => name,
+    :tomcat_home => tomcat_home
+    )
+    mode 0755
   end
   
   execute "Create manager application for #{name}" do
