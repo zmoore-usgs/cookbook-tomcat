@@ -23,23 +23,29 @@ default[:wsi_tomcat][:file][:archive][:mirrors] = [
 # http://www.openoffice.org/download/checksums.html#hash_mac
 default[:wsi_tomcat][:file][:archive][:checksum] = "1ce390049ed23143e3db0c94781c1e88a4d1b39ceb471c0af088a0c326d637cb"
 
+# Instances definition 
 default[:wsi_tomcat][:instances] = {
   "default" => {
     :port => 8080,
-    :ssl => false
+    :user => {
+      :tomcat_admin_pass => "tomcat_admin",
+      :tomcat_script_pass => "tomcat_script",
+      :tomcat_jmx_pass => "tomcat_jmx"
+    }
   },
   "test"  => {
     :port => 8081,
-    :ssl  => true
+    :ssl  => {
+      :enabled => true,
+      :port => 8444
+    },
+    :user => {
+      :tomcat_admin_pass => "tomcat_admin",
+      :tomcat_script_pass => "tomcat_script",
+      :tomcat_jmx_pass => "tomcat_jmx"
+    }
   }
 }
-# Tomcat user credentials
-default[:wsi_tomcat][:default][:user][:tomcat_admin_pass] = "tomcat_admin"
-default[:wsi_tomcat][:default][:user][:tomcat_script_pass] = "tomcat_script"
-default[:wsi_tomcat][:default][:user][:tomcat_jmx_pass] = "tomcat_jmx"
-default[:wsi_tomcat][:test][:user][:tomcat_admin_pass] = "tomcat_admin"
-default[:wsi_tomcat][:test][:user][:tomcat_script_pass] = "tomcat_script"
-default[:wsi_tomcat][:test][:user][:tomcat_jmx_pass] = "tomcat_jmx"
 
 default[:wsi_tomcat][:archive][:manager_name] = "manager_war.tar.gz"
 

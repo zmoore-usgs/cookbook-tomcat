@@ -10,8 +10,11 @@ attribute :port,
   :kind_of  => Fixnum,
   :required => true
 attribute :ssl,
-  :kind_of => [ TrueClass, FalseClass ],
-  :default => false
+  :kind_of => Hash,
+  :default => {
+    :enabled => false,
+    :port => NilClass
+  }
 attribute :tomcat_home,
   :kind_of => String,
   :default => node[:wsi_tomcat][:user][:home_dir]

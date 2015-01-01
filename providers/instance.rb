@@ -94,10 +94,11 @@ def create_tomcat_instance
       owner tomcat_user
       group tomcat_group
       source "instances/conf/#{tpl}.erb"
+      sensitive true
       variables(
-        :tomcat_admin_pass => node[:wsi_tomcat][name][:user][:tomcat_admin_pass] || "tomcat_admin",
-        :tomcat_script_pass => node[:wsi_tomcat][name][:user][:tomcat_script_pass] || "tomcat_script",
-        :tomcat_jmx_pass => node[:wsi_tomcat][name][:user][:tomcat_jmx_pass] || "tomcat_jmx"
+        :tomcat_admin_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_admin_pass] || "tomcat_admin",
+        :tomcat_script_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_script_pass] || "tomcat_script",
+        :tomcat_jmx_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_jmx_pass] || "tomcat_jmx"
       )
     end
   end
