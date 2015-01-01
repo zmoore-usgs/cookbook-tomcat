@@ -1,0 +1,7 @@
+# This file created by Chef - Any edits to this file will be overwritten
+# 
+# Please use the following format in this file: CATALINA_OPTS="$CATALINA_OPTS <option>"
+
+<% @server_opts.each do |opt| -%>
+CATALINA_OPTS="$CATALINA_OPTS -<%= "#{opt}" %>"
+<% end -%>

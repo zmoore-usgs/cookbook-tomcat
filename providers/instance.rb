@@ -32,6 +32,7 @@ def load_current_resource
   @current_resource.port(@new_resource.port)
   @current_resource.ssl(@new_resource.ssl)
   @current_resource.tomcat_home(@new_resource.tomcat_home)
+  @current_resource.server_opts(@new_resource.server_opts)
   if instance_exists?(@current_resource.name)
     @current_resource.exists     = true
   end
@@ -48,6 +49,7 @@ def create_tomcat_instance
   name                  = current_resource.name
   port                  = current_resource.port
   ssl                   = current_resource.ssl
+  server_opts           = current_resource.server_opts
   tomcat_user           = node[:wsi_tomcat][:user][:name]
   tomcat_group          = node[:wsi_tomcat][:group][:name]
   manager_archive_name  = node[:wsi_tomcat][:archive][:manager_name]
@@ -69,7 +71,6 @@ def create_tomcat_instance
     "web.xml"
   ]
   instance_bin_files = [
-    "catalinaopts.sh",
     "setenv.sh"
   ]
   
@@ -115,6 +116,16 @@ def create_tomcat_instance
       group tomcat_group
       mode 0744
     end
+  end
+  
+  template "#{::File.expand_path('catalinaopts.sh', instance_bin_path)}" do
+    source "instances/bin/catalinaopts.sh.erb"
+    owner tomcat_user
+    group tomcat_group
+    variables(
+    :server_opts => server_opts
+    )
+    mode 0744
   end
   
   execute "Create manager application for #{name}" do

@@ -18,5 +18,16 @@ attribute :ssl,
 attribute :tomcat_home,
   :kind_of => String,
   :default => node[:wsi_tomcat][:user][:home_dir]
-  
-attr_accessor :exists  
+attribute :server_opts,
+  :kind_of => [Array, String],
+  :default => lazy { |r| [
+    "server",
+    "XX:MaxPermSize=256m",
+    "Xmx1024m",
+    "XX:+HeapDumpOnOutOfMemoryError",
+    "XX:+UseConcMarkSweepGC",
+    "XX:+CMSClassUnloadingEnabled",
+    "XX:+CMSIncrementalMode",
+    "XX:HeapDumpPath=$CATALINA_HOME/heapdumps/#{node.fqdn}/#{r.name}"
+    ]}
+attr_accessor :exists
