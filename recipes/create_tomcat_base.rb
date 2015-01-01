@@ -50,7 +50,9 @@ delete_bin_files = [
   "configtest.bat"
 ]
 create_bin_files = [
-  "tomcat-initscript.sh"
+  "tomcat",
+  "start_default",
+  "stop_default"
 ]
 
 create_home_dirs.each do |dir|
@@ -108,14 +110,15 @@ end
 
 create_bin_files.each do |file|
   cookbook_file "#{File.expand_path(file, bin_dir)}" do
-    source file
+    source "bin/#{file}"
     owner user_name
     group group_name
+    mode 0755
   end
 end
 
 cookbook_file "Install #{tomcat_init_script} script" do
-  path "/etc/init.d/#{tomcat_init_script}"
+  path "/etc/init.d/tomcat"
   source "#{tomcat_init_script}"
   owner "root"
   group "root"

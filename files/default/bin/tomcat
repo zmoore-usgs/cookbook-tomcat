@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#     !!!!!!! This file created by Chef !!!!!!! 
+#    Any edits to this file will be overwritten
+
 ##
 ## Controls the tomcat daemon
 ##
@@ -38,7 +41,7 @@ setup_catalina_environ() {
                -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
                -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
     export JSVC="${CATALINA_HOME}/bin/jsvc"
-    export JAVA_HOME="/usr/java/default"	# NOTE: Our ansible requires advanced java installed (to build jsvc).  We symlink this directory for legacy support
+    export JAVA_HOME="${JAVA_HOME}"
 
     # Source user changes
     source "$CATALINA_HOME/instance/$name/bin/setenv.sh"

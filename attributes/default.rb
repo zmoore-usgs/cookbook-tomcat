@@ -24,9 +24,19 @@ default[:wsi_tomcat][:file][:archive][:mirrors] = [
 default[:wsi_tomcat][:file][:archive][:checksum] = "1ce390049ed23143e3db0c94781c1e88a4d1b39ceb471c0af088a0c326d637cb"
 
 # Instances definition 
+# port = The port that the tomcat instance will run on
+# ssl  = Optional. Defines SSL configuration for instance. 
+#   ssl.enabled = Defines whether SSL will be used on instance. 
+#   ssl.port = The port that SSL will run on
+# user = Defines credentials for various tomcat users
+#    See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access   
 default[:wsi_tomcat][:instances] = {
   "default" => {
     :port => 8080,
+    :ssl  => {
+      :enabled => true,
+      :port => 8444
+    },
     :user => {
       :tomcat_admin_pass => "tomcat_admin",
       :tomcat_script_pass => "tomcat_script",
@@ -35,10 +45,6 @@ default[:wsi_tomcat][:instances] = {
   },
   "test"  => {
     :port => 8081,
-    :ssl  => {
-      :enabled => true,
-      :port => 8444
-    },
     :user => {
       :tomcat_admin_pass => "tomcat_admin",
       :tomcat_script_pass => "tomcat_script",
@@ -52,3 +58,4 @@ default[:wsi_tomcat][:archive][:manager_name] = "manager_war.tar.gz"
 # JAVA Installation Options
 # https://supermarket.chef.io/cookbooks/java
 default[:java][:jdk_version] = "7"
+default[:java][:set_etc_environment] = true
