@@ -68,6 +68,10 @@ def create_tomcat_instance
     "tomcat-users.xml",
     "web.xml"
   ]
+  instance_bin_files = [
+    "catalinaopts.sh",
+    "setenv.sh"
+  ]
   
   Chef::Log.info "Creating Instance #{name}"
   
@@ -103,6 +107,16 @@ def create_tomcat_instance
     end
   end
   
+  instance_bin_files.each do |bin_file|
+    Chef::Log.info "Copying bin file #{bin_file}"
+    cookbook_file "#{::File.expand_path(bin_file, instance_bin_path)}" do
+      source "instances/bin/#{bin_file}"
+      owner tomcat_user
+      group tomcat_group
+      mode 0744
+    end
+  end
+  
   execute "Create manager application for #{name}" do
     cwd instance_webapps_path
     user tomcat_user
@@ -111,6 +125,7 @@ def create_tomcat_instance
     not_if ::File.exists?(::File.expand_path("manager", instance_webapps_path))
   end
   
+  # TODO This can probably be symlinked to the base tomcat directory
   execute "Copy tomcat-juli to instance #{name}" do
     user tomcat_user
     group tomcat_group

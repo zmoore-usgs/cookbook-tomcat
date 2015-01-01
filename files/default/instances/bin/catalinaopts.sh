@@ -1,0 +1,10 @@
+# Please use the following format in this file: CATALINA_OPTS="$CATALINA_OPTS <option>"
+
+CATALINA_OPTS="$CATALINA_OPTS -server"
+CATALINA_OPTS="$CATALINA_OPTS -XX:MaxPermSize=256m"
+CATALINA_OPTS="$CATALINA_OPTS -Xmx1024m"
+CATALINA_OPTS="$CATALINA_OPTS -XX:+HeapDumpOnOutOfMemoryError"
+CATALINA_OPTS="$CATALINA_OPTS -XX:+UseConcMarkSweepGC"
+CATALINA_OPTS="$CATALINA_OPTS -XX:+CMSClassUnloadingEnabled"
+CATALINA_OPTS="$CATALINA_OPTS -XX:+CMSIncrementalMode"
+CATALINA_OPTS="$CATALINA_OPTS -XX:HeapDumpPath=$CATALINA_HOME/heapdumps/cida-eros-wsdev/default"

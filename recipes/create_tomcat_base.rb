@@ -16,6 +16,7 @@ manager_archive_name = node[:wsi_tomcat][:archive][:manager_name]
 archives_dir         = File.expand_path("archives", tomcat_home)
 bin_dir              = File.expand_path("bin", tomcat_home)
 juli_jar_name        = "tomcat-juli.jar"
+tomcat_init_script   = "tomcat-initscript.sh"
 
 create_home_dirs = [
   "instance",
@@ -107,8 +108,16 @@ end
 
 create_bin_files.each do |file|
   cookbook_file "#{File.expand_path(file, bin_dir)}" do
-    path file
+    source file
     owner user_name
     group group_name
   end
+end
+
+cookbook_file "Install #{tomcat_init_script} script" do
+  path "/etc/init.d/#{tomcat_init_script}"
+  source "#{tomcat_init_script}"
+  owner "root"
+  group "root"
+  mode 0755
 end
