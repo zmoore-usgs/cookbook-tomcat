@@ -56,6 +56,19 @@ def create_tomcat_instance
   instances_home        = ::File.expand_path("instance", current_resource.tomcat_home)
   instance_home         = ::File.expand_path(name, instances_home)
   instance_webapps_path = ::File.expand_path("webapps", instance_home)
+  instance_bin_path     = ::File.expand_path("bin", instance_home)
+  instance_conf_path    = ::File.expand_path("conf", instance_home)
+  instance_conf_files   = [
+    "catalina.policy",
+    "catalina.properties",
+    "logging.properties",
+    "context.xml",
+    "logging.properties",
+    "server.xml",
+    "tomcat-users.xml",
+    "web.xml"
+  ]
+  
   Chef::Log.info "Creating Instance #{name}"
   
   Chef::Log.info "Creating Instance Directory #{instance_home}"
@@ -75,12 +88,33 @@ def create_tomcat_instance
     end
   end
   
+  instance_conf_files.each do |tpl|
+    Chef::Log.info "Creating configuration file #{tpl}"
+    template ::File.expand_path(tpl, instance_conf_path) do
+      owner tomcat_user
+      group tomcat_group
+      source "instances/conf/#{tpl}.erb"
+      variables(
+        :tomcat_admin_pass => node[:wsi_tomcat][name][:user][:tomcat_admin_pass] || "tomcat_admin",
+        :tomcat_script_pass => node[:wsi_tomcat][name][:user][:tomcat_script_pass] || "tomcat_script",
+        :tomcat_jmx_pass => node[:wsi_tomcat][name][:user][:tomcat_jmx_pass] || "tomcat_jmx"
+      )
+    end
+  end
+  
   execute "Create manager application for #{name}" do
     cwd instance_webapps_path
     user tomcat_user
     group tomcat_group
     command "/bin/tar -xvf #{manager_archive_path}"
     not_if ::File.exists?(::File.expand_path("manager", instance_webapps_path))
+  end
+  
+  execute "Copy tomcat-juli to instance #{name}" do
+    user tomcat_user
+    group tomcat_group
+    command "/bin/cp #{archives_home}/tomcat-juli.jar #{instance_bin_path}"
+    not_if ::File.exists?(::File.expand_path("tomcat-juli.jar", instance_bin_path))
   end
   
   new_resource.updated_by_last_action(true)

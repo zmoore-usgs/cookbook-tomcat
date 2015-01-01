@@ -3,6 +3,7 @@ default[:wsi_tomcat][:group][:name]    = "tomcat"
 default[:wsi_tomcat][:user][:name]     = "tomcat"
 default[:wsi_tomcat][:user][:home_dir] = "/opt/tomcat"
 
+
 # Set the version of Tomcat to install
 default[:wsi_tomcat][:version]      = "7.0.57"
 default[:wsi_tomcat][:version_base] = default[:wsi_tomcat][:version] .split(".")[0]
@@ -32,6 +33,13 @@ default[:wsi_tomcat][:instances] = {
     :ssl  => true
   }
 }
+# Tomcat user credentials
+default[:wsi_tomcat][:default][:user][:tomcat_admin_pass] = "tomcat_admin"
+default[:wsi_tomcat][:default][:user][:tomcat_script_pass] = "tomcat_script"
+default[:wsi_tomcat][:default][:user][:tomcat_jmx_pass] = "tomcat_jmx"
+default[:wsi_tomcat][:test][:user][:tomcat_admin_pass] = "tomcat_admin"
+default[:wsi_tomcat][:test][:user][:tomcat_script_pass] = "tomcat_script"
+default[:wsi_tomcat][:test][:user][:tomcat_jmx_pass] = "tomcat_jmx"
 
 default[:wsi_tomcat][:archive][:manager_name] = "manager_war.tar.gz"
 
