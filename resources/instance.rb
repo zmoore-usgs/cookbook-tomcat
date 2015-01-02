@@ -22,6 +22,9 @@ attribute :cors,
 attribute :tomcat_home,
   :kind_of => String,
   :default => node[:wsi_tomcat][:user][:home_dir]
+attribute :auto_start,
+  :kind_of => [TrueClass, FalseClass],
+  :default => true
 attribute :server_opts,
   :kind_of => [Array, String],
   :default => lazy { |r| [

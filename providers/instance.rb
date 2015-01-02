@@ -34,6 +34,7 @@ def load_current_resource
   @current_resource.cors(@new_resource.cors)
   @current_resource.tomcat_home(@new_resource.tomcat_home)
   @current_resource.server_opts(@new_resource.server_opts)
+  @current_resource.auto_start(@new_resource.auto_start)
   if instance_exists?(@current_resource.name)
     @current_resource.exists     = true
   end
@@ -53,6 +54,7 @@ def create_tomcat_instance
   server_opts           = current_resource.server_opts
   tomcat_home           = current_resource.tomcat_home
   cors                  = current_resource.cors
+  auto_start            = current_resource.auto_start
   tomcat_user           = node[:wsi_tomcat][:user][:name]
   tomcat_group          = node[:wsi_tomcat][:group][:name]
   manager_archive_name  = node[:wsi_tomcat][:archive][:manager_name]
@@ -189,6 +191,13 @@ def create_tomcat_instance
     group "root"
     command "/sbin/chkconfig --level 234 #{tomcat_init_script} on"
     not_if "chkconfig | grep -q '#{tomcat_init_script}'"
+  end
+  
+  execute "Start tomcat instance #{name}" do
+    command "/bin/bash service tomcat start #{name}"
+    user "root"
+    group "root"
+    only_if { auto_start }
   end
   new_resource.updated_by_last_action(true)
 end
