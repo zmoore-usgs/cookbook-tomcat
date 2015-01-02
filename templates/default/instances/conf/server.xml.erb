@@ -1,4 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
+<!-- 
+    !!!!!!! This file created by Chef !!!!!!! 
+    Any edits to this file will be overwritten
+-->
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -52,7 +56,7 @@
        Documentation at /docs/config/service.html
    -->
   <Service name="Catalina">
-
+    <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/executor.html -->
     <Executor
         name="tomcatThreadPool"
         namePrefix="catalina-exec-" 
@@ -69,20 +73,20 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL HTTP/1.1 Connector on port 8080
     -->
-
+    <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/http.html -->
     <Connector
-        port="8080"
+        port="<%= @port %>"
         protocol="HTTP/1.1"
         executor="tomcatThreadPool"
         connectionTimeout="20000" 
-        redirectPort="8443"
+        redirectPort="<%= @ssl_port %>"
     />
 
     <Connector
-        port="8443"
+        port="<%= @ssl_port %>"
         protocol="HTTP/1.1" 
         executor="tomcatThreadPool"
-        SSLEnabled="true"
+        SSLEnabled="<%= @ssl_enabled %>"
         SSLProtocol="TLS"
         sslEnabledProtocols="TLSv1.2,TLSv1.1,TLSv1"
         SSLCipherSuite="ALL:!LOW:!EXP:!SSLv2"
@@ -93,12 +97,13 @@
         scheme="https" 
         secure="true"
     />
-
+    
+    <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/ajp.html -->
     <Connector 
-        port="8009"
+        port="<%= @ajp_port %>"
         protocol="AJP/1.3"
         executor="tomcatThreadPool"
-        redirectPort="8443"
+        redirectPort="<%= @ssl_port %>"
         allowTrace="false"
         emptySessionPath="false"
         tcpNoDelay="true"

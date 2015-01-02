@@ -12,8 +12,12 @@ attribute :port,
 attribute :ssl,
   :kind_of => Hash,
   :default => {
-    :enabled => false,
-    :port => NilClass
+    :enabled => false
+  }
+attribute :cors,
+  :kind_of => Hash,
+  :default => {
+    :enabled => false
   }
 attribute :tomcat_home,
   :kind_of => String,

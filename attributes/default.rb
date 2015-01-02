@@ -26,16 +26,26 @@ default[:wsi_tomcat][:file][:archive][:checksum] = "1ce390049ed23143e3db0c94781c
 # Instances definition 
 # port = The port that the tomcat instance will run on
 # ssl  = Optional. Defines SSL configuration for instance. 
-#   ssl.enabled = Defines whether SSL will be used on instance. 
-#   ssl.port = The port that SSL will run on
+#   ssl.enabled = Defines whether SSL will be used on instance
 # user = Defines credentials for various tomcat users
 #    See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access   
 default[:wsi_tomcat][:instances] = {
   "default" => {
     :port => 8080,
     :ssl  => {
+      :enabled => true
+    },
+    :cors => {
       :enabled => true,
-      :port => 8444
+      :allowed => { 
+        :origins => "*",
+        :methods => ["GET", "POST", "HEAD", "OPTIONS"],
+        :headers => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
+      },
+      :exposed_headers => [],
+      :preflight_maxage => 1800,
+      :support_credentials => true,
+      :filter => "/*"
     },
     :user => {
       :tomcat_admin_pass => "tomcat-admin",

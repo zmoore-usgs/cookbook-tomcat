@@ -475,6 +475,55 @@
 
 
   <!-- ==================== Built In Filter Mappings ====================== -->
+ 
+ <% if @cors[:enabled] -%>
+ <!-- CORS filter http://tomcat.apache.org/tomcat-7.0-doc/config/filter.html#CORS_Filter -->
+ <filter>
+   <filter-name>CorsFilter</filter-name>
+   <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+   <init-param>
+     <param-name>cors.allowed.origins</param-name>
+     <param-value><%= @cors[:allowed][:origins] %></param-value>
+   </init-param>
+   <init-param>
+     <param-name>cors.allowed.methods</param-name>
+     <param-value>
+     <% @cors[:allowed][:methods].each do |method| -%>
+     <%= method %>,
+     <% end -%>
+     </param-value>
+   </init-param>
+   <init-param>
+     <param-name>cors.allowed.headers</param-name>
+     <param-value>
+     <% @cors[:allowed][:headers].each do |header| -%>
+     <%= header %>,
+     <% end -%>
+     </param-value>
+   </init-param>
+   <init-param>
+     <param-name>cors.exposed.headers</param-name>
+     <param-value>
+     <% @cors[:exposed_headers].each do |header| -%>
+     <%= header %>,
+     <% end -%>
+     </param-value>
+   </init-param>
+   <init-param>
+     <param-name>cors.support.credentials</param-name>
+     <param-value><%= @cors[:support_credentials].to_s %></param-value>
+   </init-param>
+   <init-param>
+     <param-name>cors.preflight.maxage</param-name>
+     <param-value><%= @cors[:preflight_maxage] %></param-value>
+   </init-param>
+ </filter>
+ <filter-mapping>
+   <filter-name>CorsFilter</filter-name>
+   <url-pattern><%= @cors[:filter] %></url-pattern>
+ </filter-mapping>
+ <% end -%>
+
 
   <!-- The mapping for the Set Character Encoding Filter -->
 <!--

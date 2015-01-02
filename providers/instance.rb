@@ -31,6 +31,7 @@ def load_current_resource
   @current_resource.name(@new_resource.name)
   @current_resource.port(@new_resource.port)
   @current_resource.ssl(@new_resource.ssl)
+  @current_resource.cors(@new_resource.cors)
   @current_resource.tomcat_home(@new_resource.tomcat_home)
   @current_resource.server_opts(@new_resource.server_opts)
   if instance_exists?(@current_resource.name)
@@ -51,6 +52,7 @@ def create_tomcat_instance
   ssl                   = current_resource.ssl
   server_opts           = current_resource.server_opts
   tomcat_home           = current_resource.tomcat_home
+  cors                  = current_resource.cors
   tomcat_user           = node[:wsi_tomcat][:user][:name]
   tomcat_group          = node[:wsi_tomcat][:group][:name]
   manager_archive_name  = node[:wsi_tomcat][:archive][:manager_name]
@@ -61,7 +63,21 @@ def create_tomcat_instance
   instance_webapps_path = ::File.expand_path("webapps", instance_home)
   instance_bin_path     = ::File.expand_path("bin", instance_home)
   instance_conf_path    = ::File.expand_path("conf", instance_home)
+  ssl_port              = port + 363 # Default 8443 when regular port is 8080
+  ajp_port              = port - 71 # Default port is 8009 when regular port is 8080
   tomcat_init_script    = "tomcat-#{name}"
+  default_cors          = {
+      :enabled => true,
+      :allowed => { 
+        :origins => "*",
+        :methods => ["GET", "POST", "HEAD", "OPTIONS"],
+        :headers => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
+      },
+      :exposed_headers     => [],
+      :preflight_maxage    => 1800,
+      :support_credentials => true,
+      :filter => "/*"
+    }
   instance_conf_files   = [
     "catalina.policy",
     "catalina.properties",
@@ -95,6 +111,11 @@ def create_tomcat_instance
     end
   end
   
+  # Make sure that all CORS values are set
+  if cors[:enabled]
+    cors = default_cors.merge(cors)
+  end
+  
   instance_conf_files.each do |tpl|
     Chef::Log.info "Creating configuration file #{tpl}"
     template ::File.expand_path(tpl, instance_conf_path) do
@@ -103,9 +124,14 @@ def create_tomcat_instance
       source "instances/conf/#{tpl}.erb"
       sensitive true
       variables(
-        :tomcat_admin_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_admin_pass] || "tomcat_admin",
-        :tomcat_script_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_script_pass] || "tomcat_script",
-        :tomcat_jmx_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_jmx_pass] || "tomcat_jmx"
+        :tomcat_admin_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_admin_pass],
+        :tomcat_script_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_script_pass],
+        :tomcat_jmx_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_jmx_pass],
+        :port => port,
+        :ssl_port => ssl_port,
+        :ajp_port => ajp_port,
+        :ssl_enabled => ssl[:enabled],
+        :cors => cors
       )
     end
   end
