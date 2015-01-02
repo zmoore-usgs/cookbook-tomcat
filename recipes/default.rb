@@ -15,5 +15,3 @@ include_recipe "wsi_tomcat::commons_daemon"
 include_recipe "wsi_tomcat::create_tomcat_base"
 
 include_recipe "wsi_tomcat::create_tomcat_instances"
-
-#include_recipe "wsi_tomcat::cleanup_tomcat_base"

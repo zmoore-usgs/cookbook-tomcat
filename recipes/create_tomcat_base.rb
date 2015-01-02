@@ -10,6 +10,7 @@
 user_name            = node[:wsi_tomcat][:user][:name]
 group_name           = node[:wsi_tomcat][:group][:name]
 tomcat_home          = node[:wsi_tomcat][:user][:home_dir]
+java_home            = node[:java][:java_home]
 manager_archive_name = node[:wsi_tomcat][:archive][:manager_name]
 archives_dir         = File.expand_path("archives", tomcat_home)
 bin_dir              = File.expand_path("bin", tomcat_home)
@@ -115,12 +116,17 @@ create_bin_files.each do |file|
   end
 end
 
-cookbook_file "Install #{tomcat_init_script} script" do
+template "Install #{tomcat_init_script} script" do
   path "/etc/init.d/tomcat"
-  source "#{tomcat_init_script}"
+  source "#{tomcat_init_script}.erb"
   owner "root"
   group "root"
   mode 0755
+  variables(
+    :tomcat_home => tomcat_home,
+    :java_home => java_home,
+    :tomcat_user => user_name
+  )
 end
 
 template "#{tomcat_home}/.bash_profile" do
