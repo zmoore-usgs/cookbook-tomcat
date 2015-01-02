@@ -10,6 +10,7 @@ group_name = node[:wsi_tomcat][:group][:name]
 tomcat_home = node[:wsi_tomcat][:user][:home_dir]
 unpack_directory = "/opt/commons_daemon"
 work_directory = "#{unpack_directory}/unix"
+java_home = lambda {node[:java][:java_home]} # This needs lazy evaluation
 
 directory "Create BCDP build dir" do
   path unpack_directory
@@ -27,10 +28,11 @@ execute "Unpack BCDP source" do
 end
 
 execute "Run configure on BCDP source" do
-  command "./configure"
+  command "./configure --with-java=#{java_home.call}"
   user user_name
   group group_name
   cwd work_directory
+  environment  "JAVA_HOME" => java_home.call 
   not_if { File.exist?("#{work_directory}/config.status") || File.exist?("#{tomcat_home}/bin/jsvc") }
 end
 
