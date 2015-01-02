@@ -3,6 +3,7 @@ default[:wsi_tomcat][:group][:name]    = "tomcat"
 default[:wsi_tomcat][:user][:name]     = "tomcat"
 default[:wsi_tomcat][:user][:home_dir] = "/opt/tomcat"
 
+
 # Set the version of Tomcat to install
 default[:wsi_tomcat][:version]      = "7.0.57"
 default[:wsi_tomcat][:version_base] = default[:wsi_tomcat][:version] .split(".")[0]
@@ -22,29 +23,50 @@ default[:wsi_tomcat][:file][:archive][:mirrors] = [
 # http://www.openoffice.org/download/checksums.html#hash_mac
 default[:wsi_tomcat][:file][:archive][:checksum] = "1ce390049ed23143e3db0c94781c1e88a4d1b39ceb471c0af088a0c326d637cb"
 
-# These directories will be added to the tomcat base directory 
-default[:wsi_tomcat][:file][:base_dir][:include] = [
-  "instance",
-  "heapdumps",
-  "data",
-  "run",
-  "share",
-  "ssl",
-  "ssltmp",
-  "archives"
-]
+# Instances definition 
+# port = The port that the tomcat instance will run on
+# ssl  = Optional. Defines SSL configuration for instance. 
+#   ssl.enabled = Defines whether SSL will be used on instance
+# user = Defines credentials for various tomcat users
+#    See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access   
+default[:wsi_tomcat][:instances] = {
+  "default" => {
+    :port => 8080,
+    :ssl  => {
+      :enabled => true
+    },
+    :cors => {
+      :enabled => true,
+      :allowed => { 
+        :origins => "*",
+        :methods => ["GET", "POST", "HEAD", "OPTIONS"],
+        :headers => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
+      },
+      :exposed_headers => [],
+      :preflight_maxage => 1800,
+      :support_credentials => true,
+      :filter => "/*"
+    },
+    :user => {
+      :tomcat_admin_pass => "tomcat-admin",
+      :tomcat_script_pass => "tomcat-script",
+      :tomcat_jmx_pass => "tomcat-jmx"
+    }
+  },
+  "test"  => {
+    :port => 8081,
+    :user => {
+      :tomcat_admin_pass => "tomcat-admin",
+      :tomcat_script_pass => "tomcat-script",
+      :tomcat_jmx_pass => "tomcat-jmx"
+    },
+    :auto_start => false
+  }
+}
 
-# These directories/files will be removed from the tomcat base directory
-default[:wsi_tomcat][:file][:base_dir][:exclude] = [
-  "temp",
-  "work",
-  "webapps",
-  "LICENSE",
-  "NOTICE",
-  "RELEASE-NOTES",
-  "RUNNING.txt"
-]
+default[:wsi_tomcat][:archive][:manager_name] = "manager_war.tar.gz"
 
 # JAVA Installation Options
 # https://supermarket.chef.io/cookbooks/java
-default[:java][:jdk_version]         = "7"
+default[:java][:jdk_version] = "7"
+default[:java][:set_etc_environment] = true

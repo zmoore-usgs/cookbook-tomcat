@@ -1,0 +1,407 @@
+#!/bin/bash
+
+#     !!!!!!! This file created by Chef !!!!!!! 
+#    Any edits to this file will be overwritten
+
+##
+## Controls the tomcat daemon
+##
+
+. /etc/init.d/functions
+
+# Just in case... we have an X11 display and aren't running in headless mode.
+unset DISPLAY
+
+PID_DIR=/opt/tomcat/run
+export CATALINA_HOME=/opt/tomcat
+
+get_pid_status() {
+    pid=$1
+    pid_name=$(ps -p ${pid}  -o comm= 2> /dev/null)
+    pid_status=$?
+}
+
+setup_catalina_environ() {
+    # Set defaults before we source setenv.sh
+    export INSTANCE_NAME="${name}"
+    export CWD="$(pwd)"
+    export CATALINA_HOME="/opt/tomcat"
+    export CATALINA_BASE="$CATALINA_HOME/instance/$name"
+    export CATALINA_CLASSPATH=""
+    export JAVA_ENDORSED_DIRS="$CATALINA_BASE/endorsed:$CATALINA_HOME/endorsed"
+    export JSVC_OUTPUT_OPTS="-outfile $CATALINA_BASE/logs/catalina.out -errfile &1"
+    export JSVC_OPTS=" -server \
+               -cwd ${CWD} \
+               -procname tomcat_${INSTANCE_NAME} \
+               -classpath ${CATALINA_HOME}/bin/bootstrap.jar:${CATALINA_HOME}/bin/commons-daemon.jar:${CATALINA_BASE}/bin/tomcat-juli.jar:${CATALINA_CLASSPATH} \
+               -Dcatalina.home=${CATALINA_HOME} \
+               -Dcatalina.base=${CATALINA_BASE} \
+               -Djava.endorsed.dirs=${JAVA_ENDORSED_DIRS} \
+               -Djava.io.tmpdir=${CATALINA_BASE}/temp \
+               -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
+               -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
+    export JSVC="${CATALINA_HOME}/bin/jsvc"
+    export JAVA_HOME="${JAVA_HOME}"
+
+    # Source user changes
+    source "$CATALINA_HOME/instance/$name/bin/setenv.sh"
+}
+
+show_info() {
+    name=$1
+
+    echo -e $"\nVersion info for $name tomcat:\n"
+
+    if [ ! -e "$CATALINA_HOME/instance/$name" ]; then
+        echo -n "$name instance doesn't exist!"
+        failure; echo
+        exit 1
+    fi
+
+    # If the user really wants to they can override this later
+    cd "$CATALINA_HOME/instance/$name"
+
+    # Set the environment
+    setup_catalina_environ
+
+    # Just in case the user changed CATALINA_BASE
+    cd $CATALINA_BASE
+
+    if [[ ! -x "${JSVC}" ]]; then
+        echo -ne "\n${JSVC}: cannot execute"
+	    failure; echo
+	    return
+    fi
+    
+    # Let's remove the line 'commons daemon process'.
+    ${JSVC} ${JSVC_OPTS} ${CATALINA_OPTS} -home ${JAVA_HOME} -pidfile /dev/null -version -outfile '&1' -errfile '&1' org.apache.catalina.startup.Bootstrap 2>&1 | grep -v "commons daemon process"
+
+    echo -e "\nEnvironment info for $name tomcat:\n"
+    echo "INSTANCE_NAME = \"${name}\""
+    echo "CWD = \"${CWD}\""
+    echo "CATALINA_HOME = \"/opt/tomcat\""
+    echo "CATALINA_BASE = \"${CATALINA_HOME}/instance/$name\""
+    echo "CATALINA_CLASSPATH = \"${CATALINA_CLASSPATH}\""
+    echo "JAVA_ENDORSED_DIRS = \"$CATALINA_BASE/endorsed:$CATALINA_HOME/endorsed\""
+    echo "JSVC_OUTPUT_OPTS = \"-outfile $CATALINA_BASE/logs/catalina.out -errfile &1\""
+    echo "JSVC_OPTS = \" -server  -cwd ${CWD} -procname tomcat_${INSTANCE_NAME}  -classpath ${CATALINA_HOME}/bin/bootstrap.jar:${CATALINA_HOME}/bin/commons-daemon.jar:${CATALINA_BASE}/bin/tomcat-juli.jar:${CATALINA_CLASSPATH}  -Dcatalina.home=${CATALINA_HOME}  -Dcatalina.base=${CATALINA_BASE}  -Djava.endorsed.dirs=${JAVA_ENDORSED_DIRS}  -Djava.io.tmpdir=${CATALINA_BASE}/temp  -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager  -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties\""
+    echo "CATALINA_OPTS = \"${CATALINA_OPTS}\""
+    echo "JSVC = \"${CATALINA_HOME}/bin/jsvc\""
+    echo "JAVA_HOME = \"${JAVA_HOME}\""
+}
+
+
+# Set some defaults.
+start_instance() {
+    name=$1
+
+    echo -n $"Starting $name .."
+
+    if [ ! -e "$CATALINA_HOME/instance/$name" ]; then
+        echo -n "doesn't exist!"
+        failure; echo
+        exit 1
+    fi
+
+    pidfile="${PID_DIR}/tomcat_${name}.pid"
+    pid="$(cat $pidfile 2> /dev/null)"
+
+    get_pid_status "$pid"
+
+    if [ "$pid_status" == "0" ]; then
+        echo -n " already running (pid $pid)"
+        failure; echo
+        return
+    fi
+
+    # If the user really wants to they can override this later
+    cd "$CATALINA_HOME/instance/$name"
+
+
+    # Set the environment
+    setup_catalina_environ
+
+    # Just in case the user changed CATALINA_BASE
+    cd $CATALINA_BASE
+
+    if [[ ! -x "${JSVC}" ]]; then
+        echo -ne "\n${JSVC}: cannot execute"
+	failure; echo
+	return
+    fi
+    
+    # Launch the daemon
+
+    ${JSVC} ${JSVC_OPTS} ${CATALINA_OPTS} -home ${JAVA_HOME} ${JSVC_OUTPUT_OPTS} -pidfile ${pidfile} -showversion org.apache.catalina.startup.Bootstrap start
+
+    pid_wait_time=300
+    for i in `seq 1 $pid_wait_time`; do
+        if [ ! -f "$pidfile" ]; then
+            echo -n "."
+            sleep 1
+        else
+            break
+        fi
+    done
+
+    if [[ ! -a "$pidfile" ]]; then
+        echo -n "giving up on pid file"
+        failure; echo
+        return
+    fi
+
+    pid="$(cat $pidfile 2> /dev/null)"
+    echo -n " (pid $pid)"
+    success; echo
+}
+
+stop_instance() {
+    name=$1
+    echo -n $"Stopping $name .."
+
+    if [ ! -e "$CATALINA_HOME/instance/$name" ]; then
+        echo -n "doesn't exist!"
+        failure; echo
+        exit 1
+    fi
+
+    pidfile="${PID_DIR}/tomcat_${name}.pid"
+    pid=$(cat $pidfile 2> /dev/null)
+
+    get_pid_status "$pid"
+
+    if [ "$pid_status" != "0" ]; then
+        echo -n " already stopped"
+        failure; echo
+        return
+    fi
+
+
+    kill -s SIGTERM $pid &> /dev/null
+    killed_pid=$pid
+
+    pid_wait_time=300
+    for i in `seq 1 $pid_wait_time`; do
+        get_pid_status "$pid"
+        if [ "$pid_status" == "0" ]; then
+            sleep 1
+        else
+            break
+        fi
+    done
+
+    if [ "$pid_status" == "0" ]; then
+        echo -n "not responding to SIGTERM?"
+        failure; echo
+        return
+    fi
+
+    echo -n " (pid $killed_pid)"
+    success; echo
+}
+
+kill_instance() {
+    name=$1
+    echo -n $"Killing $name .."
+
+    pidfile="${PID_DIR}/tomcat_$name.pid"
+
+    if [ ! -e "$pidfile" ]; then
+        echo -en "already dead?"
+        failure; echo
+        return
+    fi
+
+    pid="$(cat $pidfile 2> /dev/null)"
+    pid_parent="$(ps -p ${pid} -o ppid= )"
+    get_pid_status "$pid"
+
+    if [ "$pid_status" != "0" ]; then
+        echo -n " removing stale pid file"
+        rm -f $pid_parent
+	rm -f $pid
+        failure; echo
+        return
+    fi
+
+    if [[ "$pid_name" != "jsvc" ]]; then
+        echo "$pid_name"
+        echo -n "(pid $pid) is not a JSVC!"
+        failure; echo
+        return
+    fi
+
+    # Send SIGKILL to the parent
+    kill -s SIGKILL $pid_parent &> /dev/null
+
+    # Send SIGKILL to the child
+    kill -s SIGKILL $pid &> /dev/null
+
+    rm -f $pidfile
+
+    killed_pid=$pid
+
+    pid_wait_time=1200
+    for i in `seq 1 $pid_wait_time`; do
+        get_pid_status "$pid"
+        if [ "$pid_status" == "0" ]; then
+            sleep 1
+        else
+            break
+        fi
+    done
+
+    if [ "$pid_status" == "0" ]; then
+        echo -n "gave up waiting on tomcat?! (this is most unexpected)"
+        failure; echo
+        return
+    fi
+
+    echo -n " (pid $killed_pid)"
+    success; echo
+}
+
+reopen_instance() {
+    name=$1
+    echo -n $"Reopening $name tomcat log files.."
+    pidfile="${PID_DIR}/tomcat_$name.pid"
+
+    if [ ! -e "$CATALINA_HOME/instance/$name" ]; then
+        echo -n "doesn't exist!"
+        failure; echo
+        exit 1
+    fi
+
+    pid="$(cat $pidfile 2> /dev/null)"
+    pid_parent="$(ps -p ${pid} -o ppid= )"
+
+    # SIGUSR1 tells the daemon to reopen its logs
+    kill -s SIGUSR1 $pid_parent &> /dev/null
+
+    if [ "$?" == "0" ]; then
+        success; echo
+    else
+        failure; echo
+        exit 1
+    fi
+}   
+
+status_instance() {
+    name=$1
+    pidfile="${PID_DIR}/tomcat_$name.pid"
+    status -p $pidfile "${name}"
+    RETVAL="$?"
+}
+
+run_info() {
+    if [ -n "$1" ]; then
+        show_info "$1"
+    else
+        for i in $(ls -1 $CATALINA_HOME/instance); do
+            show_info "$i"
+        done;
+    fi
+}
+run_start() {
+    if [ -n "$1" ]; then
+        start_instance "$1"
+    else
+        for i in $(ls -1 $CATALINA_HOME/instance); do
+            start_instance "$i"
+        done;
+    fi
+}
+
+run_stop() {
+    if [ -n "$1" ]; then
+        stop_instance "$1"
+    else
+        for i in $(ls -1 $CATALINA_HOME/instance); do
+            stop_instance "$i"
+        done;
+    fi
+}
+
+run_status() {
+    if [ -n "$1" ]; then
+        status_instance "$1"
+    else
+        for i in $(ls -1 $CATALINA_HOME/instance); do
+            status_instance "$i"
+        done;
+    fi
+}
+
+condrestart_instance() {
+    status_instance "$1" &> /dev/null
+    if [[ "$RETVAL" == "0" ]]; then
+        stop_instance "$1"
+        start_instance "$1"
+    fi
+}
+
+run_condrestart() {
+    if [ -n "$1" ]; then
+        condrestart_instance "$1"
+    else
+        for i in $(ls -1 $CATALINA_HOME/instance); do
+            condrestart_instance "$i"
+        done;
+    fi
+}
+
+run_reopen() {
+    if [ -n "$1" ]; then
+        reopen_instance "$1"
+    else
+        for i in $(ls -1 $CATALINA_HOME/instance); do
+            reopen_instance "$i"
+        done;
+    fi
+}
+
+run_kill() {
+    if [ -n "$1" ]; then
+        kill_instance "$1"
+    else
+        for i in $(ls -1 $CATALINA_HOME/instance); do
+            kill_instance "$i"
+        done;
+    fi
+}
+
+case "$1" in
+  start)
+    run_start "$2"
+    ;;
+  stop)
+    run_stop "$2"
+    ;;
+  restart)
+    run_stop "$2"
+    run_start "$2"
+    ;;
+  condrestart)
+    run_condrestart "$2"
+    ;;
+  status)
+    run_status "$2"
+    ;;
+  reopen|hup)
+    run_reopen "$2"
+    ;;
+  kill)
+    run_kill "$2"
+    ;;
+  info)
+    run_info "$2"
+    ;;
+  *)
+    echo "Usage $(basename $0) <start|stop|status|restart|condrestart|reopen|kill|info> [instance name]"
+    exit 1
+    ;;
+esac
+
+exit $?
+
+# vim: tw=99 expandtab tabstop=4 softtabstop=4 showmatch nocompatible shiftwidth=4 ai
