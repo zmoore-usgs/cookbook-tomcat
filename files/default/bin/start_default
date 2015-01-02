@@ -1,1 +1,0 @@
-su - tomcat -c '/opt/tomcat/bin/tomcat start default'

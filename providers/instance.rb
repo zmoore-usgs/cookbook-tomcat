@@ -64,6 +64,7 @@ def create_tomcat_instance
   instance_home         = ::File.expand_path(name, instances_home)
   instance_webapps_path = ::File.expand_path("webapps", instance_home)
   instance_bin_path     = ::File.expand_path("bin", instance_home)
+  tomcat_bin_path       = ::File.expand_path("bin", tomcat_home)
   instance_conf_path    = ::File.expand_path("conf", instance_home)
   ssl_port              = port + 363 # Default 8443 when regular port is 8080
   ajp_port              = port - 71 # Default port is 8009 when regular port is 8080
@@ -89,9 +90,6 @@ def create_tomcat_instance
     "server.xml",
     "tomcat-users.xml",
     "web.xml"
-  ]
-  instance_bin_files = [
-    "setenv.sh"
   ]
   
   Chef::Log.info "Creating Instance #{name}"
@@ -138,14 +136,25 @@ def create_tomcat_instance
     end
   end
   
-  instance_bin_files.each do |bin_file|
+  %w{start stop}.each do |bin_file|
     Chef::Log.info "Copying bin file #{bin_file}"
-    cookbook_file "#{::File.expand_path(bin_file, instance_bin_path)}" do
-      source "instances/bin/#{bin_file}"
+    template "#{::File.expand_path(bin_file + '_' + name, tomcat_bin_path)}" do
+      source "instances/bin/#{bin_file}.erb"
       owner tomcat_user
       group tomcat_group
       mode 0744
+      variables(
+      :instance_name => name,
+      :tomcat_home => tomcat_home
+      )
     end
+  end
+  
+  template "#{::File.expand_path('setev.sh', instance_bin_path)}" do
+    source "instances/bin/setenv.sh.erb"
+    owner tomcat_user
+    group tomcat_group
+    mode 0744
   end
   
   template "#{::File.expand_path('catalinaopts.sh', instance_bin_path)}" do

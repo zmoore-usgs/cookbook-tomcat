@@ -49,9 +49,7 @@ delete_bin_files = [
   "configtest.bat"
 ]
 create_bin_files = [
-  "tomcat",
-  "start_default",
-  "stop_default"
+  "tomcat"
 ]
 
 create_home_dirs.each do |dir|
@@ -108,11 +106,16 @@ delete_home_files.each do |file|
 end
 
 create_bin_files.each do |file|
-  cookbook_file "#{File.expand_path(file, bin_dir)}" do
-    source "bin/#{file}"
+  template "#{File.expand_path(file, bin_dir)}" do
+    source "bin/#{file}.erb"
     owner user_name
     group group_name
     mode 0755
+    variables(
+      :tomcat_home => tomcat_home,
+      :java_home => java_home,
+      :tomcat_user => user_name
+    )
   end
 end
 
