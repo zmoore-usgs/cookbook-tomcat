@@ -14,13 +14,75 @@ action :create do
   end
 end
 
-action :delete do
+action :start do
   if @current_resource.exists
-    converge_by("Delete #{ @new_resource }") do
-      delete_tomcat_instance
+    if is_started?(current_resource.name)
+      Chef::Log.info "Tomcat instance #{ @new_resource } already started - nothing to do."
+      new_resource.updated_by_last_action(false)
+    else
+      converge_by("Start #{ @new_resource }") do
+        cmdStr = "/sbin/service tomcat start #{ current_resource.name }"
+        execute cmdStr do
+          user "root"
+        end
+        new_resource.updated_by_last_action(true)
+      end
     end
   else
-    Chef::Log.info "Tomcat instance #{ @new_resource } doesnt exist - can't delete."
+    Chef::Log.info "Tomcat instance #{ @new_resource } does not exist."
+    new_resource.updated_by_last_action(false)
+  end
+end
+
+action :stop do
+  if @current_resource.exists
+    if is_started?(current_resource.name)
+      converge_by("Stop #{ @new_resource }") do
+        cmdStr = "/sbin/service tomcat stop #{ current_resource.name }"
+        execute cmdStr do
+          user "root"
+        end
+        new_resource.updated_by_last_action(true)
+      end
+    else
+      Chef::Log.info "Tomcat instance #{ @new_resource } already started - nothing to do."
+      new_resource.updated_by_last_action(false)
+    end
+  else
+    Chef::Log.info "Tomcat instance #{ @new_resource } does not exist."
+    new_resource.updated_by_last_action(false)
+  end
+end
+
+action :restart do
+  if @current_resource.exists
+    converge_by("Restart #{ @new_resource }") do
+      cmdStr = "/sbin/service tomcat restart #{ current_resource.name }"
+      execute cmdStr do
+        user "root"
+      end
+      new_resource.updated_by_last_action(true)
+    end
+  else
+    Chef::Log.info "Tomcat instance #{ @new_resource } does not exist."
+    new_resource.updated_by_last_action(false)
+  end
+end
+
+action :deploy_app do
+  if @current_resource.exists
+    if !application_exists?(current_resource.application_name)
+      converge_by("Deploying #{current_resource.application_name} to #{ @new_resource }") do
+        deploy_application
+        new_resource.updated_by_last_action(true)
+      end
+    else
+      Chef::Log.info "Tomcat application #{current_resource.application_name} exists."
+      new_resource.updated_by_last_action(false)
+    end
+  else
+    Chef::Log.info "Tomcat instance #{ @new_resource } does not exist."
+    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -33,6 +95,7 @@ def load_current_resource
   @current_resource.tomcat_home(@new_resource.tomcat_home)
   @current_resource.server_opts(@new_resource.server_opts)
   @current_resource.auto_start(@new_resource.auto_start)
+  @current_resource.application_name(@new_resource.application_name)
   if instance_exists?(@current_resource.name)
     @current_resource.exists     = true
   end
@@ -45,12 +108,53 @@ def instance_exists?(name)
   ::File.exists?(instance_home) && ::File.directory?(instance_home)
 end
 
+def application_exists?(name)
+  application_final_name = node[:wsi_tomcat][:application][name][:final_name]
+  tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
+  instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
+  instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
+  webapps_dir            = ::File.expand_path("webapps", instance_dir)
+  war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
+  
+  ::File.exists?(war_name)
+end
+
+def is_started?(name)
+  Chef::Log.debug "Checking to see if Tomcat instance '#{name}' is started"
+  cmdStr = "/sbin/service tomcat status #{name}"
+  cmd = Mixlib::ShellOut.new(cmdStr)
+  matcher = Regexp.new("(#{name}).*(is running).*", Regexp::IGNORECASE)
+  cmd.run_command
+  matcher.match(cmd.stdout)
+end
+
+def deploy_application
+  instance_name          = current_resource.name
+  application_name       = current_resource.application_name
+  application_url        = node[:wsi_tomcat][:application][application_name][:url]
+  application_final_name = node[:wsi_tomcat][:application][application_name][:final_name]
+  tomcat_user            = node[:wsi_tomcat][:user][:name]
+  tomcat_group           = node[:wsi_tomcat][:group][:name]
+  tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
+  instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
+  instance_dir           = ::File.expand_path(instance_name, instances_dir)
+  webapps_dir            = ::File.expand_path("webapps", instance_dir)
+  war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
+  
+  remote_file war_name do
+    source application_url
+    owner tomcat_user
+    group tomcat_group
+    backup false
+  end
+end
+
 def create_tomcat_instance
   name                  = current_resource.name
   port                  = current_resource.port
   ssl                   = current_resource.ssl
   server_opts           = current_resource.server_opts
-  tomcat_home           = current_resource.tomcat_home
+  tomcat_home           = node[:wsi_tomcat][:user][:home_dir]
   cors                  = current_resource.cors
   auto_start            = current_resource.auto_start
   tomcat_user           = node[:wsi_tomcat][:user][:name]
@@ -209,13 +313,4 @@ def create_tomcat_instance
   new_resource.updated_by_last_action(true)
 end
 
-def delete_tomcat_instance
-  instances_home = ::File.expand_path("instance", current_resource.tomcat_home)
-  instance_home  = ::File.expand_path(name, instances_home)
-  directory instance_home do
-    recursive true
-    action :delete
-  end
-  new_resource.updated_by_last_action(true)
-end
 
