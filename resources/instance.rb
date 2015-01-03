@@ -1,4 +1,4 @@
-actions :create, :delete
+actions :create, :start, :stop, :restart
 default_action :create
 
 attribute :name, 
@@ -8,7 +8,7 @@ attribute :name,
   :regex          => /^[a-zA-Z]+$/
 attribute :port, 
   :kind_of  => Fixnum,
-  :required => true
+  :default => 8080
 attribute :ssl,
   :kind_of => Hash,
   :default => {
