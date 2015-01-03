@@ -12,8 +12,9 @@
 # Just in case... we have an X11 display and aren't running in headless mode.
 unset DISPLAY
 
-PID_DIR=/opt/tomcat/run
-export CATALINA_HOME=/opt/tomcat
+CATALINA_HOME=<%= @tomcat_home %>
+PID_DIR=$CATALINA_HOME/run
+export CATALINA_HOME
 
 get_pid_status() {
     pid=$1
@@ -25,7 +26,7 @@ setup_catalina_environ() {
     # Set defaults before we source setenv.sh
     export INSTANCE_NAME="${name}"
     export CWD="$(pwd)"
-    export CATALINA_HOME="/opt/tomcat"
+    export CATALINA_HOME=<%= @tomcat_home %>
     export CATALINA_BASE="$CATALINA_HOME/instance/$name"
     export CATALINA_CLASSPATH=""
     export JAVA_ENDORSED_DIRS="$CATALINA_BASE/endorsed:$CATALINA_HOME/endorsed"
@@ -79,7 +80,7 @@ show_info() {
     echo -e "\nEnvironment info for $name tomcat:\n"
     echo "INSTANCE_NAME = \"${name}\""
     echo "CWD = \"${CWD}\""
-    echo "CATALINA_HOME = \"/opt/tomcat\""
+    echo "CATALINA_HOME = \"<%= @tomcat_home %>\""
     echo "CATALINA_BASE = \"${CATALINA_HOME}/instance/$name\""
     echo "CATALINA_CLASSPATH = \"${CATALINA_CLASSPATH}\""
     echo "JAVA_ENDORSED_DIRS = \"$CATALINA_BASE/endorsed:$CATALINA_HOME/endorsed\""

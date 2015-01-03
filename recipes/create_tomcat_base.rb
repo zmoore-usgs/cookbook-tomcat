@@ -48,18 +48,12 @@ delete_bin_files = [
   "setclasspath.bat",
   "configtest.bat"
 ]
-create_bin_files = [
-  "tomcat",
-  "start_default",
-  "stop_default"
-]
 
 create_home_dirs.each do |dir|
-  directory "create directory #{dir} in tomcat home" do
-    path ::File.expand_path(dir, tomcat_home)
+  directory File.expand_path(dir, tomcat_home) do
     owner user_name
     group group_name
-    only_if { File.exists?(tomcat_home)}
+    only_if { File.exists?(tomcat_home) }
   end
 end
 
@@ -107,13 +101,16 @@ delete_home_files.each do |file|
   end
 end
 
-create_bin_files.each do |file|
-  cookbook_file "#{File.expand_path(file, bin_dir)}" do
-    source "bin/#{file}"
-    owner user_name
-    group group_name
-    mode 0755
-  end
+template "#{File.expand_path('tomcat', bin_dir)}" do
+  source "bin/tomcat.erb"
+  owner user_name
+  group group_name
+  mode 0755
+  variables(
+    :tomcat_home => tomcat_home,
+    :java_home => java_home,
+    :tomcat_user => user_name
+  )
 end
 
 template "Install #{tomcat_init_script} script" do

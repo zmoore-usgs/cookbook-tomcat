@@ -52,15 +52,6 @@ default[:wsi_tomcat][:instances] = {
       :tomcat_script_pass => "tomcat-script",
       :tomcat_jmx_pass => "tomcat-jmx"
     }
-  },
-  "test"  => {
-    :port => 8081,
-    :user => {
-      :tomcat_admin_pass => "tomcat-admin",
-      :tomcat_script_pass => "tomcat-script",
-      :tomcat_jmx_pass => "tomcat-jmx"
-    },
-    :auto_start => false
   }
 }
 
