@@ -150,7 +150,7 @@ def create_tomcat_instance
     end
   end
   
-  template "#{::File.expand_path('setev.sh', instance_bin_path)}" do
+  template "#{::File.expand_path('setenv.sh', instance_bin_path)}" do
     source "instances/bin/setenv.sh.erb"
     owner tomcat_user
     group tomcat_group
