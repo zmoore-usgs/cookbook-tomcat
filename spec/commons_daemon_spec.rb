@@ -4,6 +4,9 @@ describe "wsi_tomcat::commons_daemon" do
   let (:chef_run) do |runner|
     ChefSpec::SoloRunner.new do |runner|
       runner.node.set[:wsi_tomcat][:user][:home_dir] = "/opt/tomcat"
+      runner.node.set[:java][:java_home] = "/usr/lib/jvm/java-1.7.0"
+      runner.node.set[:wsi_tomcat][:user][:name] = "tomcat"
+      runner.node.set[:wsi_tomcat][:group][:name] = "tomcat"
     end.converge(described_recipe)
   end
 
@@ -48,15 +51,26 @@ describe "wsi_tomcat::commons_daemon" do
 =end
   
   it "unpacks the commons daemon archive" do
-    expect(chef_run).to run_execute("/bin/tar xvf /opt/tomcat/bin/commons-daemon-native.tar.gz --strip=1 -C /opt/commons_daemon")
+    expect(chef_run).to run_execute("/bin/tar xvf /opt/tomcat/bin/commons-daemon-native.tar.gz --strip=1 -C /opt/commons_daemon").with(
+    user: "tomcat",
+    group: "tomcat"
+    )
   end
    
   it "runs configure on BCDP source" do
-    expect(chef_run).to run_execute("./configure")
+    expect(chef_run).to run_execute("./configure --with-java=/usr/lib/jvm/java-1.7.0").with(
+    user: "tomcat",
+    group: "tomcat",
+    cwd: "/opt/commons_daemon/unix"
+    )
   end
    
   it "runs make on BCDP source to make jsvc binary" do
-    expect(chef_run).to run_execute("make")
+    expect(chef_run).to run_execute("make").with(
+    user: "tomcat",
+    group: "tomcat",
+    cwd: "/opt/commons_daemon/unix"
+    )
   end
    
   it "copies BCDP executable to tomcat's bin directory" do
@@ -72,7 +86,5 @@ describe "wsi_tomcat::commons_daemon" do
       group: "tomcat"
     )
   end
-
-
     
 end
