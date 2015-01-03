@@ -44,7 +44,7 @@ describe "wsi_tomcat::create_tomcat_instances" do
      allow(File).to receive(:exist?).and_call_original
   end
 
-  it 'runs wsi_tomcat_instance' do
+  it 'runs wsi_tomcat_instance(:create)' do
     expect(chef_run).to create_instance('default')
   end
 
