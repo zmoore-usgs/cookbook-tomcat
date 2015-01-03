@@ -71,9 +71,14 @@ end
 
 action :deploy_app do
   if @current_resource.exists
-    converge_by("Deploying #{current_resource.application_name} to #{ @new_resource }") do
-      deploy_application
-      new_resource.updated_by_last_action(true)
+    if !application_exists?(current_resource.application_name)
+      converge_by("Deploying #{current_resource.application_name} to #{ @new_resource }") do
+        deploy_application
+        new_resource.updated_by_last_action(true)
+      end
+    else
+      Chef::Log.info "Tomcat application #{current_resource.application_name} exists."
+      new_resource.updated_by_last_action(false)
     end
   else
     Chef::Log.info "Tomcat instance #{ @new_resource } does not exist."
@@ -101,6 +106,17 @@ def instance_exists?(name)
   instances_home = ::File.expand_path("instance", current_resource.tomcat_home)
   instance_home = ::File.expand_path(name, instances_home)
   ::File.exists?(instance_home) && ::File.directory?(instance_home)
+end
+
+def application_exists?(name)
+  application_final_name = node[:wsi_tomcat][:application][name][:final_name]
+  tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
+  instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
+  instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
+  webapps_dir            = ::File.expand_path("webapps", instance_dir)
+  war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
+  
+  ::File.exists?(war_name)
 end
 
 def is_started?(name)
