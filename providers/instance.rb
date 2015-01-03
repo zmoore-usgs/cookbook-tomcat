@@ -4,8 +4,6 @@ end
 
 use_inline_resources
 
-
-
 action :create do
   if @current_resource.exists
     Chef::Log.info "Tomcat instance #{ @new_resource } already exists - nothing to do."
