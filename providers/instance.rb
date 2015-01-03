@@ -137,7 +137,7 @@ def create_tomcat_instance
   end
   
   %w{start stop}.each do |bin_file|
-    Chef::Log.info "Copying bin file #{bin_file}"
+    Chef::Log.info "Templating bin file #{bin_file}"
     template "#{::File.expand_path(bin_file + '_' + name, tomcat_bin_path)}" do
       source "instances/bin/#{bin_file}.erb"
       owner tomcat_user
