@@ -43,8 +43,8 @@ class Chef::Recipe::ContextHelper
     @default_environment = {
       "name" => "insert_name_here",
       "type" => "java.lang.String",
-      "value" => "insert_value_here",
-      "description" => "insert_description_here",
+      "value" => "",
+      "description" => "",
       "override" => "false"
     }
     @default_environment.merge(incoming_environment)
