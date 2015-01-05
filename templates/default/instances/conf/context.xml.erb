@@ -35,9 +35,6 @@
     -->
     <% if defined?(@resources) %>
         <% @resources.each do |r| -%>
-            <% if defined?(@application) %>
-            <!-- Resource definition for application <%= @application %> -->
-            <% end %>
             <Resource name="<%= r["name"] %>"
                     auth="<%= r["auth"] %>"
                     type="<%= r["type"] %>"
@@ -63,9 +60,6 @@
     
     <% if defined?(@environments) %>
       <% @environments.each do |e| -%>
-          <% if defined?(@application) %>
-          <!-- Environment definition for application <%= @application %> -->
-          <% end %>
           <Environment 
               name="<%= e["name"] %>" 
               type="<%= e["type"] %>" 
