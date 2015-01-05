@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!--
+    !!!!!!! This file created by Chef !!!!!!!
+    Any edits to this file will be overwritten 
+-->
+<!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -29,5 +33,47 @@
     <!--
     <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
     -->
-
+    <% if defined?(@resources) %>
+        <% @resources.each do |r| -%>
+            <% if defined?(@application) %>
+            <!-- Resource definition for application <%= @application %> -->
+            <% end %>
+            <Resource name="<%= r["name"] %>"
+                    auth="<%= r["auth"] %>"
+                    type="<%= r["type"] %>"
+                    username="<%= r["username"] %>"
+                    password="<%= r["password"] %>"
+                    factory="<%= r["factory"] %>"
+                    driverClassName="<%= r["driver_class"] %>"
+                    url="<%= r["url"] %>"
+                    maxActive="<%= r["max_active"] %>"
+                    maxIdle="<%= r["max_idle"] %>"
+                    removeAbandoned="<%= r["remove_abandoned"] %>"
+                    removeAbandonedTimeout="<%= r["remove_abandoned_timeout"] %>"
+                    logAbandoned="<%= r["log_abandoned"] %>"
+                    testOnBorrow="<%= r["test_on_borrow"] %>"
+                    defaultAutoCommit="<%= r["default_auto_commit"] %>"
+                    validationQuery="<%= r["validation_query"] %>"
+                    accessToUnderlyingConnectionAllowed="<%= r["access_to_underlying_connection_allowed"] %>"
+                    poolPreparedStatements="<%= r["pool_prepared_statements"] %>"
+                    maxOpenPreparedStatements="<%= r["max_open_prepared_statements"] %>"
+                    />
+        <% end -%>
+    <% end %>
+    
+    <% if defined?(@environments) %>
+      <% @environments.each do |e| -%>
+          <% if defined?(@application) %>
+          <!-- Environment definition for application <%= @application %> -->
+          <% end %>
+          <Environment 
+              name="<%= e["name"] %>" 
+              type="<%= e["type"] %>" 
+              value="<%= e["value"] %>" 
+              description="<%= e["description"] %>" 
+              override="<%= e["override"] %>"
+              />
+      <% end -%>
+    <% end %>
+    
 </Context>

@@ -109,7 +109,7 @@ def instance_exists?(name)
 end
 
 def application_exists?(name)
-  application_final_name = node[:wsi_tomcat][:application][name][:final_name]
+  application_final_name = node[:wsi_tomcat][:instances][current_resource.name][:application][name][:final_name]
   tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
   instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
   instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
@@ -131,8 +131,8 @@ end
 def deploy_application
   instance_name          = current_resource.name
   application_name       = current_resource.application_name
-  application_url        = node[:wsi_tomcat][:application][application_name][:url]
-  application_final_name = node[:wsi_tomcat][:application][application_name][:final_name]
+  application_url        = node[:wsi_tomcat][:instances][instance_name][:application][application_name][:url]
+  application_final_name = node[:wsi_tomcat][:instances][instance_name][:application][application_name][:final_name]
   tomcat_user            = node[:wsi_tomcat][:user][:name]
   tomcat_group           = node[:wsi_tomcat][:group][:name]
   tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
