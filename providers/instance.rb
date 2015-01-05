@@ -109,7 +109,7 @@ def instance_exists?(name)
 end
 
 def application_exists?(name)
-  application_final_name = node[:wsi_tomcat][:application][name][:final_name]
+  application_final_name = node[:wsi_tomcat][:instances][current_resource.name][:application][name][:final_name]
   tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
   instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
   instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
@@ -131,8 +131,8 @@ end
 def deploy_application
   instance_name          = current_resource.name
   application_name       = current_resource.application_name
-  application_url        = node[:wsi_tomcat][:application][application_name][:url]
-  application_final_name = node[:wsi_tomcat][:application][application_name][:final_name]
+  application_url        = node[:wsi_tomcat][:instances][instance_name][:application][application_name][:url]
+  application_final_name = node[:wsi_tomcat][:instances][instance_name][:application][application_name][:final_name]
   tomcat_user            = node[:wsi_tomcat][:user][:name]
   tomcat_group           = node[:wsi_tomcat][:group][:name]
   tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
@@ -155,6 +155,7 @@ def create_tomcat_instance
   ssl                   = current_resource.ssl
   server_opts           = current_resource.server_opts
   tomcat_home           = node[:wsi_tomcat][:user][:home_dir]
+  fqdn                  = node[:fqdn]
   cors                  = current_resource.cors
   auto_start            = current_resource.auto_start
   tomcat_user           = node[:wsi_tomcat][:user][:name]
@@ -279,6 +280,13 @@ def create_tomcat_instance
     :tomcat_home => tomcat_home
     )
     mode 0755
+  end
+  
+  directory "Create heapdumps directory" do
+    owner tomcat_user
+    group tomcat_group
+    path "#{tomcat_home}/heapdumps/#{fqdn}/#{name}"
+    recursive true
   end
   
   execute "Create manager application for #{name}" do
