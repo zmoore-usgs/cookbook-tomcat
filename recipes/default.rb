@@ -16,3 +16,6 @@ include_recipe "wsi_tomcat::commons_daemon"
 include_recipe "wsi_tomcat::create_tomcat_base"
 
 include_recipe "wsi_tomcat::create_tomcat_instances"
+
+#include_recipe "wsi_tomcat::deploy_application"
+include_recipe "wsi_tomcat::update_context"

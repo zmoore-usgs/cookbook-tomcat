@@ -39,7 +39,17 @@ instances.each do |instance, attributes|
     :resources    => r.flatten,
     :environments => e.flatten
     )
+    notifies :restart, "wsi_tomcat_instance[restart instance]", :delayed
   end
+  
+  # Restart if context changed
+  wsi_tomcat_instance "restart instance" do
+    name instance
+    action :nothing
+  end
+  
 end
+
+
 
 
