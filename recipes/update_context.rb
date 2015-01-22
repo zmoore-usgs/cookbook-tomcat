@@ -5,10 +5,10 @@
 #
 # Description: Updates context.xml 
 
-instances    = node[:wsi_tomcat][:instances]
-tomcat_group = node[:wsi_tomcat][:group][:name]
-tomcat_user  = node[:wsi_tomcat][:user][:name]
-tomcat_home  = node[:wsi_tomcat][:user][:home_dir]
+instances    = node["wsi_tomcat"]["instances"]
+tomcat_group = node["wsi_tomcat"]["group"]["name"]
+tomcat_user  = node["wsi_tomcat"]["user"]["name"]
+tomcat_home  = node["wsi_tomcat"]["user"]["home_dir"]
 context_xml  = "context.xml"
 r            = []
 e            = []
@@ -17,8 +17,8 @@ instances.each do |instance, attributes|
   
   attributes.application.each do |application, app_attributes|
     if app_attributes.has_key?("context")
-      original_resources    = app_attributes[:context].fetch(:resources, [])
-      original_environments = app_attributes[:context].fetch(:environments, [])
+      original_resources    = app_attributes["context"].fetch(:resources, [])
+      original_environments = app_attributes["context"].fetch(:environments, [])
       
       unless original_resources.empty?
         r.push(ContextHelper.normalize_resources(original_resources))

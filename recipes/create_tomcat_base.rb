@@ -101,7 +101,7 @@ delete_home_files.each do |file|
   end
 end
 
-template "#{File.expand_path('tomcat', bin_dir)}" do
+template "#{bin_dir}/tomcat" do
   source "bin/tomcat.erb"
   owner user_name
   group group_name

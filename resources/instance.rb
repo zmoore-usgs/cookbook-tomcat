@@ -30,7 +30,7 @@ attribute :cors,
 # Where the tomcat home directory is located. "/opt/tomcat" by default
 attribute :tomcat_home,
   :kind_of => String,
-  :default => node[:wsi_tomcat][:user][:home_dir]
+  :default => node["wsi_tomcat"]["user"]["home_dir"]
   
 # Used in: create
 # Is optional: true
@@ -42,10 +42,11 @@ attribute :auto_start,
 # Used in: create, deploy_app
 # Is optional: true
 # An array of strings to add to the server
+fqdn = node["fqdn"]
 attribute :server_opts,
   :kind_of => [Array, String],
   :default => lazy { |r| [
-    "XX:HeapDumpPath=$CATALINA_HOME/heapdumps/#{node.fqdn}/#{r.name}"
+    "XX:HeapDumpPath=$CATALINA_HOME/heapdumps/#{fqdn}/#{r.name}"
     ]}
 
 # Used in: deploy_app

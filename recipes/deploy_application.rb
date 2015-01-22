@@ -5,8 +5,8 @@
 #
 # Description: Deploys application(s) to a specified tomcat instance
 
-instances = node[:wsi_tomcat][:instances]
-tomcat_home = node[:wsi_tomcat][:user][:home_dir]
+instances = node["wsi_tomcat"]["instances"]
+tomcat_home = node["wsi_tomcat"]["user"]["home_dir"]
 instances_home = File.expand_path("instance", tomcat_home)
 
 instances.each do |instance, attributes|
