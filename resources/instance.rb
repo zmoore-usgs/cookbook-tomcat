@@ -13,19 +13,9 @@ attribute :name,
 # Used in: create
 # Is optional: false
 # The port number that the instance will be assigned to
-attribute :port, 
-  :kind_of  => Fixnum,
-  :default => 8080
-  
-# Used in: create
-# Is optional: true
-# Whether SSL will be enabled. False by default
-attribute :ssl,
-  :kind_of => Hash,
-  :default => {
-    :enabled => false
-  }
-  
+attribute :service_definitions, 
+  :kind_of  => [Array]
+    
 # Used in: create
 # Is optional: true
 # Whether CORS will be enabled. False by default 

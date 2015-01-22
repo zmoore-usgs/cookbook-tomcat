@@ -7,11 +7,11 @@
 #
 # http://scottwb.com/blog/2014/01/24/defeating-the-infamous-chef-3694-warning/
 
-user_name            = node[:wsi_tomcat][:user][:name]
-group_name           = node[:wsi_tomcat][:group][:name]
-tomcat_home          = node[:wsi_tomcat][:user][:home_dir]
-java_home            = node[:java][:java_home]
-manager_archive_name = node[:wsi_tomcat][:archive][:manager_name]
+user_name            = node["wsi_tomcat"]["user"]["name"]
+group_name           = node["wsi_tomcat"]["group"]["name"]
+tomcat_home          = node["wsi_tomcat"]["user"]["home_dir"]
+java_home            = node["java"]["java_home"]
+manager_archive_name = node["wsi_tomcat"]["archive"]["manager_name"]
 archives_dir         = File.expand_path("archives", tomcat_home)
 bin_dir              = File.expand_path("bin", tomcat_home)
 juli_jar_name        = "tomcat-juli.jar"

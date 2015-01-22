@@ -47,6 +47,7 @@ class Chef::Recipe::ContextHelper
       "description" => "",
       "override" => "false"
     }
+    
     @default_environment.merge(incoming_environment)
   end
   

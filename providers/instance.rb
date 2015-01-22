@@ -89,8 +89,7 @@ end
 def load_current_resource 
   @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.port(@new_resource.port)
-  @current_resource.ssl(@new_resource.ssl)
+  @current_resource.service_definitions(@new_resource.service_definitions)
   @current_resource.cors(@new_resource.cors)
   @current_resource.tomcat_home(@new_resource.tomcat_home)
   @current_resource.server_opts(@new_resource.server_opts)
@@ -109,8 +108,8 @@ def instance_exists?(name)
 end
 
 def application_exists?(name)
-  application_final_name = node[:wsi_tomcat][:instances][current_resource.name][:application][name][:final_name]
-  tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
+  application_final_name = node["wsi_tomcat"]["instances"][current_resource.name]["application"][name]["final_name"]
+  tomcat_home_dir        = node["wsi_tomcat"]["user"]["home_dir"]
   instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
   instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
   webapps_dir            = ::File.expand_path("webapps", instance_dir)
@@ -131,11 +130,11 @@ end
 def deploy_application
   instance_name          = current_resource.name
   application_name       = current_resource.application_name
-  application_url        = node[:wsi_tomcat][:instances][instance_name][:application][application_name][:url]
-  application_final_name = node[:wsi_tomcat][:instances][instance_name][:application][application_name][:final_name]
-  tomcat_user            = node[:wsi_tomcat][:user][:name]
-  tomcat_group           = node[:wsi_tomcat][:group][:name]
-  tomcat_home_dir        = node[:wsi_tomcat][:user][:home_dir]
+  application_url        = node["wsi_tomcat"]["instances"][instance_name]["application"][application_name]["url"]
+  application_final_name = node["wsi_tomcat"]["instances"][instance_name]["application"][application_name]["final_name"]
+  tomcat_user            = node["wsi_tomcat"]["user"]["name"]
+  tomcat_group           = node["wsi_tomcat"]["group"]["name"]
+  tomcat_home_dir        = node["wsi_tomcat"]["user"]["home_dir"]
   instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
   instance_dir           = ::File.expand_path(instance_name, instances_dir)
   webapps_dir            = ::File.expand_path("webapps", instance_dir)
@@ -151,16 +150,15 @@ end
 
 def create_tomcat_instance
   name                  = current_resource.name
-  port                  = current_resource.port
-  ssl                   = current_resource.ssl
+  service_definitions   = current_resource.service_definitions
   server_opts           = current_resource.server_opts
-  tomcat_home           = node[:wsi_tomcat][:user][:home_dir]
-  fqdn                  = node[:fqdn]
+  tomcat_home           = node["wsi_tomcat"]["user"]["home_dir"]
+  fqdn                  = node["fqdn"]
   cors                  = current_resource.cors
   auto_start            = current_resource.auto_start
-  tomcat_user           = node[:wsi_tomcat][:user][:name]
-  tomcat_group          = node[:wsi_tomcat][:group][:name]
-  manager_archive_name  = node[:wsi_tomcat][:archive][:manager_name]
+  tomcat_user           = node["wsi_tomcat"]["user"]["name"]
+  tomcat_group          = node["wsi_tomcat"]["group"]["name"]
+  manager_archive_name  = node["wsi_tomcat"]["archive"]["manager_name"]
   archives_home         = ::File.expand_path("archives", tomcat_home)
   manager_archive_path  = ::File.expand_path(manager_archive_name, archives_home)
   instances_home        = ::File.expand_path("instance", tomcat_home)
@@ -169,15 +167,15 @@ def create_tomcat_instance
   instance_bin_path     = ::File.expand_path("bin", instance_home)
   tomcat_bin_path       = ::File.expand_path("bin", tomcat_home)
   instance_conf_path    = ::File.expand_path("conf", instance_home)
-  ssl_port              = port + 363 # Default 8443 when regular port is 8080
-  ajp_port              = port - 71 # Default port is 8009 when regular port is 8080
+  #ssl_port              = port + 363 # Default 8443 when regular port is 8080
+  #ajp_port              = port - 71 # Default port is 8009 when regular port is 8080
   tomcat_init_script    = "tomcat-#{name}"
   default_cors          = {
-      :enabled => true,
-      :allowed => { 
-        :origins => "*",
-        :methods => ["GET", "POST", "HEAD", "OPTIONS"],
-        :headers => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
+      :enabled          => true,
+      :allowed          => { 
+        :origins        => "*",
+        :methods        => ["GET", "POST", "HEAD", "OPTIONS"],
+        :headers        => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
       },
       :exposed_headers     => [],
       :preflight_maxage    => 1800,
@@ -215,7 +213,7 @@ def create_tomcat_instance
   end
   
   # Make sure that all CORS values are set
-  if cors[:enabled]
+  if cors["enabled"]
     cors = default_cors.merge(cors)
   end
   
@@ -227,13 +225,13 @@ def create_tomcat_instance
       source "instances/conf/#{tpl}.erb"
       sensitive true
       variables(
-        :tomcat_admin_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_admin_pass],
-        :tomcat_script_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_script_pass],
-        :tomcat_jmx_pass => node[:wsi_tomcat][:instances][name][:user][:tomcat_jmx_pass],
-        :port => port,
-        :ssl_port => ssl_port,
-        :ajp_port => ajp_port,
-        :ssl_enabled => ssl[:enabled],
+        :tomcat_admin_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_admin_pass"],
+        :tomcat_script_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_script_pass"],
+        :tomcat_jmx_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_jmx_pass"],
+        :port => service_definitions[0]["port"],
+        :ssl_port => service_definitions[0]["port"] + 363,
+        :ajp_port => service_definitions[0]["port"] - 71,
+        :ssl_enabled => service_definitions[0]["ssl"]["enabled"],
         :cors => cors
       )
     end
@@ -241,7 +239,7 @@ def create_tomcat_instance
   
   %w{start stop}.each do |bin_file|
     Chef::Log.info "Templating bin file #{bin_file}"
-    template "#{::File.expand_path(bin_file + '_' + name, tomcat_bin_path)}" do
+    template "#{tomcat_bin_path}/#{bin_file}_#{name}" do
       source "instances/bin/#{bin_file}.erb"
       owner tomcat_user
       group tomcat_group
@@ -253,14 +251,14 @@ def create_tomcat_instance
     end
   end
   
-  template "#{::File.expand_path('setenv.sh', instance_bin_path)}" do
+  template "#{instance_bin_path}/setenv.sh" do
     source "instances/bin/setenv.sh.erb"
     owner tomcat_user
     group tomcat_group
     mode 0744
   end
   
-  template "#{::File.expand_path('catalinaopts.sh', instance_bin_path)}" do
+  template "#{instance_bin_path}/catalinaopts.sh" do
     source "instances/bin/catalinaopts.sh.erb"
     owner tomcat_user
     group tomcat_group

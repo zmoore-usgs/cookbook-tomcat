@@ -4,17 +4,15 @@
 # Author: Ivan Suftin < isuftin@usgs.gov >
 #
 # Description: 
-tomcat_home = node[:wsi_tomcat][:user][:home_dir]
+tomcat_home = node["wsi_tomcat"]["user"]["home_dir"]
 
-node[:wsi_tomcat][:instances].each do |name, attributes|
-  port = attributes.port
-  ssl  = attributes.key?("ssl") ? attributes.ssl  : { :enabled => false }
+node["wsi_tomcat"]["instances"].each do |name, attributes|
+  service_definitions = attributes.service_definitions
   cors = attributes.key?("cors") ? attributes.cors : { :enabled => false }
   auto_start = attributes.key?("auto_start") ? attributes.auto_start : true
   
   wsi_tomcat_instance name do
-    port port
-    ssl ssl
+    service_definitions service_definitions
     tomcat_home tomcat_home
     cors cors
     auto_start auto_start

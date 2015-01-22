@@ -49,7 +49,3 @@ instances.each do |instance, attributes|
   end
   
 end
-
-
-
-
