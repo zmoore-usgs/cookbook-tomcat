@@ -13,7 +13,7 @@ if !ENV['JAVA_HOME'] || ENV['JAVA_HOME'].strip.length == 0
   include_recipe "java"
 else
   Chef::Log.info "Java already installed at #{ENV['JAVA_HOME']}"
-  node.default[:java][:java_home] = ENV['JAVA_HOME']
+  node.default["java"]["java_home"] = ENV['JAVA_HOME']
 end
 
 # gcc is needed to compile Tomcat's JSVC module

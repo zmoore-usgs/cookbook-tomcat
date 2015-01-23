@@ -5,7 +5,7 @@
 #
 # Description: Creates a tomcat group
 
-group_name = node[:wsi_tomcat][:group][:name]
+group_name = node["wsi_tomcat"]["group"]["name"]
 
 group group_name do
   action :create

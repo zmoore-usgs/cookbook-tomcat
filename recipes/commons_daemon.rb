@@ -5,12 +5,12 @@
 #
 # Description: Build Commons Daemon Package for jsvc executable
 
-user_name = node[:wsi_tomcat][:user][:name]
-group_name = node[:wsi_tomcat][:group][:name]
-tomcat_home = node[:wsi_tomcat][:user][:home_dir]
+user_name = node["wsi_tomcat"]["user"]["name"]
+group_name = node["wsi_tomcat"]["group"]["name"]
+tomcat_home = node["wsi_tomcat"]["user"]["home_dir"]
 unpack_directory = "/opt/commons_daemon"
 work_directory = "#{unpack_directory}/unix"
-java_home = lambda {node[:java][:java_home]} # This needs lazy evaluation
+java_home = lambda {node["java"]["java_home"]} # This needs lazy evaluation
 
 directory "Create BCDP build dir" do
   path unpack_directory
