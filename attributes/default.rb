@@ -42,10 +42,10 @@ default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_script_pass"] = "t
 default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_script_pass"] = "tomcat-script-admin"
 default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_jmx_pass"] = "tomcat-jmx"
 default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
-  "port" => 8080,
-  "ssl" => {
-    "enabled" => true
-  }
+  "name" => "Catalina", 
+  "thread_pool" => { "max_threads" => 200, "daemon" => "true", "min_spare_threads" => 25, "max_idle_time" => 60000 },
+  "connector" => { "port" => 8080 },
+  "ssl_connector" => { "enabled" => true}
 }]
 
 default["wsi_tomcat"]["archive"]["manager_name"] = "manager_war.tar.gz"
