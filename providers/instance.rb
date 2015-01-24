@@ -167,8 +167,6 @@ def create_tomcat_instance
   instance_bin_path     = ::File.expand_path("bin", instance_home)
   tomcat_bin_path       = ::File.expand_path("bin", tomcat_home)
   instance_conf_path    = ::File.expand_path("conf", instance_home)
-  #ssl_port              = port + 363 # Default 8443 when regular port is 8080
-  #ajp_port              = port - 71 # Default port is 8009 when regular port is 8080
   tomcat_init_script    = "tomcat-#{name}"
   default_cors          = {
       :enabled          => true,
@@ -228,10 +226,11 @@ def create_tomcat_instance
         :tomcat_admin_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_admin_pass"],
         :tomcat_script_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_script_pass"],
         :tomcat_jmx_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_jmx_pass"],
-        :port => service_definitions[0]["port"],
-        :ssl_port => service_definitions[0]["port"] + 363,
-        :ajp_port => service_definitions[0]["port"] - 71,
-        :ssl_enabled => service_definitions[0]["ssl"]["enabled"],
+        :service_definitions => service_definitions,
+        # :port => service_definitions[0]["port"],
+        # :ssl_port => service_definitions[0]["port"] + 363,
+        # :ajp_port => service_definitions[0]["port"] - 71,
+        # :ssl_enabled => service_definitions[0]["ssl"]["enabled"],
         :cors => cors
       )
     end
