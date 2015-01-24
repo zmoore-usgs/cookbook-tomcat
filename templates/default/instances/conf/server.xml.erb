@@ -3,6 +3,7 @@
     !!!!!!! This file created by Chef !!!!!!! 
     Any edits to this file will be overwritten
 -->
+
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -50,129 +51,184 @@
               pathname="conf/tomcat-users.xml" />
   </GlobalNamingResources>
 
-  <!-- A "Service" is a collection of one or more "Connectors" that share
-       a single "Container" Note:  A "Service" is not itself a "Container",
-       so you may not define subcomponents such as "Valves" at this level.
-       Documentation at /docs/config/service.html
-   -->
-  <Service name="Catalina">
-    <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/executor.html -->
-    <Executor
-        name="tomcatThreadPool"
-        namePrefix="catalina-exec-" 
-        maxThreads="500"
-        daemon="true" 
-        minSpareThreads="25"
-        maxIdleTime="60000"
-    />
-
-    <!-- A "Connector" represents an endpoint by which requests are received
-         and responses are returned. Documentation at :
-         Java HTTP Connector: /docs/config/http.html (blocking & non-blocking)
-         Java AJP  Connector: /docs/config/ajp.html
-         APR (HTTP/AJP) Connector: /docs/apr.html
-         Define a non-SSL HTTP/1.1 Connector on port 8080
-    -->
-    <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/http.html -->
-    <Connector
-        port="<%= @port %>"
-        protocol="HTTP/1.1"
-        executor="tomcatThreadPool"
-        connectionTimeout="20000" 
-        redirectPort="<%= @ssl_port %>"
-    />
-
-    <Connector
-        port="<%= @ssl_port %>"
-        protocol="HTTP/1.1" 
-        executor="tomcatThreadPool"
-        SSLEnabled="<%= @ssl_enabled %>"
-        SSLProtocol="TLS"
-        sslEnabledProtocols="TLSv1.2,TLSv1.1,TLSv1"
-        SSLCipherSuite="ALL:!LOW:!EXP:!SSLv2"
-        SSLCertificateFile="${catalina.home}/ssl/localhost.crt"
-        SSLCertificateKeyFile="${catalina.home}/ssl/localhost.key"
-        SSLPassword="NONE"
-        SSLVerifyClient="none"
-        scheme="https" 
-        secure="true"
-    />
     
-    <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/ajp.html -->
-    <Connector 
-        port="<%= @ajp_port %>"
-        protocol="AJP/1.3"
-        executor="tomcatThreadPool"
-        redirectPort="<%= @ssl_port %>"
-        allowTrace="false"
-        emptySessionPath="false"
-        tcpNoDelay="true"
-        pollTime="2000"
-        pollerSize="8192"
-        tomcatAuthentication="true"
-    />
+    <% @service_definitions.each do |d| %>
+        <!-- A "Service" is a collection of one or more "Connectors" that share
+             a single "Container" Note:  A "Service" is not itself a "Container",
+             so you may not define subcomponents such as "Valves" at this level.
+             Documentation at /docs/config/service.html
+         -->
+        <Service name="<%= d.name %>">
+            
+            <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/executor.html -->
+            <Executor
+                name="<%= d.name %>ThreadPool"
+                namePrefix="<%= d.name %>-exec-" 
+                maxThreads="<%= d.thread_pool.max_threads %>"
+                daemon="<%= d.thread_pool.daemon %>" 
+                minSpareThreads="<%= d.thread_pool.min_spare_threads %>"
+                maxIdleTime="<%= d.thread_pool.max_idle_time %>"
+            />
+           
+            <!-- A "Connector" represents an endpoint by which requests are received
+                 and responses are returned. Documentation at :
+                 Java HTTP Connector: /docs/config/http.html (blocking & non-blocking)
+                 Java AJP  Connector: /docs/config/ajp.html
+                 APR (HTTP/AJP) Connector: /docs/apr.html
+                 Define a non-SSL HTTP/1.1 Connector on port 8080
+            -->
+            <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/http.html -->
+            <Connector
+                port="<%= d.connector.port %>"
+                executor="<%= d.name %>ThreadPool"
+                protocol="<%= d.connector.key?("protocol") ? d.connector.protocol : 'HTTP/1.1' %>"
+                redirectPort="<%= d.connector.port + 363 %>"
+                acceptCount="<%= d.connector.key?("accept_count") ? d.connector.accept_count : 100 %>"
+                acceptorThreadCount="<%= d.connector.key?("acceptor_thread_count") ? d.connector.acceptor_thread_count : 1 %>"
+                acceptorThreadPriority="<%= d.connector.key?("acceptor_thread_priority") ? d.connector.acceptor_thread_priority : 5 %>"
+                address="<%= d.connector.key?("address") ? d.connector.address : '0.0.0.0' %>"
+                allowTrace="<%= d.connector.key?("allow_trace") ? d.connector.allow_trace : false %>"
+                asyncTimeout="<%= d.connector.key?("async_timeout") ? d.connector.async_timeout : 10000 %>"
+                bindOnInit="<%= d.connector.key?("bind_on_init") ? d.connector.bind_on_init : true %>"
+                compressableMimeType="<%= d.connector.key?("compressable_mime_type") ? d.connector.compressable_mime_type : 'text/html,text/xml,text/plain' %>"
+                compression="<%= d.connector.key?("compression") ? d.connector.compression : 'off' %>"
+                compressionMinSize="<%= d.connector.key?("compression_min_size") ? d.connector.compression_min_size : 2048 %>"
+                connectionLinger="<%= d.connector.key?("connection_linger") ? d.connector.connection_linger : '-1' %>"
+                connectionTimeout="<%= d.connector.key?("connection_timeout") ? d.connector.connection_timeout : 20000 %>"
+                connectionUploadTimeout= "<%= d.connector.key?("connection_upload_timeout") ? d.connector.connection_upload_timeout : false %>"
+                disableUploadTimeout="<%= d.connector.key?("disable_upload_timeout") ? d.connector.disable_upload_timeout : true %>"
+                enableLookups="<%= d.connector.key?("enable_lookups") ? d.connector.enable_lookups : false %>"
+                executorTerminationTimeoutMillis="<%= d.connector.key?("executor_termination_timeout_millis") ? d.connector.executor_termination_timeout_millis : 0 %>"
+                keepAliveTimeout="<%= d.connector.key?("keep_alive_timeout") ? d.connector.keep_alive_timeout : 20000 %>"
+                maxConnections="<%= d.connector.key?("max_connections") ? d.connector.max_connections : 8192 %>"
+                maxExtensionSize="<%= d.connector.key?("max_extension_size") ? d.connector.max_extension_size : 8192 %>"
+                maxHttpHeaderSize="<%= d.connector.key?("max_http_header_size") ? d.connector.max_http_header_size : 8192 %>"
+                maxKeepAliveRequests="<%= d.connector.key?("keep_alive_requests") ? d.connector.keep_alive_requests : 100 %>"
+                maxSwallowSize="<%= d.connector.key?("max_swallow_size") ? d.connector.max_swallow_size : 2097152 %>"
+                maxThreads="<%= d.connector.key?("max_threads") ? d.connector.max_threads : 200 %>"
+                maxHeaderCount="<%= d.connector.key?("max_header_count") ? d.connector.max_header_count : 100 %>"
+                maxParameterCount="<%= d.connector.key?("max_parameter_count") ? d.connector.max_parameter_count : 10000 %>"
+                maxPostSize="<%= d.connector.key?("max_post_size") ? d.connector.max_post_size : 2097152 %>"
+                maxSavePostSize="<%= d.connector.key?("max_save_post_size") ? d.connector.max_save_post_size : 4096 %>"
+                maxTrailerSize="<%= d.connector.key?("max_trailer_size") ? d.connector.max_trailer_size : 8192 %>"
+                minSpareThreads="<%= d.connector.key?("min_spare_threads") ? d.connector.min_spare_threads : 10 %>"
+                noCompressionUserAgents="<%= d.connector.key?("no_compression_user_agents") ? d.connector.no_compression_user_agents : '' %>"
+                parseBodyMethods="<%= d.connector.key?("parse_body_methods") ? d.connector.parse_body_methods : 'POST' %>"
+                processorCache="<%= d.connector.key?("processor_cache") ? d.connector.processor_cache : 200 %>"
+                restrictedUserAgents="<%= d.connector.key?("restricted_user_agents") ? d.connector.restricted_user_agents : '' %>"
+                scheme="<%= d.connector.key?("scheme") ? d.connector.scheme : 'http' %>"
+                secure="<%= d.connector.key?("secure") ? d.connector.secure : false %>"
+                server="<%= d.connector.key?("server") ? d.connector.server : '' %>"
+                socketBuffer="<%= d.connector.key?("socket_buffer") ? d.connector.socket_buffer : 9000 %>"
+                SSLEnabled="<%= d.connector.key?("ssl_enabled") ? d.connector.ssl_enabled : false %>"
+                tcpNoDelay="<%= d.connector.key?("tcp_no_delay") ? d.connector.tcp_no_delay : true %>"
+                threadPriority="<%= d.connector.key?("thread_priority") ? d.connector.thread_priority : 5 %>"
+                upgradeAsyncWriteBufferSize="<%= d.connector.key?("upgrade_async_write_buffer_size") ? d.connector.upgrade_async_write_buffer_size : 8192 %>"
+                URIEncoding="<%= d.connector.key?("uri_encoding") ? d.connector.uri_encoding : 'ISO-8859-1' %>"
+                useBodyEncodingForURI="<%= d.connector.key?("use_body_encoding_uri") ? d.connector.use_body_encoding_uri : false %>"
+                useIPVHosts="<%= d.connector.key?("use_ipv_hosts") ? d.connector.use_ipv_hosts : false %>"
+                xpoweredBy="<%= d.connector.key?("x_powered_by") ? d.connector.x_powered_by : false %>"
+            />
+            
+            <Connector
+                port="<%= d.connector.port + 363 %>"
+                protocol="HTTP/1.1"
+                executor="<%= d.name %>ThreadPool"
+                SSLEnabled="<%= d.ssl_connector.enabled %>"
+                SSLProtocol="TLS"
+                sslEnabledProtocols="TLSv1.2,TLSv1.1,TLSv1"
+                SSLCipherSuite="ALL:!LOW:!EXP:!SSLv2"
+                SSLCertificateFile="${catalina.home}/ssl/localhost.crt"
+                SSLCertificateKeyFile="${catalina.home}/ssl/localhost.key"
+                SSLPassword="NONE"
+                SSLVerifyClient="none"
+                scheme="https"
+                secure="true"
+            />
+            
+            <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/ajp.html -->
+            <Connector
+                port="<%= d.connector.port - 71 %>"
+                protocol="AJP/1.3"
+                executor="<%= d.name %>ThreadPool"
+                redirectPort="<%= d.connector.port + 363 %>"
+                allowTrace="false"
+                emptySessionPath="false"
+                tcpNoDelay="true"
+                pollTime="2000"
+                pollerSize="8192"
+                tomcatAuthentication="true"
+            />
+            
+            <Engine name="Catalina" defaultHost="localhost" jvmRoute="default">
 
-    <!-- A "Connector" using the shared thread pool-->
-    <!--
-    <Connector executor="tomcatThreadPool"
-               port="8080" protocol="HTTP/1.1"
-               connectionTimeout="20000"
-               redirectPort="8443" />
-    -->
-    <!-- Define a SSL HTTP/1.1 Connector on port 8443
-         This connector uses the JSSE configuration, when using APR, the
-         connector should be using the OpenSSL style configuration
-         described in the APR documentation -->
-    <!--
-    <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
-               maxThreads="150" scheme="https" secure="true"
-               clientAuth="false" sslProtocol="TLS" />
-    -->
+              <!--For clustering, please take a look at documentation at:
+                  /docs/cluster-howto.html  (simple how to)
+                  /docs/config/cluster.html (reference documentation) -->
+              <!--
+              <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
+              -->
 
+              <!-- Use the LockOutRealm to prevent attempts to guess user passwords
+                   via a brute-force attack -->
+              <Realm className="org.apache.catalina.realm.LockOutRealm">
+                <!-- This Realm uses the UserDatabase configured in the global JNDI
+                     resources under the key "UserDatabase".  Any edits
+                     that are performed against this UserDatabase are immediately
+                     available for use by the Realm.  -->
+                <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+                       resourceName="UserDatabase"/>
+              </Realm>
 
-    <!-- An Engine represents the entry point (within Catalina) that processes
-         every request.  The Engine implementation for Tomcat stand alone
-         analyzes the HTTP headers included with the request, and passes them
-         on to the appropriate Host (virtual host).
-         Documentation at /docs/config/engine.html -->
+              <Host name="localhost"  appBase="webapps"
+                    unpackWARs="true" autoDeploy="true"
+        	    xmlValidation="false" xmlNamespaceAware="false">
 
-    <Engine name="Catalina" defaultHost="localhost" jvmRoute="default">
+                <!-- SingleSignOn valve, share authentication between web applications
+                     Documentation at: /docs/config/valve.html -->
+                <!--
+                <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
+                -->
 
-      <!--For clustering, please take a look at documentation at:
-          /docs/cluster-howto.html  (simple how to)
-          /docs/config/cluster.html (reference documentation) -->
-      <!--
-      <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
-      -->
+                <!-- Access log processes all example.
+                     Documentation at: /docs/config/valve.html
+                     Note: The pattern used is equivalent to using pattern="common" -->
+                <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+                       prefix="localhost_access_log." suffix=".txt"
+                       pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+              </Host>
+            </Engine>
+            
+        </Service>
+        
+    
 
-      <!-- Use the LockOutRealm to prevent attempts to guess user passwords
-           via a brute-force attack -->
-      <Realm className="org.apache.catalina.realm.LockOutRealm">
-        <!-- This Realm uses the UserDatabase configured in the global JNDI
-             resources under the key "UserDatabase".  Any edits
-             that are performed against this UserDatabase are immediately
-             available for use by the Realm.  -->
-        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
-               resourceName="UserDatabase"/>
-      </Realm>
-
-      <Host name="localhost"  appBase="webapps"
-            unpackWARs="true" autoDeploy="true"
-	    xmlValidation="false" xmlNamespaceAware="false">
-
-        <!-- SingleSignOn valve, share authentication between web applications
-             Documentation at: /docs/config/valve.html -->
+        <!-- A "Connector" using the shared thread pool-->
         <!--
-        <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
+        <Connector executor="tomcatThreadPool"
+                   port="8080" protocol="HTTP/1.1"
+                   connectionTimeout="20000"
+                   redirectPort="8443" />
+        -->
+        <!-- Define a SSL HTTP/1.1 Connector on port 8443
+             This connector uses the JSSE configuration, when using APR, the
+             connector should be using the OpenSSL style configuration
+             described in the APR documentation -->
+        <!--
+        <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
+                   maxThreads="150" scheme="https" secure="true"
+                   clientAuth="false" sslProtocol="TLS" />
         -->
 
-        <!-- Access log processes all example.
-             Documentation at: /docs/config/valve.html
-             Note: The pattern used is equivalent to using pattern="common" -->
-        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
-               prefix="localhost_access_log." suffix=".txt"
-               pattern="%h %l %u %t &quot;%r&quot; %s %b" />
-      </Host>
-    </Engine>
-  </Service>
+
+        <!-- An Engine represents the entry point (within Catalina) that processes
+             every request.  The Engine implementation for Tomcat stand alone
+             analyzes the HTTP headers included with the request, and passes them
+             on to the appropriate Host (virtual host).
+             Documentation at /docs/config/engine.html -->
+
+        
+            
+    <% end %>
+
 </Server>

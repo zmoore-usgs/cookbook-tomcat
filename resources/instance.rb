@@ -13,19 +13,9 @@ attribute :name,
 # Used in: create
 # Is optional: false
 # The port number that the instance will be assigned to
-attribute :port, 
-  :kind_of  => Fixnum,
-  :default => 8080
-  
-# Used in: create
-# Is optional: true
-# Whether SSL will be enabled. False by default
-attribute :ssl,
-  :kind_of => Hash,
-  :default => {
-    :enabled => false
-  }
-  
+attribute :service_definitions, 
+  :kind_of  => [Array]
+    
 # Used in: create
 # Is optional: true
 # Whether CORS will be enabled. False by default 
@@ -40,7 +30,7 @@ attribute :cors,
 # Where the tomcat home directory is located. "/opt/tomcat" by default
 attribute :tomcat_home,
   :kind_of => String,
-  :default => node[:wsi_tomcat][:user][:home_dir]
+  :default => node["wsi_tomcat"]["user"]["home_dir"]
   
 # Used in: create
 # Is optional: true
@@ -52,10 +42,11 @@ attribute :auto_start,
 # Used in: create, deploy_app
 # Is optional: true
 # An array of strings to add to the server
+fqdn = node["fqdn"]
 attribute :server_opts,
   :kind_of => [Array, String],
   :default => lazy { |r| [
-    "XX:HeapDumpPath=$CATALINA_HOME/heapdumps/#{node.fqdn}/#{r.name}"
+    "XX:HeapDumpPath=$CATALINA_HOME/heapdumps/#{fqdn}/#{r.name}"
     ]}
 
 # Used in: deploy_app
