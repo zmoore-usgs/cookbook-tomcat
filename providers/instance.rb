@@ -227,10 +227,6 @@ def create_tomcat_instance
         :tomcat_script_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_script_pass"],
         :tomcat_jmx_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_jmx_pass"],
         :service_definitions => service_definitions,
-        # :port => service_definitions[0]["port"],
-        # :ssl_port => service_definitions[0]["port"] + 363,
-        # :ajp_port => service_definitions[0]["port"] - 71,
-        # :ssl_enabled => service_definitions[0]["ssl"]["enabled"],
         :cors => cors
       )
     end

@@ -160,75 +160,53 @@
                 tomcatAuthentication="true"
             />
             
-            <Engine name="Catalina" defaultHost="localhost" jvmRoute="default">
-
-              <!--For clustering, please take a look at documentation at:
-                  /docs/cluster-howto.html  (simple how to)
-                  /docs/config/cluster.html (reference documentation) -->
-              <!--
-              <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
-              -->
-
-              <!-- Use the LockOutRealm to prevent attempts to guess user passwords
-                   via a brute-force attack -->
-              <Realm className="org.apache.catalina.realm.LockOutRealm">
-                <!-- This Realm uses the UserDatabase configured in the global JNDI
-                     resources under the key "UserDatabase".  Any edits
-                     that are performed against this UserDatabase are immediately
-                     available for use by the Realm.  -->
+            <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/engine.html -->
+            <Engine name="<%= d.engine.key?("name") ? d.engine.name : d.name %>" 
+                defaultHost="<%= d.engine.key?("default_host") ? d.engine.default_host : 'localhost' %>" 
+                jvmRoute="<%= d.engine.key?("jvm_route") ? d.engine.jvm_route : 'default' %>"
+                startStopThreads="<%= d.engine.key?("start_stop_threads") ? d.engine.start_stop_threads : 1 %>"
+                backgroundProcessorDelay="<%= d.engine.key?("background_processor_delay") ? d.engine.background_processor_delay : 10 %>"
+                >
+                
+                <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/realm.html -->
+                <Realm className="org.apache.catalina.realm.LockOutRealm">
                 <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
                        resourceName="UserDatabase"/>
-              </Realm>
-
-              <Host name="localhost"  appBase="webapps"
-                    unpackWARs="true" autoDeploy="true"
-        	    xmlValidation="false" xmlNamespaceAware="false">
-
-                <!-- SingleSignOn valve, share authentication between web applications
-                     Documentation at: /docs/config/valve.html -->
-                <!--
-                <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
-                -->
-
-                <!-- Access log processes all example.
-                     Documentation at: /docs/config/valve.html
-                     Note: The pattern used is equivalent to using pattern="common" -->
-                <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
-                       prefix="localhost_access_log." suffix=".txt"
-                       pattern="%h %l %u %t &quot;%r&quot; %s %b" />
-              </Host>
+                </Realm>
+                
+                <% d.engine.host.each do |host| %>
+                    <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/host.html -->
+                    <Host name="<%= host.key?("name") ? host.name : 'localhost' %>"  
+                        appBase="<%= host.key?("app_base") ? host.app_base : 'webapps' %>"
+                        xmlbase="<%= host.key?("xml_base") ? host.xml_base : 'conf' %>"
+                        createDirs="<%= host.key?("create_dirs") ? host.create_dirs : true %>"
+                        autoDeploy="<%= host.key?("auto_deploy") ? host.auto_deploy : true %>"
+                        backgroundProcessorDelay="<%= host.key?("background_processor_delay") ? host.background_processor_delay : '-1' %>"
+                        deployIgnore="<%= host.key?("deploy_ignore") ? host.deploy_ignore : '' %>"
+                        deployOnStartup="<%= host.key?("deploy_on_startup") ? host.deploy_on_startup : true %>"
+                        failCtxIfServletStartFails="<%= host.key?("fail_ctx_if_servlet_start_fails") ? host.fail_ctx_if_servlet_start_fails : false %>"
+                        startStopThreads="<%= host.key?("start_stop_threads") ? host.start_stop_threads : 1 %>"
+                        undeployOldVersions="<%= host.key?("undeploy_old_versions") ? host.undeploy_old_versions : false %>"
+                        copyXML="<%= host.key?("copy_xml") ? host.copy_xml : false %>"
+                        deployXML="<%= host.key?("deploy_xml") ? host.deploy_xml : true %>"
+                        errorReportValveClass="<%= host.key?("error_report_valve_class") ? host.error_report_valve_class : 'org.apache.catalina.valves.ErrorReportValve' %>"
+                        unpackWARs="<%= host.key?("unpack_wars") ? host.unpack_wars : true %>"
+                        workDir="<%= host.key?("work_dir") ? host.work_dir : 'work' %>"
+                        >
+                    
+                        <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/valve.html -->
+                        <Valve className="org.apache.catalina.valves.AccessLogValve" 
+                            directory="logs"
+                            prefix="<%= host.key?("name") ? host.name : 'localhost' %>_access_log." 
+                            suffix=".txt"
+                            pattern="%h %l %u %t &quot;%r&quot; %s %b" 
+                            />
+                            
+                            <Context privileged="true" docBase="manager" path="/manager" reloadable="true"/>
+                    </Host>
+                <% end %>
             </Engine>
-            
         </Service>
-        
-    
-
-        <!-- A "Connector" using the shared thread pool-->
-        <!--
-        <Connector executor="tomcatThreadPool"
-                   port="8080" protocol="HTTP/1.1"
-                   connectionTimeout="20000"
-                   redirectPort="8443" />
-        -->
-        <!-- Define a SSL HTTP/1.1 Connector on port 8443
-             This connector uses the JSSE configuration, when using APR, the
-             connector should be using the OpenSSL style configuration
-             described in the APR documentation -->
-        <!--
-        <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
-                   maxThreads="150" scheme="https" secure="true"
-                   clientAuth="false" sslProtocol="TLS" />
-        -->
-
-
-        <!-- An Engine represents the entry point (within Catalina) that processes
-             every request.  The Engine implementation for Tomcat stand alone
-             analyzes the HTTP headers included with the request, and passes them
-             on to the appropriate Host (virtual host).
-             Documentation at /docs/config/engine.html -->
-
-        
-            
     <% end %>
 
 </Server>
