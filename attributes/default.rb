@@ -14,7 +14,8 @@ default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
   "http://mirror.olnevhost.net/pub/apache/#{tomcat_url_fragment}",
   "http://apache.mirrors.lucidnetworks.net/#{tomcat_url_fragment}",
   "http://www.webhostingreviewjam.com/mirror/apache/#{tomcat_url_fragment}",
-  "http://mirror.nexcess.net/apache/#{tomcat_url_fragment}"
+  "http://mirror.nexcess.net/apache/#{tomcat_url_fragment}",
+  "http://archive.apache.org/dist/#{tomcat_url_fragment}"
 ]
 # Chef will verify the SHA256 checksum of the downloaded archive
 # Generate SHA256 checksum for a file:
