@@ -5,7 +5,7 @@ default["wsi_tomcat"]["user"]["home_dir"] = "/opt/tomcat"
 
 
 # Set the version of Tomcat to install
-default["wsi_tomcat"]["version"]      = "7.0.57"
+default["wsi_tomcat"]["version"]      = "7.0.61"
 default["wsi_tomcat"]["version_base"] = default["wsi_tomcat"]["version"] .split(".")[0]
 
 # Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
