@@ -5,7 +5,7 @@ default["wsi_tomcat"]["user"]["home_dir"] = "/opt/tomcat"
 
 
 # Set the version of Tomcat to install
-default["wsi_tomcat"]["version"]      = "7.0.57"
+default["wsi_tomcat"]["version"]      = "7.0.61"
 default["wsi_tomcat"]["version_base"] = default["wsi_tomcat"]["version"] .split(".")[0]
 
 # Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
@@ -22,7 +22,7 @@ default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
 # http://www.openoffice.org/download/checksums.html#hash_win
 # http://www.openoffice.org/download/checksums.html#hash_linux
 # http://www.openoffice.org/download/checksums.html#hash_mac
-default["wsi_tomcat"]["file"]["archive"]["checksum"] = "1ce390049ed23143e3db0c94781c1e88a4d1b39ceb471c0af088a0c326d637cb"
+default["wsi_tomcat"]["file"]["archive"]["checksum"] = "2528ad7434e44ab1198b5692d5f831ac605051129119fd81a00d4c75abe1c0e0"
 
 # Instances definition 
 # port = The port that the tomcat instance will run on
