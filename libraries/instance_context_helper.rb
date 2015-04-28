@@ -14,6 +14,7 @@ class Chef::Recipe::ContextHelper
   def self.normalize_resource(incoming_resource)
     @default_resource                           = {
       "name"                                    => "jdbc/insert_name_here",
+      "description"                             => "",
       "auth"                                    => "Container",
       "type"                                    => "javax.sql.DataSource",
       "username"                                => "",

@@ -35,7 +35,9 @@
     -->
     <% if defined?(@resources) %>
         <% @resources.each do |r| -%>
-            <Resource name="<%= r["name"] %>"
+            <Resource 
+                    description="<%=r["description"] %>"
+                    name="<%= r["name"] %>"
                     auth="<%= r["auth"] %>"
                     type="<%= r["type"] %>"
                     username="<%= r["username"] %>"
