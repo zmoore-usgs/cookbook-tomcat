@@ -142,6 +142,8 @@
                 SSLCertificateKeyFile="${catalina.home}/ssl/localhost.key"
                 SSLPassword="NONE"
                 SSLVerifyClient="none"
+                keystoreFile="<%= d.ssl_connector.keystore_file %>"
+                keystorePass="<%= d.ssl_connector.keystore_pass %>"
                 scheme="https"
                 secure="true"
             />
