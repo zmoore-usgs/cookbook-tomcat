@@ -46,7 +46,9 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
   "name" => "Catalina", 
   "thread_pool" => { "max_threads" => 200, "daemon" => "true", "min_spare_threads" => 25, "max_idle_time" => 60000 },
   "connector" => { "port" => 8080 },
-  "ssl_connector" => { "enabled" => true},
+  "ssl_connector" => { 
+    "enabled" => true
+  },
   "engine" => { "host" => [ "name" => "localhost" ] }
   }]
 
