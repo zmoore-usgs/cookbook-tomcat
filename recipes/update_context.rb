@@ -15,17 +15,30 @@ e            = []
 instances.each do |instance, attributes|
   conf_path = "#{tomcat_home}/instance/#{instance}/conf/#{context_xml}"
   
-  attributes.application.each do |application, app_attributes|
-    if app_attributes.has_key?("context")
-      original_resources    = app_attributes["context"].fetch(:resources, [])
-      original_environments = app_attributes["context"].fetch(:environments, [])
+  if attributes.has_key?("context")
+    Chef::Log.info("Updating #{instance} context")
+    original_resources    = attributes["context"].fetch(:resources, [])
+    original_environments = attributes["context"].fetch(:environments, [])
+    
+    unless original_resources.empty?
+      r.push(ContextHelper.normalize_resources(original_resources))
+    end
+    
+    unless original_environments.empty?
+      e.push(ContextHelper.normalize_environments(original_environments))
+    end
+    
+    #encrypted properties to be used as String kvps
+    if attributes["context"].has_key?("encrypted_environments_databag") 
+      enc_environments_databag = attributes["context"].fetch(:encrypted_environments_databag, {})
+      databag_name = enc_environments_databag["databag_name"]
+      enc_key_location = enc_environments_databag["key_location"]
+      extract_fields = enc_environments_databag["extract_fields"]
+      Chef::Log.debug("Getting encrypted environment entries from #{databag_name}")
       
-      unless original_resources.empty?
-        r.push(ContextHelper.normalize_resources(original_resources))
-      end
-      
-      unless original_environments.empty?
-        e.push(ContextHelper.normalize_environments(original_environments))
+      databag = data_bag_item(databag_name, databag_name, IO.read(enc_key_location))
+      extract_fields.each do |propName|
+        e.push({ "name" => propName, "value" => databag[propName], "type" => "java.lang.String", "override" => true})
       end
     end
   end

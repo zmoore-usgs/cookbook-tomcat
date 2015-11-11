@@ -11,6 +11,7 @@ instances_home = File.expand_path("instance", tomcat_home)
 
 instances.each do |instance, attributes|
   attributes.application.each do |application, app_attributes|
+    Chef::Log.info("Deploying #{application}")
     wsi_tomcat_instance instance do
       application_name application
       action :deploy_app

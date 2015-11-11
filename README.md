@@ -1,3 +1,3 @@
 # wsi-tomcat
 
-Installs Tomcat
+Installs Tomcat, see attributes/default.rb for configuration options
