@@ -20,7 +20,7 @@
   limitations under the License.
 -->
 <tomcat-users>
-<% if @d.disable_admin_users != true %>
+<% if @disable_admin_users != true %>
  <role rolename="manager-gui"/>
  <role rolename="manager-script"/>
  <role rolename="manager-jmx"/>
