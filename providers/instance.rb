@@ -140,6 +140,8 @@ def deploy_application
   webapps_dir            = ::File.expand_path("webapps", instance_dir)
   war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
   
+  Chef::Log.info("deploying #{application_name} from #{application_url}")
+  
   remote_file war_name do
     source application_url
     owner tomcat_user
@@ -223,6 +225,7 @@ def create_tomcat_instance
       source "instances/conf/#{tpl}.erb"
       sensitive true
       variables(
+        :disable_admin_users => node["wsi_tomcat"]["instances"][name]["user"]["disable_admin_users"],
         :tomcat_admin_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_admin_pass"],
         :tomcat_script_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_script_pass"],
         :tomcat_jmx_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_jmx_pass"],

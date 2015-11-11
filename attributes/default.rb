@@ -5,7 +5,7 @@ default["wsi_tomcat"]["user"]["home_dir"] = "/opt/tomcat"
 
 
 # Set the version of Tomcat to install
-default["wsi_tomcat"]["version"]      = "7.0.61"
+default["wsi_tomcat"]["version"]      = "8.0.28"
 default["wsi_tomcat"]["version_base"] = default["wsi_tomcat"]["version"] .split(".")[0]
 
 # Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
@@ -22,7 +22,7 @@ default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
 # http://www.openoffice.org/download/checksums.html#hash_win
 # http://www.openoffice.org/download/checksums.html#hash_linux
 # http://www.openoffice.org/download/checksums.html#hash_mac
-default["wsi_tomcat"]["file"]["archive"]["checksum"] = "2528ad7434e44ab1198b5692d5f831ac605051129119fd81a00d4c75abe1c0e0"
+default["wsi_tomcat"]["file"]["archive"]["checksum"] = "a7a6c092b79fc5a8cffe5916d0e5554254eddcb3c1911ed90696c153b4f13d10"
 
 # Instances definition 
 # port = The port that the tomcat instance will run on
@@ -38,8 +38,8 @@ default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["exposed_header
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["preflight_maxage"] = 1800
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["support_credentials"] = true
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["filter"] = "/*"
+default["wsi_tomcat"]["instances"]["default"]["user"]["disable_admin_users"] = true
 default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_admin_pass"] = "tomcat-admin"
-default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_script_pass"] = "tomcat-script-admin"
 default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_script_pass"] = "tomcat-script-admin"
 default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_jmx_pass"] = "tomcat-jmx"
 default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
@@ -52,9 +52,24 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
   "engine" => { "host" => [ "name" => "localhost" ] }
   }]
 
+# if you want to set environment variable entries in context.xml
+# default["wsi_tomcat"]["instances"]["default"]["context"]["environments"] = [
+#   { "name" => "propName", "type" => "java.lang.String", "override" => true, 
+#     "value" => "propValue"}]
+
+# To pull a list (extract_fields) from an encrypted databag and add them to the context.xml as String properties.
+# this feature relies on an encryption key being placed on the system before this recipe runs
+# default["wsi_tomcat"]["instances"]["default"]["context"]["encrypted_environments_databag"] = {
+#   "databag_name" => "name_of_your_databag",
+#   "key_location" => "local_file_path_to_encryption_key",
+#   "extract_fields" => ["field1", "field2", "field3"]
+# }
+
 default["wsi_tomcat"]["archive"]["manager_name"] = "manager_war.tar.gz"
 
 # JAVA Installation Options
 # https://supermarket.chef.io/cookbooks/java
-default["java"]["jdk_version"] = "7"
+default["java"]["install_flavor"] = "oracle"
+default["java"]["oracle"]["accept_oracle_download_terms"] = true
+default["java"]["jdk_version"] = "8"
 default["java"]["set_etc_environment"] = true
