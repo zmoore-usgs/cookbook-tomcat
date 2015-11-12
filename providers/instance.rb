@@ -225,6 +225,7 @@ def create_tomcat_instance
       source "instances/conf/#{tpl}.erb"
       sensitive true
       variables(
+        :version => node["wsi_tomcat"]["version"].split(".")[0],
         :disable_admin_users => node["wsi_tomcat"]["instances"][name]["user"]["disable_admin_users"],
         :tomcat_admin_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_admin_pass"],
         :tomcat_script_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_script_pass"],

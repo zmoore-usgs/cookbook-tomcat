@@ -25,8 +25,11 @@
     <!-- Default set of monitored resources. If one of these changes, the    -->
     <!-- web application will be reloaded.                                   -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    
+    <% if @version.tr(',','').to_i  > 7 %>
     <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
-
+	<% end %>
+	
     <!-- Uncomment this to disable session persistence across Tomcat restarts -->
     <Manager pathname="" />
 

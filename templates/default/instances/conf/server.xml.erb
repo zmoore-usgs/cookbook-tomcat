@@ -25,12 +25,20 @@
      Documentation at /docs/config/server.html
  -->
 <Server port="-1" shutdown="SHUTDOWN">
+  <% if @version.tr(',','').to_i  > 7 %>
   <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+  <% end %>
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
   <!--APR library loader. Documentation at /docs/apr.html -->
   <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+  
+  <% if @version.tr(',','').to_i  <= 7 %>
+  <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html -->
+  <Listener className="org.apache.catalina.core.JasperListener" />
+  <% end %>
+  
   <!-- Prevent memory leaks due to use of particular java/javax APIs-->
   <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
