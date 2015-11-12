@@ -3,19 +3,16 @@ default["wsi_tomcat"]["group"]["name"]    = "tomcat"
 default["wsi_tomcat"]["user"]["name"]     = "tomcat"
 default["wsi_tomcat"]["user"]["home_dir"] = "/opt/tomcat"
 
-
 # Set the version of Tomcat to install
 default["wsi_tomcat"]["version"]      = "8.0.28"
-default["wsi_tomcat"]["version_base"] = default["wsi_tomcat"]["version"] .split(".")[0]
 
 # Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
-tomcat_url_fragment                   = "tomcat/tomcat-#{wsi_tomcat.version_base}/v#{wsi_tomcat.version}/bin/apache-tomcat-#{wsi_tomcat.version}.tar.gz"
 default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
-  "http://mirror.olnevhost.net/pub/apache/#{tomcat_url_fragment}",
-  "http://apache.mirrors.lucidnetworks.net/#{tomcat_url_fragment}",
-  "http://www.webhostingreviewjam.com/mirror/apache/#{tomcat_url_fragment}",
-  "http://mirror.nexcess.net/apache/#{tomcat_url_fragment}",
-  "http://archive.apache.org/dist/#{tomcat_url_fragment}"
+  "http://mirror.olnevhost.net/pub/apache/",
+  "http://apache.mirrors.lucidnetworks.net/",
+  "http://www.webhostingreviewjam.com/mirror/",
+  "http://mirror.nexcess.net/apache/",
+  "http://archive.apache.org/dist/"
 ]
 # Chef will verify the SHA256 checksum of the downloaded archive
 # Generate SHA256 checksum for a file:
