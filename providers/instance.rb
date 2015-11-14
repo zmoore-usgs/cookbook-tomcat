@@ -150,7 +150,7 @@ def deploy_application
   end
 end
 
-# will check for ssl=true and load/create keys from encrypted databags
+# will check for ssl=true and load/create keys from encrypted data_bags
 def load_service_definitions_and_keys (service_definitions, current_resource)
   built_service_definitions = []
   home_dir = node["wsi_tomcat"]["user"]["home_dir"]
@@ -164,12 +164,12 @@ def load_service_definitions_and_keys (service_definitions, current_resource)
       wsi_tomcat_keys_data_bag = newDef["ssl_connector"]["wsi_tomcat_keys_data_bag"]
       enc_key_location = newDef["ssl_connector"]["key_location"]
       
-      decrypted_keystore_databag = data_bag_item(wsi_tomcat_keys_data_bag, wsi_tomcat_keys_data_bag, IO.read(enc_key_location))
+      decrypted_keystore_data_bag = data_bag_item(wsi_tomcat_keys_data_bag, wsi_tomcat_keys_data_bag, IO.read(enc_key_location))
       
-      keystore_password = decrypted_keystore_databag["keystore_password"]
-      privKey = decrypted_keystore_databag["private_key"]
-      cert = decrypted_keystore_databag["certificate"]
-      trust_certs = decrypted_keystore_databag["trust_certs"]
+      keystore_password = decrypted_keystore_data_bag["keystore_password"]
+      privKey = decrypted_keystore_data_bag["private_key"]
+      cert = decrypted_keystore_data_bag["certificate"]
+      trust_certs = decrypted_keystore_data_bag["trust_certs"]
       
       #write out private key, eg /opt/tomcat/ssl/<NAME>.localhost.key
       file "#{home_dir}/ssl/#{newDef['name']}.localhost.key" do

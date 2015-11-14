@@ -56,10 +56,10 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 #   { "name" => "propName", "type" => "java.lang.String", "override" => true, 
 #     "value" => "propValue"}]
 
-# To pull a list (extract_fields) from an encrypted databag and add them to the context.xml as String properties.
+# To pull a list (extract_fields) from an encrypted data_bag and add them to the context.xml as String properties.
 # this feature relies on an encryption key being placed on the system before this recipe runs
 # default["wsi_tomcat"]["instances"]["default"]["context"]["encrypted_environments_data_bag"] = {
-#   "data_bag_name" => "name_of_your_databag",
+#   "data_bag_name" => "name_of_your_data_bag",
 #   "key_location" => "local_file_path_to_encryption_key",
 #   "extract_fields" => ["field1", "field2", "field3"]
 # }
