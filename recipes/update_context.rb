@@ -29,16 +29,16 @@ instances.each do |instance, attributes|
     end
     
     #encrypted properties to be used as String kvps
-    if attributes["context"].has_key?("encrypted_environments_databag") 
-      enc_environments_databag = attributes["context"].fetch(:encrypted_environments_databag, {})
-      databag_name = enc_environments_databag["databag_name"]
-      enc_key_location = enc_environments_databag["key_location"]
-      extract_fields = enc_environments_databag["extract_fields"]
-      Chef::Log.debug("Getting encrypted environment entries from #{databag_name}")
+    if attributes["context"].has_key?("encrypted_environments_data_bag") 
+      enc_environments_data_bag = attributes["context"].fetch(:encrypted_environments_data_bag, {})
+      data_bag_name = enc_environments_data_bag["data_bag_name"]
+      enc_key_location = enc_environments_data_bag["key_location"]
+      extract_fields = enc_environments_data_bag["extract_fields"]
+      Chef::Log.debug("Getting encrypted environment entries from #{data_bag_name}")
       
-      databag = data_bag_item(databag_name, databag_name, IO.read(enc_key_location))
+      data_bag = data_bag_item(data_bag_name, data_bag_name, IO.read(enc_key_location))
       extract_fields.each do |propName|
-        e.push({ "name" => propName, "value" => databag[propName], "type" => "java.lang.String", "override" => true})
+        e.push({ "name" => propName, "value" => data_bag[propName], "type" => "java.lang.String", "override" => true})
       end
     end
   end

@@ -137,25 +137,19 @@
                 xpoweredBy="<%= d.connector.key?("x_powered_by") ? d.connector.x_powered_by : false %>"
             />
             
-            <Connector
-                port="<%= d.connector.port + 363 %>"
-                protocol="HTTP/1.1"
-                executor="<%= d.name %>ThreadPool"
-                SSLEnabled="<%= d.ssl_connector.enabled %>"
-                SSLProtocol="TLS"
-                sslEnabledProtocols="TLSv1.2,TLSv1.1,TLSv1"
-                SSLCipherSuite="ALL:!LOW:!EXP:!SSLv2"
-                SSLCertificateFile="${catalina.home}/ssl/localhost.crt"
-                SSLCertificateKeyFile="${catalina.home}/ssl/localhost.key"
-                SSLPassword="NONE"
-                SSLVerifyClient="none"
-                <% if defined?(@d.ssl_connector.keystore_file) %>
-                keystoreFile="<%= d.ssl_connector.keystore_file %>"
-                keystorePass="<%= d.ssl_connector.keystore_pass %>"
-                <% end %>
-                scheme="https"
-                secure="true"
-            />
+            <% if d.ssl_connector.enabled == true %>
+              <Connector
+                  port="<%= d.connector.port + 363 %>"
+                  protocol="HTTP/1.1"
+                  executor="<%= d.name %>ThreadPool"
+                  SSLEnabled="<%= d.ssl_connector.enabled %>"
+                  keystoreFile="${catalina.home}/ssl/<%= d.name%>.jks" 
+                  keystorePass="<%= @keystore_password %>" 
+                  sslProtocol="TLS"
+                  scheme="https"
+                  secure="true"
+              />
+            <% end  %>
             
             <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/ajp.html -->
             <Connector
@@ -212,8 +206,9 @@
                             suffix=".txt"
                             pattern="%h %l %u %t &quot;%r&quot; %s %b" 
                             />
-                            
+                            <% unless @disable_manager %>
                             <Context privileged="true" docBase="manager" path="/manager" reloadable="true"/>
+                            <% end %>
                     </Host>
                 <% end %>
             </Engine>

@@ -150,9 +150,98 @@ def deploy_application
   end
 end
 
+# will check for ssl=true and load/create keys from encrypted data_bags
+def load_service_definitions_and_keys (service_definitions, current_resource)
+  built_service_definitions = []
+  home_dir = node["wsi_tomcat"]["user"]["home_dir"]
+  keystore_password = ""
+  
+  service_definitions.each do |d|
+    newDef = d
+ 
+    Chef::Log.info "Found service_definition #{newDef['name']}"
+    if newDef["ssl_connector"]["enabled"] == true
+      wsi_tomcat_keys_data_bag = newDef["ssl_connector"]["wsi_tomcat_keys_data_bag"]
+      enc_key_location = newDef["ssl_connector"]["key_location"]
+      
+      decrypted_keystore_data_bag = data_bag_item(wsi_tomcat_keys_data_bag, wsi_tomcat_keys_data_bag, IO.read(enc_key_location))
+      
+      keystore_password = decrypted_keystore_data_bag["keystore_password"]
+      privKey = decrypted_keystore_data_bag["private_key"]
+      cert = decrypted_keystore_data_bag["certificate"]
+      trust_certs = decrypted_keystore_data_bag["trust_certs"]
+      
+      #write out private key, eg /opt/tomcat/ssl/<NAME>.localhost.key
+      file "#{home_dir}/ssl/#{newDef['name']}.localhost.key" do
+        content privKey
+        owner node["wsi_tomcat"]["user"]["name"]
+        group node["wsi_tomcat"]["group"]["name"]
+        mode 00600
+      end
+      
+      #write out public cert, eg /opt/tomcat/ssl/<NAME>.localhost.crt
+      file "#{home_dir}/ssl/#{newDef['name']}.localhost.crt" do
+        content cert
+        owner node["wsi_tomcat"]["user"]["name"]
+        group node["wsi_tomcat"]["group"]["name"]
+        mode 00600
+      end
+      
+      #create keystore from the key/crt
+      bash 'make_keystore' do
+        cwd "#{home_dir}/ssl"
+        code <<-EOH
+          openssl pkcs12 -export -name #{newDef['name']}-localhost -in #{newDef['name']}.localhost.crt -inkey #{newDef['name']}.localhost.key -out #{newDef['name']}.p12 -password pass:#{keystore_password} -passin pass:#{keystore_password} -passout pass:#{keystore_password}
+          keytool -importkeystore -destkeystore #{newDef['name']}.jks -srckeystore #{newDef['name']}.p12 -srcstoretype pkcs12 -alias #{newDef['name']}-localhost -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
+          EOH
+        not_if { ::File.exists?("#{home_dir}/ssl/#{newDef['name']}.jks") }
+      end
+   
+      #create truststore
+      bash 'make_truststore' do
+        cwd "#{home_dir}/ssl"
+        code <<-EOH
+          cp $JAVA_HOME/jre/lib/security/cacerts #{home_dir}/ssl/truststore
+          keytool -storepasswd -keystore truststore -storepass changeit -new #{keystore_password}
+          EOH
+        not_if { ::File.exists?("#{home_dir}/truststore") }
+      end
+      current_resource.server_opts.push("Djavax.net.ssl.trustStore=#{home_dir}/ssl/truststore")
+      
+      #add each cert to trust store
+      trust_certs.each do |host, trust_cert|
+      	#write cert to file
+      	file "#{home_dir}/ssl/#{host}.#{newDef['name']}.crt" do
+          content trust_cert
+          owner node["wsi_tomcat"]["user"]["name"]
+          group node["wsi_tomcat"]["group"]["name"]
+          mode 00600
+        end
+        
+        bash 'make_keystore' do
+          cwd "#{home_dir}/ssl"
+          code <<-EOH
+            keytool -import -noprompt -trustcacerts -alias #{host} -file #{host}.#{newDef['name']}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
+            EOH
+        end
+      end
+      
+    end
+    
+    built_service_definitions.push(newDef)
+  end
+  
+  return {
+    "service_definitions" => built_service_definitions,
+    "keystore_password" => keystore_password
+  }
+end
+
 def create_tomcat_instance
   name                  = current_resource.name
-  service_definitions   = current_resource.service_definitions
+  sd_keys               = load_service_definitions_and_keys(node["wsi_tomcat"]["instances"]["default"]["service_definitions"], current_resource)
+  service_definitions   = sd_keys["service_definitions"]
+  keystore_password     = sd_keys["keystore_password"]
   server_opts           = current_resource.server_opts
   tomcat_home           = node["wsi_tomcat"]["user"]["home_dir"]
   fqdn                  = node["fqdn"]
@@ -227,11 +316,13 @@ def create_tomcat_instance
       variables(
         :version => node["wsi_tomcat"]["version"].split(".")[0],
         :disable_admin_users => node["wsi_tomcat"]["instances"][name]["user"]["disable_admin_users"],
+        :disable_manager => node["wsi_tomcat"]["disable_manager"],
         :tomcat_admin_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_admin_pass"],
         :tomcat_script_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_script_pass"],
         :tomcat_jmx_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_jmx_pass"],
         :service_definitions => service_definitions,
-        :cors => cors
+        :cors => cors,
+        :keystore_password => keystore_password
       )
     end
   end
@@ -286,12 +377,14 @@ def create_tomcat_instance
     recursive true
   end
   
-  execute "Create manager application for #{name}" do
-    cwd instance_webapps_path
-    user tomcat_user
-    group tomcat_group
-    command "/bin/tar -xvf #{manager_archive_path}"
-    not_if ::File.exists?(::File.expand_path("manager", instance_webapps_path))
+  unless node["wsi_tomcat"]["disable_manager"] 
+    execute "Create manager application for #{name}" do
+      cwd instance_webapps_path
+      user tomcat_user
+      group tomcat_group
+      command "/bin/tar -xvf #{manager_archive_path}"
+      not_if ::File.exists?(::File.expand_path("manager", instance_webapps_path))
+    end
   end
   
   # TODO This can probably be symlinked to the base tomcat directory

@@ -200,6 +200,7 @@ grant {
 // - default CATALINA_HOME == CATALINA_BASE
 // - CATALINA_HOME != CATALINA_BASE, per instance Manager in CATALINA_BASE
 // - CATALINA_HOME != CATALINA_BASE, shared Manager in CATALINA_HOME
+<% unless @disable_manager %>
 grant codeBase "file:${catalina.base}/webapps/manager/-" {
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.ha.session";
@@ -214,6 +215,7 @@ grant codeBase "file:${catalina.home}/webapps/manager/-" {
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.manager.util";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.util";
 };
+<% end %>
 
 // You can assign additional permissions to particular web applications by
 // adding additional "grant" entries here, based on the code base for that
