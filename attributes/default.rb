@@ -44,7 +44,9 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
   "thread_pool" => { "max_threads" => 200, "daemon" => "true", "min_spare_threads" => 25, "max_idle_time" => 60000 },
   "connector" => { "port" => 8080 },
   "ssl_connector" => { 
-    "enabled" => true
+    "enabled" => false, #off by default
+    "wsi_tomcat_keys_data_bag" => "name_of_your_data_bag", # see environment/example_keystore_data_bag.json for examples
+    "key_location" => "local_file_path_to_encryption_key", # note: this feature relies on an encryption key being placed on the system before this recipe runs
   },
   "engine" => { "host" => [ "name" => "localhost" ] }
   }]
@@ -56,12 +58,13 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 
 # To pull a list (extract_fields) from an encrypted databag and add them to the context.xml as String properties.
 # this feature relies on an encryption key being placed on the system before this recipe runs
-# default["wsi_tomcat"]["instances"]["default"]["context"]["encrypted_environments_databag"] = {
-#   "databag_name" => "name_of_your_databag",
+# default["wsi_tomcat"]["instances"]["default"]["context"]["encrypted_environments_data_bag"] = {
+#   "data_bag_name" => "name_of_your_databag",
 #   "key_location" => "local_file_path_to_encryption_key",
 #   "extract_fields" => ["field1", "field2", "field3"]
 # }
 
+default["wsi_tomcat"]["disable_manager"] = false
 default["wsi_tomcat"]["archive"]["manager_name"] = "manager_war.tar.gz"
 
 # JAVA Installation Options
