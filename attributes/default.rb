@@ -51,6 +51,17 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
   "engine" => { "host" => [ "name" => "localhost" ] }
   }]
 
+# You can add as many applications as needed by using the following...
+# default["wsi_tomcat"]["instances"]["default"]["application"]["app1"] = {
+# 	"url" => app1Url,
+# 	"final_name" => app1Name
+# }
+# default["wsi_tomcat"]["instances"]["default"]["application"]["app2"] = {
+# 	"url" => app2Url,
+# 	"final_name" => app2Name
+# }
+
+
 # if you want to set environment variable entries in context.xml
 # default["wsi_tomcat"]["instances"]["default"]["context"]["environments"] = [
 #   { "name" => "propName", "type" => "java.lang.String", "override" => true, 
