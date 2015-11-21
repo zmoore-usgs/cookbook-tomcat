@@ -34,10 +34,10 @@ instances.each do |instance, attributes|
           data_bag_name = encrypted_attributes["data_bag_name"]
           enc_key_location = encrypted_attributes["key_location"]
           field_map = encrypted_attributes["field_map"]
-      
           data_bag = data_bag_item(data_bag_name, data_bag_name, IO.read(enc_key_location))
-          field_map.each do |propName|
-            res[field_map[propName]] = data_bag[propName]
+          
+          field_map.each do |k, v|
+            res[v] = data_bag[k]
           end
         end
       end
