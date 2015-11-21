@@ -41,26 +41,26 @@
     <% if defined?(@resources) %>
         <% @resources.each do |r| -%>
             <Resource 
-                    description="<%=r["description"] %>"
-                    name="<%= r["name"] %>"
-                    auth="<%= r["auth"] %>"
-                    type="<%= r["type"] %>"
-                    username="<%= r["username"] %>"
-                    password="<%= r["password"] %>"
-                    factory="<%= r["factory"] %>"
-                    driverClassName="<%= r["driver_class"] %>"
-                    url="<%= r["url"] %>"
-                    maxActive="<%= r["max_active"] %>"
-                    maxIdle="<%= r["max_idle"] %>"
-                    removeAbandoned="<%= r["remove_abandoned"] %>"
-                    removeAbandonedTimeout="<%= r["remove_abandoned_timeout"] %>"
-                    logAbandoned="<%= r["log_abandoned"] %>"
-                    testOnBorrow="<%= r["test_on_borrow"] %>"
-                    defaultAutoCommit="<%= r["default_auto_commit"] %>"
-                    validationQuery="<%= r["validation_query"] %>"
-                    accessToUnderlyingConnectionAllowed="<%= r["access_to_underlying_connection_allowed"] %>"
-                    poolPreparedStatements="<%= r["pool_prepared_statements"] %>"
-                    maxOpenPreparedStatements="<%= r["max_open_prepared_statements"] %>"
+                    <% if r.has_key?("description") %>description="<%=r["description"] %>"<% end %>
+                    <% if r.has_key?("name") %>name="<%= r["name"] %>"<% end %>
+                    <% if r.has_key?("auth") %>auth="<%= r["auth"] %>"<% end %>
+                    <% if r.has_key?("type") %>type="<%= r["type"] %>"<% end %>
+                    <% if r.has_key?("username") %>username="<%= r["username"] %>"<% end %>
+                    <% if r.has_key?("password") %>password="<%= r["password"] %>"<% end %>
+                    <% if r.has_key?("factory") %>factory="<%= r["factory"] %>"<% end %>
+                    <% if r.has_key?("driver_class") %>driverClassName="<%= r["driver_class"] %>"<% end %>
+                    <% if r.has_key?("url") %>url="<%= r["url"] %>"<% end %>
+                    <% if r.has_key?("max_active") %>maxActive="<%= r["max_active"] %>"<% end %>
+                    <% if r.has_key?("max_idle") %>maxIdle="<%= r["max_idle"] %>"<% end %>
+                    <% if r.has_key?("remove_abandoned") %>removeAbandoned="<%= r["remove_abandoned"] %>"<% end %>
+                    <% if r.has_key?("remove_abandoned_timeout") %>removeAbandonedTimeout="<%= r["remove_abandoned_timeout"] %>"<% end %>
+                    <% if r.has_key?("log_abandoned") %>logAbandoned="<%= r["log_abandoned"] %>"<% end %>
+                    <% if r.has_key?("test_on_borrow") %>testOnBorrow="<%= r["test_on_borrow"] %>"<% end %>
+                    <% if r.has_key?("default_auto_commit") %>defaultAutoCommit="<%= r["default_auto_commit"] %>"<% end %>
+                    <% if r.has_key?("validation_query") %>validationQuery="<%= r["validation_query"] %>"<% end %>
+                    <% if r.has_key?("access_to_underlying_connection_allowed") %>accessToUnderlyingConnectionAllowed="<%= r["access_to_underlying_connection_allowed"] %>"<% end %>
+                    <% if r.has_key?("pool_prepared_statements") %>poolPreparedStatements="<%= r["pool_prepared_statements"] %>"<% end %>
+                    <% if r.has_key?("max_open_prepared_statements") %>maxOpenPreparedStatements="<%= r["max_open_prepared_statements"] %>"<% end %>
                     />
         <% end -%>
     <% end %>
