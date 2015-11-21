@@ -24,6 +24,25 @@ instances.each do |instance, attributes|
       r.push(ContextHelper.normalize_resources(original_resources))
     end
     
+      Chef::Log.info r
+    
+    #decrypt resource attributes
+    r.each do |r1|
+      r1.each do |res|
+        if res.has_key?("encrypted_attributes")
+          encrypted_attributes = res["encrypted_attributes"]
+          data_bag_name = encrypted_attributes["data_bag_name"]
+          enc_key_location = encrypted_attributes["key_location"]
+          field_map = encrypted_attributes["field_map"]
+      
+          data_bag = data_bag_item(data_bag_name, data_bag_name, IO.read(enc_key_location))
+          field_map.each do |propName|
+            res[field_map[propName]] = data_bag[propName]
+          end
+        end
+      end
+    end 
+    
     unless original_environments.empty?
       e.push(ContextHelper.normalize_environments(original_environments))
     end

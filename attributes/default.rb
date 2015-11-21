@@ -50,7 +50,7 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
   },
   "engine" => { "host" => [ "name" => "localhost" ] }
   }]
-
+  
 # You can add as many applications as needed by using the following...
 # default["wsi_tomcat"]["instances"]["default"]["application"]["app1"] = {
 # 	"url" => app1Url,
@@ -61,11 +61,43 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 # 	"final_name" => app2Name
 # }
 
+# if you want to set resource entries in context.xml, notice encrypted attributes entry
+# default["wsi_tomcat"]["instances"]["default"]["context"]["resources"] = [
+#   { 
+#        "description" => "value",
+#        "name" => "value",
+#        "auth" => "value",
+#        "type" => "value",
+#        "username" => "value",
+#        "password" => "value",
+#        "factory" => "value",
+#        "driver_class" => "value",
+#        "url" => "value",
+#        "max_active" => "value",
+#        "max_idle" => "value",
+#        "remove_abandoned" => "value",
+#        "remove_abandoned_timeout" => "value",
+#        "log_abandoned" => "value",
+#        "test_on_borrow" => "value",
+#        "default_auto_commit" => "value",
+#        "validation_query" => "value",
+#        "access_to_underlying_connection_allowed" => "value",
+#        "pool_prepared_statements" => "value",
+#        "max_open_prepared_statements" => "value",
+#        "encrypted_attributes" => {
+#        	"data_bag_name" => "data_bag_to_decrypt",
+#        	"key_location" => "location_of_encryption_key",
+#        	"field_map" => {
+#        		"fromField" : "toField" //EG: take the value from fromField and place it into the toField attribute of the resource
+#        	}
+#        }
+#}]
+
 
 # if you want to set environment variable entries in context.xml
 # default["wsi_tomcat"]["instances"]["default"]["context"]["environments"] = [
-#   { "name" => "propName", "type" => "java.lang.String", "override" => true, 
-#     "value" => "propValue"}]
+#   { "name" => "propName", "type" => "java.lang.String", "override" => true, "value" => "propValue"}]
+
 
 # To pull a list (extract_fields) from an encrypted data_bag and add them to the context.xml as String properties.
 # this feature relies on an encryption key being placed on the system before this recipe runs
@@ -77,6 +109,10 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 
 default["wsi_tomcat"]["disable_manager"] = false
 default["wsi_tomcat"]["archive"]["manager_name"] = "manager_war.tar.gz"
+
+# you can download libs into the main lib director by providing a list of URLs and the final file name to create
+# eg: default["wsi_tomcat"]["lib_sources"] = [{ filename: "mylib.jar", url: "http://www.website.com/mylib.jar" }]
+default["wsi_tomcat"]["lib_sources"] = []
 
 # JAVA Installation Options
 # https://supermarket.chef.io/cookbooks/java
