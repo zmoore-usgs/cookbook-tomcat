@@ -207,6 +207,7 @@ def load_service_definitions_and_keys (service_definitions, current_resource)
         not_if { ::File.exists?("#{home_dir}/truststore") }
       end
       current_resource.server_opts.push("Djavax.net.ssl.trustStore=#{home_dir}/ssl/truststore")
+      current_resource.server_opts.push("Djavax.net.ssl.trustStorePassword=#{keystore_password}")
       
       #add each cert to trust store
       trust_certs.each do |host, trust_cert|
