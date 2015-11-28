@@ -19,7 +19,6 @@ class Chef::Recipe::ContextHelper
       "type"                                    => "javax.sql.DataSource",
       "username"                                => "",
       "password"                                => "",
-      "factory"                                 => "org.apache.commons.dbcp.BasicDataSourceFactory",
       "driver_class"                            => "oracle.jdbc.OracleDriver",
       "url"                                     => "jdbc:oracle:thin:@some.db.address.usgs.gov:1521:db",
       "max_active"                              => "10",
