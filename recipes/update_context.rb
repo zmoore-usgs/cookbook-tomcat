@@ -32,9 +32,10 @@ instances.each do |instance, attributes|
         if res.has_key?("encrypted_attributes")
           encrypted_attributes = res["encrypted_attributes"]
           data_bag_name = encrypted_attributes["data_bag_name"]
+          data_bag_item = encrypted_attributes["data_bag_item"]
           enc_key_location = encrypted_attributes["key_location"]
           field_map = encrypted_attributes["field_map"]
-          data_bag = data_bag_item(data_bag_name, data_bag_name, IO.read(enc_key_location))
+          data_bag = data_bag_item(data_bag_name, data_bag_item, IO.read(enc_key_location))
           
           field_map.each do |k, v|
             res[v] = data_bag[k]
@@ -51,11 +52,12 @@ instances.each do |instance, attributes|
     if attributes["context"].has_key?("encrypted_environments_data_bag") 
       enc_environments_data_bag = attributes["context"].fetch(:encrypted_environments_data_bag, {})
       data_bag_name = enc_environments_data_bag["data_bag_name"]
+      data_bag_item = enc_environments_data_bag["data_bag_item"]
       enc_key_location = enc_environments_data_bag["key_location"]
       extract_fields = enc_environments_data_bag["extract_fields"]
       Chef::Log.debug("Getting encrypted environment entries from #{data_bag_name}")
       
-      data_bag = data_bag_item(data_bag_name, data_bag_name, IO.read(enc_key_location))
+      data_bag = data_bag_item(data_bag_name, data_bag_item, IO.read(enc_key_location))
       extract_fields.each do |propName|
         e.push({ "name" => propName, "value" => data_bag[propName], "type" => "java.lang.String", "override" => true})
       end
