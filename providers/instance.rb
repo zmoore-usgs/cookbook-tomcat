@@ -162,9 +162,10 @@ def load_service_definitions_and_keys (service_definitions, current_resource)
     Chef::Log.info "Found service_definition #{newDef['name']}"
     if newDef["ssl_connector"]["enabled"] == true
       wsi_tomcat_keys_data_bag = newDef["ssl_connector"]["wsi_tomcat_keys_data_bag"]
+      wsi_tomcat_keys_data_item = newDef["ssl_connector"]["wsi_tomcat_keys_data_item"]
       enc_key_location = newDef["ssl_connector"]["key_location"]
       
-      decrypted_keystore_data_bag = data_bag_item(wsi_tomcat_keys_data_bag, wsi_tomcat_keys_data_bag, IO.read(enc_key_location))
+      decrypted_keystore_data_bag = data_bag_item(wsi_tomcat_keys_data_bag, wsi_tomcat_keys_data_item, IO.read(enc_key_location))
       
       keystore_password = decrypted_keystore_data_bag["keystore_password"]
       privKey = decrypted_keystore_data_bag["private_key"]
