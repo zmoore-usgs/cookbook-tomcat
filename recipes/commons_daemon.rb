@@ -8,7 +8,7 @@
 user_name = node["wsi_tomcat"]["user"]["name"]
 group_name = node["wsi_tomcat"]["group"]["name"]
 tomcat_home = node["wsi_tomcat"]["user"]["home_dir"]
-unpack_directory = "/opt/commons_daemon"
+unpack_directory = Chef::Config[:file_cache_path] + "/opt/commons_daemon"
 work_directory = "#{unpack_directory}/unix"
 java_home = lambda {node["java"]["java_home"]} # This needs lazy evaluation
 
@@ -16,6 +16,7 @@ directory "Create BCDP build dir" do
   path unpack_directory
   owner user_name
   group group_name
+  recursive true
   only_if do not ::File.exist?("#{tomcat_home}/bin/jsvc") end
 end
 

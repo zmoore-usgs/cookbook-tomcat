@@ -1,11 +1,34 @@
 ---
 driver:
   name: vagrant
+  network:
+    - ['forwarded_port', {guest: 8080, host: 8080, auto_correct: true}]
+    - ['forwarded_port', {guest: 8443, host: 8443, auto_correct: true}]
 
 provisioner:
   name: chef_zero
 
 platforms:
+  - name: centos-7.1-vbox
+    driver:
+      box: bento/centos-7.1
+      box_url: bento/centos-7.1
+      provider: virtualbox
+  - name: centos-7.1-vmware
+    driver:
+      box: bento/centos-7.1
+      box_url: bento/centos-7.1
+      provider: vmware_fusion
+  - name: centos-6.7-vbox
+    driver:
+      box: bento/centos-6.7
+      box_url: bento/centos-6.7
+      provider: virtualbox
+  - name: centos-6.7-vmware
+    driver:
+      box: bento/centos-6.7
+      box_url: bento/centos-6.7
+      provider: vmware_fusion
   - name: centos-6.6-vbox
     driver:
       box: chef/centos-6.6
@@ -13,15 +36,38 @@ platforms:
       provider: virtualbox
   - name: centos-6.6-vmware
     driver:
-      box: chef/centos-6.6
-      box_url: chef/centos-6.6
+      box: bento/centos-6.6
+      box_url: bento/centos-6.6
       provider: vmware_fusion
 
 suites:
   - name: default
-    driver:
-      network: 
-      - ["private_network", {ip: "10.0.0.15"}]
     run_list:
       - recipe[wsi_tomcat::default]
-    attributes:
+    data_bags_path: './test/integration/default/data_bags/'
+    encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
+    attributes: {
+      "java" : {
+          "install_flavor" : "oracle",
+          "jdk_version" : "8",
+          "oracle" : {
+               "accept_oracle_download_terms" : true
+          }
+      }
+    }
+
+  - name: default-with-stig
+    run_list:
+      - recipe[stig]
+      - recipe[wsi_tomcat::default]
+    data_bags_path: './test/integration/default/data_bags/'
+    encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
+    attributes: {
+      "java" : {
+          "install_flavor" : "oracle",
+          "jdk_version" : "8",
+          "oracle" : {
+               "accept_oracle_download_terms" : true
+          }
+      }
+    }
