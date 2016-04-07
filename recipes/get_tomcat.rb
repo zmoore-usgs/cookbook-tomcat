@@ -16,7 +16,7 @@ version = node["wsi_tomcat"]["version"];
 version_base = version.split(".")[0]
 tomcat_url_fragment  = "tomcat/tomcat-#{version_base}/v#{version}/bin/apache-tomcat-#{version}.tar.gz"
 mirrors_built = []
-mirrors.each do |base| 
+mirrors.each do |base|
   mirrors_built.push(base + tomcat_url_fragment)
 end
 

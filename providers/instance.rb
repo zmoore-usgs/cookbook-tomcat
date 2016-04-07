@@ -86,7 +86,7 @@ action :deploy_app do
   end
 end
 
-def load_current_resource 
+def load_current_resource
   @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
   @current_resource.service_definitions(@new_resource.service_definitions)
@@ -114,7 +114,7 @@ def application_exists?(name)
   instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
   webapps_dir            = ::File.expand_path("webapps", instance_dir)
   war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
-  
+
   ::File.exists?(war_name)
 end
 
@@ -139,9 +139,9 @@ def deploy_application
   instance_dir           = ::File.expand_path(instance_name, instances_dir)
   webapps_dir            = ::File.expand_path("webapps", instance_dir)
   war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
-  
+
   Chef::Log.info("deploying #{application_name} from #{application_url}")
-  
+
   remote_file war_name do
     source application_url
     owner tomcat_user
@@ -155,23 +155,23 @@ def load_service_definitions_and_keys (service_definitions, current_resource)
   built_service_definitions = []
   home_dir = node["wsi_tomcat"]["user"]["home_dir"]
   keystore_password = ""
-  
+
   service_definitions.each do |d|
     newDef = d
- 
+
     Chef::Log.info "Found service_definition #{newDef['name']}"
     if newDef["ssl_connector"]["enabled"] == true
       wsi_tomcat_keys_data_bag = newDef["ssl_connector"]["wsi_tomcat_keys_data_bag"]
       wsi_tomcat_keys_data_item = newDef["ssl_connector"]["wsi_tomcat_keys_data_item"]
       enc_key_location = newDef["ssl_connector"]["key_location"]
-      
+
       decrypted_keystore_data_bag = data_bag_item(wsi_tomcat_keys_data_bag, wsi_tomcat_keys_data_item, IO.read(enc_key_location))
-      
+
       keystore_password = decrypted_keystore_data_bag["keystore_password"]
       privKey = decrypted_keystore_data_bag["private_key"]
       cert = decrypted_keystore_data_bag["certificate"]
       trust_certs = decrypted_keystore_data_bag["trust_certs"]
-      
+
       #write out private key, eg /opt/tomcat/ssl/<NAME>.localhost.key
       file "#{home_dir}/ssl/#{newDef['name']}.localhost.key" do
         content privKey
@@ -179,7 +179,7 @@ def load_service_definitions_and_keys (service_definitions, current_resource)
         group node["wsi_tomcat"]["group"]["name"]
         mode 00600
       end
-      
+
       #write out public cert, eg /opt/tomcat/ssl/<NAME>.localhost.crt
       file "#{home_dir}/ssl/#{newDef['name']}.localhost.crt" do
         content cert
@@ -187,52 +187,52 @@ def load_service_definitions_and_keys (service_definitions, current_resource)
         group node["wsi_tomcat"]["group"]["name"]
         mode 00600
       end
-      
+
       #create keystore from the key/crt
       bash 'make_keystore' do
         cwd "#{home_dir}/ssl"
         code <<-EOH
-          openssl pkcs12 -export -name #{newDef['name']}-localhost -in #{newDef['name']}.localhost.crt -inkey #{newDef['name']}.localhost.key -out #{newDef['name']}.p12 -password pass:#{keystore_password} -passin pass:#{keystore_password} -passout pass:#{keystore_password}
-          keytool -importkeystore -destkeystore #{newDef['name']}.jks -srckeystore #{newDef['name']}.p12 -srcstoretype pkcs12 -alias #{newDef['name']}-localhost -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
-          EOH
+        openssl pkcs12 -export -name #{newDef['name']}-localhost -in #{newDef['name']}.localhost.crt -inkey #{newDef['name']}.localhost.key -out #{newDef['name']}.p12 -password pass:#{keystore_password} -passin pass:#{keystore_password} -passout pass:#{keystore_password}
+        keytool -importkeystore -destkeystore #{newDef['name']}.jks -srckeystore #{newDef['name']}.p12 -srcstoretype pkcs12 -alias #{newDef['name']}-localhost -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
+        EOH
         not_if { ::File.exists?("#{home_dir}/ssl/#{newDef['name']}.jks") }
       end
-   
+
       #create truststore
       bash 'make_truststore' do
         cwd "#{home_dir}/ssl"
         code <<-EOH
-          cp $JAVA_HOME/jre/lib/security/cacerts #{home_dir}/ssl/truststore
-          keytool -storepasswd -keystore truststore -storepass changeit -new #{keystore_password}
-          EOH
+        cp $JAVA_HOME/jre/lib/security/cacerts #{home_dir}/ssl/truststore
+        keytool -storepasswd -keystore truststore -storepass changeit -new #{keystore_password}
+        EOH
         not_if { ::File.exists?("#{home_dir}/truststore") }
       end
       current_resource.server_opts.push("Djavax.net.ssl.trustStore=#{home_dir}/ssl/truststore")
       current_resource.server_opts.push("Djavax.net.ssl.trustStorePassword=#{keystore_password}")
-      
+
       #add each cert to trust store
       trust_certs.each do |host, trust_cert|
-      	#write cert to file
-      	file "#{home_dir}/ssl/#{host}.#{newDef['name']}.crt" do
+        #write cert to file
+        file "#{home_dir}/ssl/#{host}.#{newDef['name']}.crt" do
           content trust_cert
           owner node["wsi_tomcat"]["user"]["name"]
           group node["wsi_tomcat"]["group"]["name"]
           mode 00600
         end
-        
+
         bash 'make_keystore' do
           cwd "#{home_dir}/ssl"
           code <<-EOH
-            keytool -import -noprompt -trustcacerts -alias #{host} -file #{host}.#{newDef['name']}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
-            EOH
+          keytool -import -noprompt -trustcacerts -alias #{host} -file #{host}.#{newDef['name']}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
+          EOH
         end
       end
-      
+
     end
-    
+
     built_service_definitions.push(newDef)
   end
-  
+
   return {
     "service_definitions" => built_service_definitions,
     "keystore_password" => keystore_password
@@ -241,7 +241,7 @@ end
 
 def create_tomcat_instance
   name                  = current_resource.name
-  sd_keys               = load_service_definitions_and_keys(node["wsi_tomcat"]["instances"]["default"]["service_definitions"], current_resource)
+  sd_keys               = load_service_definitions_and_keys(node["wsi_tomcat"]["instances"][current_resource.name]["service_definitions"], current_resource)
   service_definitions   = sd_keys["service_definitions"]
   keystore_password     = sd_keys["keystore_password"]
   server_opts           = current_resource.server_opts
@@ -262,17 +262,17 @@ def create_tomcat_instance
   instance_conf_path    = ::File.expand_path("conf", instance_home)
   tomcat_init_script    = "tomcat-#{name}"
   default_cors          = {
-      :enabled          => true,
-      :allowed          => { 
-        :origins        => "*",
-        :methods        => ["GET", "POST", "HEAD", "OPTIONS"],
-        :headers        => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
-      },
-      :exposed_headers     => [],
-      :preflight_maxage    => 1800,
-      :support_credentials => true,
-      :filter => "/*"
-    }
+    :enabled          => true,
+    :allowed          => {
+      :origins        => "*",
+      :methods        => ["GET", "POST", "HEAD", "OPTIONS"],
+      :headers        => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
+    },
+    :exposed_headers     => [],
+    :preflight_maxage    => 1800,
+    :support_credentials => true,
+    :filter => "/*"
+  }
   instance_conf_files   = [
     "catalina.policy",
     "catalina.properties",
@@ -283,16 +283,26 @@ def create_tomcat_instance
     "tomcat-users.xml",
     "web.xml"
   ]
-  
+
+  databag_name = node["wsi_tomcat"]['data_bag_config']['bag_name']
+  credentials_attribute = node["wsi_tomcat"]['data_bag_config']['credentials_attribute']
+  credentials = {}
+  if search(databag_name, "id:#{credentials_attribute}").any?
+    credentials = data_bag_item(databag_name, credentials_attribute)
+    tomcat_admin_pass = credentials[name]['tomcat_admin_pass']
+    tomcat_script_pass = credentials[name]['tomcat_script_pass']
+    tomcat_jmx_pass = credentials[name]['tomcat_jmx_pass']
+  end
+
   Chef::Log.info "Creating Instance #{name}"
-  
+
   Chef::Log.info "Creating Instance Directory #{instance_home}"
   directory instance_home do
     owner tomcat_user
     group tomcat_group
     action :create
   end
-  
+
   # Create the required directories in the instance directory
   %w{bin conf lib logs temp webapps work}.each do |dir|
     Chef::Log.info "Creating Instance subdirectory #{dir}"
@@ -302,12 +312,12 @@ def create_tomcat_instance
       action :create
     end
   end
-  
+
   # Make sure that all CORS values are set
   if cors["enabled"]
     cors = default_cors.merge(cors)
   end
-  
+
   instance_conf_files.each do |tpl|
     Chef::Log.info "Creating configuration file #{tpl}"
     template ::File.expand_path(tpl, instance_conf_path) do
@@ -319,16 +329,16 @@ def create_tomcat_instance
         :version => node["wsi_tomcat"]["version"].split(".")[0],
         :disable_admin_users => node["wsi_tomcat"]["instances"][name]["user"]["disable_admin_users"],
         :disable_manager => node["wsi_tomcat"]["disable_manager"],
-        :tomcat_admin_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_admin_pass"],
-        :tomcat_script_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_script_pass"],
-        :tomcat_jmx_pass => node["wsi_tomcat"]["instances"][name]["user"]["tomcat_jmx_pass"],
+        :tomcat_admin_pass => tomcat_admin_pass,
+        :tomcat_script_pass => tomcat_script_pass,
+        :tomcat_jmx_pass => tomcat_jmx_pass,
         :service_definitions => service_definitions,
         :cors => cors,
         :keystore_password => keystore_password
       )
     end
   end
-  
+
   %w{start stop}.each do |bin_file|
     Chef::Log.info "Templating bin file #{bin_file}"
     template "#{tomcat_bin_path}/#{bin_file}_#{name}" do
@@ -337,49 +347,49 @@ def create_tomcat_instance
       group tomcat_group
       mode 0744
       variables(
-      :instance_name => name,
-      :tomcat_home => tomcat_home
+        :instance_name => name,
+        :tomcat_home => tomcat_home
       )
     end
   end
-  
+
   template "#{instance_bin_path}/setenv.sh" do
     source "instances/bin/setenv.sh.erb"
     owner tomcat_user
     group tomcat_group
     mode 0744
   end
-  
+
   template "#{instance_bin_path}/catalinaopts.sh" do
     source "instances/bin/catalinaopts.sh.erb"
     owner tomcat_user
     group tomcat_group
     variables(
-    :server_opts => server_opts
+      :server_opts => server_opts
     )
     mode 0744
   end
-  
+
   template "Install #{tomcat_init_script} script" do
     path "/etc/init.d/#{tomcat_init_script}"
     source "instances/tomcat-initscript.sh.erb"
     owner "root"
     group "root"
     variables(
-    :instance_name => name,
-    :tomcat_home => tomcat_home
+      :instance_name => name,
+      :tomcat_home => tomcat_home
     )
     mode 0755
   end
-  
+
   directory "Create heapdumps directory" do
     owner tomcat_user
     group tomcat_group
     path "#{tomcat_home}/heapdumps/#{fqdn}/#{name}"
     recursive true
   end
-  
-  unless node["wsi_tomcat"]["disable_manager"] 
+
+  unless node["wsi_tomcat"]["disable_manager"]
     execute "Create manager application for #{name}" do
       cwd instance_webapps_path
       user tomcat_user
@@ -388,7 +398,7 @@ def create_tomcat_instance
       not_if ::File.exists?(::File.expand_path("manager", instance_webapps_path))
     end
   end
-  
+
   # TODO This can probably be symlinked to the base tomcat directory
   execute "Copy tomcat-juli to instance #{name}" do
     user tomcat_user
@@ -396,14 +406,14 @@ def create_tomcat_instance
     command "/bin/cp #{archives_home}/tomcat-juli.jar #{instance_bin_path}"
     not_if ::File.exists?(::File.expand_path("tomcat-juli.jar", instance_bin_path))
   end
-  
+
   execute "Chkconfig the init script for this instance" do
     user "root"
     group "root"
     command "/sbin/chkconfig --level 234 #{tomcat_init_script} on"
     not_if "chkconfig | grep -q '#{tomcat_init_script}'"
   end
-  
+
   execute "Start tomcat instance #{name}" do
     command "/bin/bash service tomcat start #{name}"
     user "root"
@@ -412,5 +422,3 @@ def create_tomcat_instance
   end
   new_resource.updated_by_last_action(true)
 end
-
-

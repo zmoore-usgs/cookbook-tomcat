@@ -75,7 +75,7 @@ end
 
 delete_home_dirs.each do |dir|
   full_path  = File.expand_path(dir, tomcat_home);
-  
+
   directory "remove directory #{full_path} in tomcat home" do
     path full_path
     recursive true
@@ -85,7 +85,7 @@ end
 
 delete_bin_files.each do |file|
   full_path  = File.expand_path(file, bin_dir);
-  
+
   file "remove file #{full_path} in tomcat bin" do
     path full_path
     action :delete

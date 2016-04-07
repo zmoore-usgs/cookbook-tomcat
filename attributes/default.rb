@@ -4,7 +4,7 @@ default["wsi_tomcat"]["user"]["name"]     = "tomcat"
 default["wsi_tomcat"]["user"]["home_dir"] = "/opt/tomcat"
 
 # Set the version of Tomcat to install
-default["wsi_tomcat"]["version"]      = "8.0.28"
+default["wsi_tomcat"]["version"]      = "8.0.33"
 
 # Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
 default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
@@ -19,7 +19,23 @@ default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
 # http://www.openoffice.org/download/checksums.html#hash_win
 # http://www.openoffice.org/download/checksums.html#hash_linux
 # http://www.openoffice.org/download/checksums.html#hash_mac
-default["wsi_tomcat"]["file"]["archive"]["checksum"] = "a7a6c092b79fc5a8cffe5916d0e5554254eddcb3c1911ed90696c153b4f13d10"
+default["wsi_tomcat"]["file"]["archive"]["checksum"] = "c77873c1861ed81617abb8bedc392fb0ff5ebf871de33cd1fcd49d4c072e38b7"
+
+# Some credentials are stored in an encrypted data bag
+default["wsi_tomcat"]['data_bag_config']['bag_name'] = "wsi_tomcat-_default"
+# This stores Tomcat passwords for things like the Tomcat manager application
+# Example can be found in test/integration/default/credentials_unencrypted.json
+# Each tomcat instance should have its own top-level credentials object
+# {
+#   "id" : "credentials",
+#   "default" : {
+#     "tomcat_admin_pass" : "tomcat-admin",
+#     "tomcat_script_pass" : "tomcat-script-admin",
+#     "tomcat_jmx_pass" : "tomcat-jmx"
+#   }
+# }
+default["wsi_tomcat"]['data_bag_config']['credentials_attribute'] = "credentials"
+
 
 # Instances definition 
 # port = The port that the tomcat instance will run on
@@ -35,10 +51,7 @@ default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["exposed_header
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["preflight_maxage"] = 1800
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["support_credentials"] = true
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["filter"] = "/*"
-default["wsi_tomcat"]["instances"]["default"]["user"]["disable_admin_users"] = true
-default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_admin_pass"] = "tomcat-admin"
-default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_script_pass"] = "tomcat-script-admin"
-default["wsi_tomcat"]["instances"]["default"]["user"]["tomcat_jmx_pass"] = "tomcat-jmx"
+default["wsi_tomcat"]["instances"]["default"]["user"]["disable_admin_users"] = false
 default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
   "name" => "Catalina", 
   "thread_pool" => { "max_threads" => 200, "daemon" => "true", "min_spare_threads" => 25, "max_idle_time" => 60000 },
@@ -108,17 +121,9 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 #   "key_location" => "local_file_path_to_encryption_key",
 #   "extract_fields" => ["field1", "field2", "field3"]
 # }
-
 default["wsi_tomcat"]["disable_manager"] = false
 default["wsi_tomcat"]["archive"]["manager_name"] = "manager_war.tar.gz"
 
 # you can download libs into the main lib director by providing a list of URLs and the final file name to create
 # eg: default["wsi_tomcat"]["lib_sources"] = [{ filename: "mylib.jar", url: "http://www.website.com/mylib.jar" }]
 default["wsi_tomcat"]["lib_sources"] = []
-
-# JAVA Installation Options
-# https://supermarket.chef.io/cookbooks/java
-default["java"]["install_flavor"] = "oracle"
-default["java"]["oracle"]["accept_oracle_download_terms"] = true
-default["java"]["jdk_version"] = "8"
-default["java"]["set_etc_environment"] = true
