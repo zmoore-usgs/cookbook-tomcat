@@ -37,12 +37,12 @@ default["wsi_tomcat"]['data_bag_config']['bag_name'] = "wsi_tomcat-_default"
 default["wsi_tomcat"]['data_bag_config']['credentials_attribute'] = "credentials"
 
 
-# Instances definition 
+# Instances definition
 # port = The port that the tomcat instance will run on
-# ssl  = Optional. Defines SSL configuration for instance. 
+# ssl  = Optional. Defines SSL configuration for instance.
 #   ssl.enabled = Defines whether SSL will be used on instance
 # user = Defines credentials for various tomcat users
-#    See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access   
+#    See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access
 default["wsi_tomcat"]["instances"]["default"]["cors"]["enabled"] = true
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["origins"] = "*"
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["methods"] = ["GET", "POST", "HEAD", "OPTIONS"]
@@ -53,31 +53,51 @@ default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["support_creden
 default["wsi_tomcat"]["instances"]["default"]["cors"]["allowed"]["filter"] = "/*"
 default["wsi_tomcat"]["instances"]["default"]["user"]["disable_admin_users"] = false
 default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
-  "name" => "Catalina", 
-  "thread_pool" => { "max_threads" => 200, "daemon" => "true", "min_spare_threads" => 25, "max_idle_time" => 60000 },
-  "connector" => { "port" => 8080 },
-  "ssl_connector" => { 
-    "enabled" => false, #off by default
-    "wsi_tomcat_keys_data_bag" => "name_of_your_data_bag", # see environment/example_keystore_data_bag.json for examples
-    "wsi_tomcat_keys_data_item" => "item_in_your_data_bag", # see environment/example_keystore_data_bag.json for examples
-    "key_location" => "local_file_path_to_encryption_key", # note: this feature relies on an encryption key being placed on the system before this recipe runs
-  },
-  "engine" => { "host" => [ "name" => "localhost" ] }
-  }]
-  
+    "name" => "Catalina",
+    "thread_pool" => { "max_threads" => 200, "daemon" => "true", "min_spare_threads" => 25, "max_idle_time" => 60000 },
+    "connector" => { "port" => 8080 },
+    "ssl_connector" => {
+      "enabled" => false,
+      "wsi_tomcat_keys_data_bag" => "wsi_tomcat-_default", # see test/integration/default/keystore_unencrypted.json for examples
+      "wsi_tomcat_keys_data_item" => "keystores", # see environment/example_keystore_data_bag.json for examples
+
+      # If you already have a certificate file:
+      "ssl_cert_file" => "", # file:///path/to/remote/crt/file/if/available.crt
+      "ssl_key_file" => "", # file:///path/to/remote/key/file/if/available.key
+
+      # If you have certificates per host...
+      # [ {"name" : "www.host1.com" , "path" : "file:///path/to/trustcert1/crt"}, {"name" : "www.host2.com" , "path" : "file:///path/to/trustcert2/crt"}]
+      # or to create self-signed certs per host...
+      # [ {"name" : "www.host1.com"}, {"name" : "www.host2.com"}]
+      "trust_certs" => [], 
+
+      # If you want this cookbook to create certs:
+      "directory_info" => {
+        "name" => "gov.usgs.cida",
+        "org_unit" => "DevOps",
+        "org" => "CIDA",
+        "locality" => "Middleton",
+        "state" => "WI",
+        "country" => "US"
+      },
+      
+    },
+    "engine" => { "host" => [ "name" => "localhost" ] }
+}]
+
 # You can add as many applications as needed by using the following...
 # default["wsi_tomcat"]["instances"]["default"]["application"]["app1"] = {
-# 	"url" => app1Url,
-# 	"final_name" => app1Name
+#   "url" => app1Url,
+#   "final_name" => app1Name
 # }
 # default["wsi_tomcat"]["instances"]["default"]["application"]["app2"] = {
-# 	"url" => app2Url,
-# 	"final_name" => app2Name
+#   "url" => app2Url,
+#   "final_name" => app2Name
 # }
 
 # if you want to set resource entries in context.xml, notice encrypted attributes entry
 # default["wsi_tomcat"]["instances"]["default"]["context"]["resources"] = [
-#   { 
+#   {
 #        "description" => "value",
 #        "name" => "value",
 #        "auth" => "value",
@@ -99,11 +119,10 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 #        "pool_prepared_statements" => "value",
 #        "max_open_prepared_statements" => "value",
 #        "encrypted_attributes" => {
-#        	"data_bag_name" => "data_bag_to_decrypt",
-#        	"key_location" => "location_of_encryption_key",
-#        	"field_map" => {
-#        		"fromField" : "toField" //EG: take the value from fromField and place it into the toField attribute of the resource
-#        	}
+#         "data_bag_name" => "data_bag_to_decrypt",
+#         "field_map" => {
+#           "fromField" : "toField" //EG: take the value from fromField and place it into the toField attribute of the resource
+#         }
 #        }
 #}]
 
@@ -118,7 +137,6 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 # default["wsi_tomcat"]["instances"]["default"]["context"]["encrypted_environments_data_bag"] = {
 #   "data_bag_name" => "name_of_your_data_bag",
 #   "data_bag_item" => "name_of_item_in_data_bag",
-#   "key_location" => "local_file_path_to_encryption_key",
 #   "extract_fields" => ["field1", "field2", "field3"]
 # }
 default["wsi_tomcat"]["disable_manager"] = false
