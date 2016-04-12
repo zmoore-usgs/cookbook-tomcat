@@ -151,86 +151,120 @@ def deploy_application
 end
 
 # will check for ssl=true and load/create keys from encrypted data_bags
-def load_service_definitions_and_keys (service_definitions, current_resource)
+def load_service_definitions_and_keys (service_definitions)
   built_service_definitions = []
   home_dir = node["wsi_tomcat"]["user"]["home_dir"]
+  user = node["wsi_tomcat"]["user"]["name"]
+  group = node["wsi_tomcat"]["group"]["name"]
   keystore_password = ""
 
   service_definitions.each do |d|
-    newDef = d
 
-    Chef::Log.info "Found service_definition #{newDef['name']}"
-    if newDef["ssl_connector"]["enabled"] == true
-      wsi_tomcat_keys_data_bag = newDef["ssl_connector"]["wsi_tomcat_keys_data_bag"]
-      wsi_tomcat_keys_data_item = newDef["ssl_connector"]["wsi_tomcat_keys_data_item"]
-      enc_key_location = newDef["ssl_connector"]["key_location"]
+    new_def = d
+    name = new_def['name']
+    Chef::Log.info "Found service_definition #{name}"
 
-      decrypted_keystore_data_bag = data_bag_item(wsi_tomcat_keys_data_bag, wsi_tomcat_keys_data_item, IO.read(enc_key_location))
-
+    if new_def["ssl_connector"]["enabled"]
+      ssl_config = new_def["ssl_connector"]
+      remote_cert_file = ssl_config['ssl_cert_file']
+      remote_key_file = ssl_config['ssl_key_file']
+      wsi_tomcat_keys_data_bag = ssl_config["wsi_tomcat_keys_data_bag"]
+      wsi_tomcat_keys_data_item = ssl_config["wsi_tomcat_keys_data_item"]
+      trust_certs = ssl_config["trust_certs"]
+      decrypted_keystore_data_bag = data_bag_item(wsi_tomcat_keys_data_bag, wsi_tomcat_keys_data_item)
       keystore_password = decrypted_keystore_data_bag["keystore_password"]
-      privKey = decrypted_keystore_data_bag["private_key"]
-      cert = decrypted_keystore_data_bag["certificate"]
-      trust_certs = decrypted_keystore_data_bag["trust_certs"]
+      ssl_dir = "#{home_dir}/ssl"
+      local_certificate_location = "#{ssl_dir}/#{name}.localhost.crt"
+      local_keystore_location = "#{ssl_dir}/#{name}.localhost.key"
 
-      #write out private key, eg /opt/tomcat/ssl/<NAME>.localhost.key
-      file "#{home_dir}/ssl/#{newDef['name']}.localhost.key" do
-        content privKey
-        owner node["wsi_tomcat"]["user"]["name"]
-        group node["wsi_tomcat"]["group"]["name"]
-        mode 00600
-      end
 
-      #write out public cert, eg /opt/tomcat/ssl/<NAME>.localhost.crt
-      file "#{home_dir}/ssl/#{newDef['name']}.localhost.crt" do
-        content cert
-        owner node["wsi_tomcat"]["user"]["name"]
-        group node["wsi_tomcat"]["group"]["name"]
-        mode 00600
+      if ! remote_cert_file.nil? && ! remote_cert_file.empty? && ! remote_key_file.nil? && ! remote_key_file.empty?
+        # Use provided certificates
+        remote_file local_certificate_location do
+          source remote_cert_file
+          owner user
+          group group
+          mode 00600
+          sensitive true
+        end
+
+        remote_file local_keystore_location do
+          source remote_key_file
+          owner user
+          group group
+          mode 00600
+          sensitive true
+        end
+      else
+        # Generate certificates
+        org_unit = ssl_config['org_unit']
+        org = ssl_config['org']
+        locality = ssl_config['locality']
+        state = ssl_config['state']
+        country = ssl_config['country']
+        host = node['fqdn']
+        if ! ssl_config['name'].nil? && !  ssl_config['name'].empty?
+          host =  ssl_config['name']
+        end
+
+        execute "Create keystore" do
+          command "/usr/bin/keytool -genkey -noprompt -keystore #{local_keystore_location}  -alias '#{name}' -keyalg RSA -keypass #{keystore_password} -storepass #{keystore_password} -dname 'CN=#{host}, OU=#{org_unit}, O=#{org}, L=#{locality}, S=#{state}, C=#{country}'"
+          sensitive true
+          not_if do ::File.exists?(local_keystore_location) end
+        end
       end
 
       #create keystore from the key/crt
       bash 'make_keystore' do
-        cwd "#{home_dir}/ssl"
+        cwd ssl_dir
         code <<-EOH
-        openssl pkcs12 -export -name #{newDef['name']}-localhost -in #{newDef['name']}.localhost.crt -inkey #{newDef['name']}.localhost.key -out #{newDef['name']}.p12 -password pass:#{keystore_password} -passin pass:#{keystore_password} -passout pass:#{keystore_password}
-        keytool -importkeystore -destkeystore #{newDef['name']}.jks -srckeystore #{newDef['name']}.p12 -srcstoretype pkcs12 -alias #{newDef['name']}-localhost -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
+        openssl pkcs12 -export -name #{name}-localhost -in #{name}.localhost.crt -inkey #{name}.localhost.key -out #{name}.p12 -password pass:#{keystore_password} -passin pass:#{keystore_password} -passout pass:#{keystore_password}
+        keytool -importkeystore -destkeystore #{name}.jks -srckeystore #{name}.p12 -srcstoretype pkcs12 -alias #{name}-localhost -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
         EOH
-        not_if { ::File.exists?("#{home_dir}/ssl/#{newDef['name']}.jks") }
+        not_if { ::File.exists?("#{ssl_dir}/#{name}.jks") }
       end
 
       #create truststore
       bash 'make_truststore' do
-        cwd "#{home_dir}/ssl"
+        cwd ssl_dir
         code <<-EOH
-        cp $JAVA_HOME/jre/lib/security/cacerts #{home_dir}/ssl/truststore
+        cp $JAVA_HOME/jre/lib/security/cacerts #{ssl_dir}/truststore
         keytool -storepasswd -keystore truststore -storepass changeit -new #{keystore_password}
         EOH
-        not_if { ::File.exists?("#{home_dir}/truststore") }
+        not_if { ::File.exists?("#{ssl_dir}/truststore") }
       end
-      current_resource.server_opts.push("Djavax.net.ssl.trustStore=#{home_dir}/ssl/truststore")
+      current_resource.server_opts.push("Djavax.net.ssl.trustStore=#{ssl_dir}/truststore")
       current_resource.server_opts.push("Djavax.net.ssl.trustStorePassword=#{keystore_password}")
 
       #add each cert to trust store
-      trust_certs.each do |host, trust_cert|
-        #write cert to file
-        file "#{home_dir}/ssl/#{host}.#{newDef['name']}.crt" do
-          content trust_cert
-          owner node["wsi_tomcat"]["user"]["name"]
-          group node["wsi_tomcat"]["group"]["name"]
-          mode 00600
-        end
+      trust_certs.each do |ts|
+        host = ts['name']
+        location = ts['path']
 
-        bash 'make_keystore' do
-          cwd "#{home_dir}/ssl"
-          code <<-EOH
-          keytool -import -noprompt -trustcacerts -alias #{host} -file #{host}.#{newDef['name']}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
-          EOH
+        if ! location.nil? && ! location.empty?
+          # write cert to file
+          remote_file "#{ssl_dir}/#{host}.#{name}.crt" do
+            source location
+            owner user
+            group group
+            mode 00600
+            not_if { ::File.exists?("#{ssl_dir}/#{host}.Catalina.crt") }
+          end
+        else
+          # Create CRT
+          bash 'make_keystore' do
+            cwd ssl_dir
+            code <<-EOH
+            keytool -import -noprompt -trustcacerts -alias #{host} -file #{host}.#{name}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
+            EOH
+            not_if { ::File.exists?("#{ssl_dir}/#{host}.Catalina.crt") }
+          end
         end
       end
 
     end
 
-    built_service_definitions.push(newDef)
+    built_service_definitions.push(new_def)
   end
 
   return {
@@ -241,7 +275,7 @@ end
 
 def create_tomcat_instance
   name                  = current_resource.name
-  sd_keys               = load_service_definitions_and_keys(node["wsi_tomcat"]["instances"][current_resource.name]["service_definitions"], current_resource)
+  sd_keys               = load_service_definitions_and_keys(node["wsi_tomcat"]["instances"][name]["service_definitions"])
   service_definitions   = sd_keys["service_definitions"]
   keystore_password     = sd_keys["keystore_password"]
   server_opts           = current_resource.server_opts
