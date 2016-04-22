@@ -221,6 +221,7 @@ def load_service_definitions_and_keys (service_definitions)
         openssl pkcs12 -export -name #{name}-localhost -in #{name}.localhost.crt -inkey #{name}.localhost.key -out #{name}.p12 -password pass:#{keystore_password} -passin pass:#{keystore_password} -passout pass:#{keystore_password}
         keytool -importkeystore -destkeystore #{name}.jks -srckeystore #{name}.p12 -srcstoretype pkcs12 -alias #{name}-localhost -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
         EOH
+        sensitive true
         not_if { ::File.exists?("#{ssl_dir}/#{name}.jks") }
       end
 
@@ -231,10 +232,9 @@ def load_service_definitions_and_keys (service_definitions)
         cp $JAVA_HOME/jre/lib/security/cacerts #{ssl_dir}/truststore
         keytool -storepasswd -keystore truststore -storepass changeit -new #{keystore_password}
         EOH
+        sensitive true
         not_if { ::File.exists?("#{ssl_dir}/truststore") }
       end
-      current_resource.server_opts.push("Djavax.net.ssl.trustStore=#{ssl_dir}/truststore")
-      current_resource.server_opts.push("Djavax.net.ssl.trustStorePassword=#{keystore_password}")
 
       #add each cert to trust store
       trust_certs.each do |ts|
@@ -248,6 +248,7 @@ def load_service_definitions_and_keys (service_definitions)
             owner user
             group group
             mode 00600
+            sensitive true
             not_if { ::File.exists?("#{ssl_dir}/#{host}.Catalina.crt") }
           end
         else
@@ -257,6 +258,7 @@ def load_service_definitions_and_keys (service_definitions)
             code <<-EOH
             keytool -import -noprompt -trustcacerts -alias #{host} -file #{host}.#{name}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
             EOH
+            sensitive true
             not_if { ::File.exists?("#{ssl_dir}/#{host}.Catalina.crt") }
           end
         end
@@ -278,7 +280,7 @@ def create_tomcat_instance
   sd_keys               = load_service_definitions_and_keys(node["wsi_tomcat"]["instances"][name]["service_definitions"])
   service_definitions   = sd_keys["service_definitions"]
   keystore_password     = sd_keys["keystore_password"]
-  server_opts           = current_resource.server_opts
+  server_opts           = Array.new(current_resource.server_opts)
   tomcat_home           = node["wsi_tomcat"]["user"]["home_dir"]
   fqdn                  = node["fqdn"]
   cors                  = current_resource.cors
@@ -307,6 +309,7 @@ def create_tomcat_instance
     :support_credentials => true,
     :filter => "/*"
   }
+  
   instance_conf_files   = [
     "catalina.policy",
     "catalina.properties",
@@ -317,6 +320,9 @@ def create_tomcat_instance
     "tomcat-users.xml",
     "web.xml"
   ]
+
+  server_opts.push("Djavax.net.ssl.trustStore=#{tomcat_home}/ssl/truststore")
+  server_opts.push("Djavax.net.ssl.trustStorePassword=#{keystore_password}")
 
   databag_name = node["wsi_tomcat"]['data_bag_config']['bag_name']
   credentials_attribute = node["wsi_tomcat"]['data_bag_config']['credentials_attribute']
@@ -392,6 +398,7 @@ def create_tomcat_instance
     owner tomcat_user
     group tomcat_group
     mode 0744
+    sensitive true
   end
 
   template "#{instance_bin_path}/catalinaopts.sh" do
@@ -402,6 +409,7 @@ def create_tomcat_instance
       :server_opts => server_opts
     )
     mode 0744
+    sensitive true
   end
 
   template "Install #{tomcat_init_script} script" do

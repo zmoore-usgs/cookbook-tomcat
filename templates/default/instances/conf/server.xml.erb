@@ -89,13 +89,22 @@
                 port="<%= d.connector.port %>"
                 executor="<%= d.name %>ThreadPool"
                 protocol="<%= d.connector.key?("protocol") ? d.connector.protocol : 'HTTP/1.1' %>"
+                allowTrace="<%= d.connector.key?("allow_trace") ? d.connector.allow_trace : false %>"
+                asyncTimeout="<%= d.connector.key?("async_timeout") ? d.connector.async_timeout : 10000 %>"
+                enableLookups="<%= d.connector.key?("enable_lookups") ? d.connector.enable_lookups : false %>"
+                <% if d.connector.key?("proxy_port") %>
+                proxyPort="<%= d.connector.proxy_port %>"
+                <% end  %>
+                <% if d.connector.key?("proxy_name") %>
+                proxyName="<%= d.connector.proxy_name %>"
+                <% end  %>
+                <% if d.ssl_connector.enabled == true %>
                 redirectPort="<%= d.connector.port + 363 %>"
+                <% end  %>
                 acceptCount="<%= d.connector.key?("accept_count") ? d.connector.accept_count : 100 %>"
                 acceptorThreadCount="<%= d.connector.key?("acceptor_thread_count") ? d.connector.acceptor_thread_count : 1 %>"
                 acceptorThreadPriority="<%= d.connector.key?("acceptor_thread_priority") ? d.connector.acceptor_thread_priority : 5 %>"
                 address="<%= d.connector.key?("address") ? d.connector.address : '0.0.0.0' %>"
-                allowTrace="<%= d.connector.key?("allow_trace") ? d.connector.allow_trace : false %>"
-                asyncTimeout="<%= d.connector.key?("async_timeout") ? d.connector.async_timeout : 10000 %>"
                 bindOnInit="<%= d.connector.key?("bind_on_init") ? d.connector.bind_on_init : true %>"
                 compressableMimeType="<%= d.connector.key?("compressable_mime_type") ? d.connector.compressable_mime_type : 'text/html,text/xml,text/plain' %>"
                 compression="<%= d.connector.key?("compression") ? d.connector.compression : 'off' %>"
@@ -104,7 +113,6 @@
                 connectionTimeout="<%= d.connector.key?("connection_timeout") ? d.connector.connection_timeout : 20000 %>"
                 connectionUploadTimeout= "<%= d.connector.key?("connection_upload_timeout") ? d.connector.connection_upload_timeout : false %>"
                 disableUploadTimeout="<%= d.connector.key?("disable_upload_timeout") ? d.connector.disable_upload_timeout : true %>"
-                enableLookups="<%= d.connector.key?("enable_lookups") ? d.connector.enable_lookups : false %>"
                 executorTerminationTimeoutMillis="<%= d.connector.key?("executor_termination_timeout_millis") ? d.connector.executor_termination_timeout_millis : 0 %>"
                 keepAliveTimeout="<%= d.connector.key?("keep_alive_timeout") ? d.connector.keep_alive_timeout : 20000 %>"
                 maxConnections="<%= d.connector.key?("max_connections") ? d.connector.max_connections : 8192 %>"
@@ -124,15 +132,14 @@
                 processorCache="<%= d.connector.key?("processor_cache") ? d.connector.processor_cache : 200 %>"
                 restrictedUserAgents="<%= d.connector.key?("restricted_user_agents") ? d.connector.restricted_user_agents : '' %>"
                 scheme="<%= d.connector.key?("scheme") ? d.connector.scheme : 'http' %>"
-                secure="<%= d.connector.key?("secure") ? d.connector.secure : false %>"
                 server="<%= d.connector.key?("server") ? d.connector.server : '' %>"
                 socketBuffer="<%= d.connector.key?("socket_buffer") ? d.connector.socket_buffer : 9000 %>"
-                SSLEnabled="<%= d.connector.key?("ssl_enabled") ? d.connector.ssl_enabled : false %>"
                 tcpNoDelay="<%= d.connector.key?("tcp_no_delay") ? d.connector.tcp_no_delay : true %>"
                 threadPriority="<%= d.connector.key?("thread_priority") ? d.connector.thread_priority : 5 %>"
                 upgradeAsyncWriteBufferSize="<%= d.connector.key?("upgrade_async_write_buffer_size") ? d.connector.upgrade_async_write_buffer_size : 8192 %>"
                 URIEncoding="<%= d.connector.key?("uri_encoding") ? d.connector.uri_encoding : 'ISO-8859-1' %>"
                 useBodyEncodingForURI="<%= d.connector.key?("use_body_encoding_uri") ? d.connector.use_body_encoding_uri : false %>"
+                secure="<%= d.connector.key?("secure") ? d.connector.secure : false %>"
                 useIPVHosts="<%= d.connector.key?("use_ipv_hosts") ? d.connector.use_ipv_hosts : false %>"
                 xpoweredBy="<%= d.connector.key?("x_powered_by") ? d.connector.x_powered_by : false %>"
             />
@@ -140,12 +147,18 @@
             <% if d.ssl_connector.enabled == true %>
               <Connector
                   port="<%= d.connector.port + 363 %>"
-                  protocol="HTTP/1.1"
+                  protocol="<%= d.ssl_connector.key?("protocol") ? d.ssl_connector.protocol : "HTTP/1.1" %>"
+                  <% if d.ssl_connector.key?("algorithm") %>
+                  algorithm="<%= d.ssl_connector.algorithm %>"
+                  <% end  %>
                   executor="<%= d.name %>ThreadPool"
                   SSLEnabled="<%= d.ssl_connector.enabled %>"
                   keystoreFile="${catalina.home}/ssl/<%= d.name%>.jks" 
                   keystorePass="<%= @keystore_password %>" 
+                  truststoreFile="${catalina.home}/ssl/truststore"
+                  truststorePass="<%= @keystore_password %>"
                   sslProtocol="TLS"
+                  ciphers="<%= d.ssl_connector.key?("cipher_suite") ? d.ssl_connector.cipher_suite : "ALL:!LOW:!EXP:!SSLv2" %>"
                   scheme="https"
                   secure="true"
               />
