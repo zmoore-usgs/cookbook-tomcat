@@ -39,6 +39,7 @@
     <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
     -->
     <% if defined?(@resources) %>
+
         <% @resources.each do |r| -%>
             <Resource 
                     <% if r.has_key?("description") %>description="<%=r["description"] %>"<% end %>
@@ -60,13 +61,16 @@
                     <% if r.has_key?("validation_query") %>validationQuery="<%= r["validation_query"] %>"<% end %>
                     <% if r.has_key?("access_to_underlying_connection_allowed") %>accessToUnderlyingConnectionAllowed="<%= r["access_to_underlying_connection_allowed"] %>"<% end %>
                     <% if r.has_key?("pool_prepared_statements") %>poolPreparedStatements="<%= r["pool_prepared_statements"] %>"<% end %>
+                    <% if r.has_key?("jdbc_interceptors") %>jdbcInterceptors="<%= r["jdbc_interceptors"] %>"<% end %>
                     <% if r.has_key?("max_open_prepared_statements") %>maxOpenPreparedStatements="<%= r["max_open_prepared_statements"] %>"<% end %>
                     />
         <% end -%>
+
     <% end %>
     
     <% if defined?(@environments) %>
       <% @environments.each do |e| -%>
+
           <Environment 
               name="<%= e["name"] %>" 
               type="<%= e["type"] %>" 
@@ -74,6 +78,7 @@
               description="<%= e["description"] %>" 
               override="<%= e["override"] %>"
               />
+               
       <% end -%>
     <% end %>
     

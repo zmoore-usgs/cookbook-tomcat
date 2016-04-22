@@ -58,6 +58,9 @@ suites:
       "wsi_tomcat" : {
         "instances" : {
           "default" : {
+            "server_opts" : [
+              "server"
+            ],
             "service_definitions" : [
             {
               "name" : "Catalina",

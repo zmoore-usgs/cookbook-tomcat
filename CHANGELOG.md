@@ -1,3 +1,11 @@
+0.1.9
+-----
+- [isuftin@usgs.gov] - Added sensitivity to templates
+- [isuftin@usgs.gov] - Fixed server opts updating
+- [isuftin@usgs.gov] - Removed the `application_name` attribute
+- [isuftin@usgs.gov] - Updated how encrypted data bags are accessed
+- [isuftin@usgs.gov] - Added more attributes to put into context.xml and server.xml
+
 0.1.8
 -----
 - Removed requirement for specifying key location. Using default key location as according to Chef
