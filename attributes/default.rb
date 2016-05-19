@@ -3,8 +3,15 @@ default["wsi_tomcat"]["group"]["name"]    = "tomcat"
 default["wsi_tomcat"]["user"]["name"]     = "tomcat"
 default["wsi_tomcat"]["user"]["home_dir"] = "/opt/tomcat"
 
+# If an instance is not listed in the Chef configuration but appears running on 
+# the system, should the instance be removed?
+default["wsi_tomcat"]["deploy"]["remove_unlisted_instances"] = true
+# If an application is not listed in the Chef configuration but appears running on 
+# the system, should the application be removed?
+default["wsi_tomcat"]["deploy"]["remove_unlisted_applications"] = true
+
 # Set the version of Tomcat to install
-default["wsi_tomcat"]["version"]      = "8.0.33"
+default["wsi_tomcat"]["version"]      = "8.0.35"
 
 # Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
 default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
@@ -19,7 +26,7 @@ default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
 # http://www.openoffice.org/download/checksums.html#hash_win
 # http://www.openoffice.org/download/checksums.html#hash_linux
 # http://www.openoffice.org/download/checksums.html#hash_mac
-default["wsi_tomcat"]["file"]["archive"]["checksum"] = "c77873c1861ed81617abb8bedc392fb0ff5ebf871de33cd1fcd49d4c072e38b7"
+default["wsi_tomcat"]["file"]["archive"]["checksum"] = "6bc380aeebe0b56cf9b37b8c3c128919d2e8ac84d756448fc8e9d8af122f88fd"
 
 # Some credentials are stored in an encrypted data bag
 default["wsi_tomcat"]['data_bag_config']['bag_name'] = "wsi_tomcat-_default"
@@ -140,6 +147,7 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 #   "extract_fields" => ["field1", "field2", "field3"]
 # }
 default["wsi_tomcat"]["disable_manager"] = false
+
 default["wsi_tomcat"]["archive"]["manager_name"] = "manager_war.tar.gz"
 
 # you can download libs into the main lib director by providing a list of URLs and the final file name to create
