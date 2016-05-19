@@ -3,6 +3,8 @@ driver:
   name: vagrant
   network:
     - ['forwarded_port', {guest: 8080, host: 8080, auto_correct: true}]
+    - ['forwarded_port', {guest: 8081, host: 8081, auto_correct: true}]
+    - ['forwarded_port', {guest: 8444, host: 8444, auto_correct: true}]
     - ['forwarded_port', {guest: 8443, host: 8443, auto_correct: true}]
 
 provisioner:
@@ -43,7 +45,15 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[wsi_tomcat::default]
+      - recipe[wsi_tomcat::install_deps]
+      - recipe[wsi_tomcat::create_group]
+      - recipe[wsi_tomcat::create_user]
+      - recipe[wsi_tomcat::get_tomcat]
+      - recipe[wsi_tomcat::commons_daemon]
+      - recipe[wsi_tomcat::create_tomcat_base]
+      - recipe[wsi_tomcat::create_tomcat_instances]
+      - recipe[wsi_tomcat::update_context]
+      - recipe[wsi_tomcat::deploy_application] 
     data_path: test/files
     data_bags_path: './test/integration/default/data_bags/'
     encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
@@ -58,6 +68,15 @@ suites:
       "wsi_tomcat" : {
         "instances" : {
           "default" : {
+            "application" : {
+              "probe" : {
+                "url" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war",
+                "final_name" : "probe"
+              }
+            },
+            "user" : {
+              "disable_admin_users" : false
+            },
             "server_opts" : [
               "server"
             ],
@@ -109,7 +128,68 @@ suites:
               }
             }
             ]
+          },
+
+
+          "test" : {
+            "user" : {
+              "disable_admin_users" : false
+            },
+            "server_opts" : [
+              "server"
+            ],
+            "service_definitions" : [
+            {
+              "name" : "Catalina",
+              "thread_pool" : {
+                "max_threads" : 200,
+                "daemon" : "true",
+                "min_spare_threads" : 25,
+                "max_idle_time" : 60000
+              },
+              "connector" : {
+                "port" : 8081
+              },
+              "ssl_connector" : {
+                "enabled" : true,
+                "wsi_tomcat_keys_data_bag" : "wsi_tomcat-_default",
+                "wsi_tomcat_keys_data_item" : "keystores",
+                
+                # Provided Certs
+
+                "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
+                "ssl_key_file" : "file:///tmp/kitchen/data/certs/client.key",
+                "trust_certs" : [
+                  {"name" : "www.host1.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"},
+                  {"name" : "www.host2.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"}
+                ]
+
+                # Create Certs
+                # "directory_info" : {
+                #   "name" : "gov.usgs.cida",
+                #   "org_unit" : "DevOps",
+                #   "org" : "CIDA",
+                #   "locality" : "Middleton",
+                #   "state" : "WI",
+                #   "country" : "US"
+                # },
+                # "trust_certs" : [
+                #   {"name" : "www.host1.com"},
+                #   {"name" : "www.host2.com"}
+                # ]
+
+              },
+              "engine" : { 
+                "host" : [ 
+                  "name" : "localhost" 
+                ] 
+              }
+            }
+            ]
           }
+
+
+
         }
       }
     }

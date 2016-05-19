@@ -2,6 +2,9 @@ def whyrun_supported?
   true
 end
 
+# Used to interact with Tomcat Manager via REST API
+require 'open-uri'
+
 use_inline_resources
 
 action :create do
@@ -11,6 +14,17 @@ action :create do
     converge_by("Create #{ @new_resource }") do
       create_tomcat_instance
     end
+  end
+end
+
+action :remove do
+  if @current_resource.exists
+    converge_by("Remove #{ @new_resource }") do
+      new_resource.updated_by_last_action(remove_tomcat_instance?(current_resource.name))
+    end
+  else
+    Chef::Log.info "Tomcat instance #{ @new_resource } does not exist - nothing to do."
+    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -86,6 +100,22 @@ action :deploy_app do
   end
 end
 
+action :undeploy_app do
+  if @current_resource.exists
+    if ! application_exists?(current_resource.application_name)
+      Chef::Log.info "Tomcat application #{current_resource.application_name} does not exist."
+      new_resource.updated_by_last_action(false)
+    else
+      converge_by("Undeploying #{current_resource.application_name} from #{ @new_resource }") do
+        new_resource.updated_by_last_action(undeploy_application?(current_resource.application_name))
+      end
+    end
+  else
+    Chef::Log.info "Tomcat instance #{ @new_resource } does not exist."
+    new_resource.updated_by_last_action(false)
+  end
+end
+
 def load_current_resource
   @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
@@ -107,13 +137,34 @@ def instance_exists?(name)
   ::File.exists?(instance_home) && ::File.directory?(instance_home)
 end
 
+def remove_tomcat_instance?(name)
+  if instance_exists?(name)
+    if is_started?(name)
+      cmdStr = "/sbin/service tomcat stop #{name}"
+      execute cmdStr do
+        user "root"
+        ignore_failure true # This is just a convenience to try and stop the resource before deleting it
+      end
+    end
+
+    # Delete the instance directory
+    instances_home = ::File.expand_path("instance", current_resource.tomcat_home)
+    instance_home = ::File.expand_path(name, instances_home)
+    directory instance_home do
+      recursive true
+      action :delete
+    end
+  else
+    return false
+  end
+end
+
 def application_exists?(name)
-  application_final_name = node["wsi_tomcat"]["instances"][current_resource.name]["application"][name]["final_name"]
   tomcat_home_dir        = node["wsi_tomcat"]["user"]["home_dir"]
   instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
   instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
   webapps_dir            = ::File.expand_path("webapps", instance_dir)
-  war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
+  war_name               = ::File.expand_path("#{name}.war", webapps_dir)
 
   ::File.exists?(war_name)
 end
@@ -125,6 +176,40 @@ def is_started?(name)
   matcher = Regexp.new("(#{name}).*(is running).*", Regexp::IGNORECASE)
   cmd.run_command
   matcher.match(cmd.stdout)
+end
+
+def undeploy_application?(application_name)
+  instance_name          = current_resource.name
+  tomcat_home_dir        = node["wsi_tomcat"]["user"]["home_dir"]
+  instances_dir          = ::File.expand_path("instance", tomcat_home_dir)
+  instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
+  webapps_dir            = ::File.expand_path("webapps", instance_dir)
+  war_name               = ::File.expand_path("#{application_name}.war", webapps_dir)
+
+  node["wsi_tomcat"]["instances"][instance_name]["service_definitions"].each do |sd, sd_att|
+    port = sd["connector"]["port"]
+    databag_name = node["wsi_tomcat"]['data_bag_config']['bag_name']
+    credentials_attribute = node["wsi_tomcat"]['data_bag_config']['credentials_attribute']
+    tomcat_script_pass = data_bag_item(databag_name, credentials_attribute)[instance_name]['tomcat_script_pass']
+    response = ""
+    open("http://127.0.0.1:#{port}/manager/text/undeploy?path=/#{application_name}", :http_basic_authentication=>["tomcat-script","#{tomcat_script_pass}"]) do |f|
+      # First result will be the response for this command
+      response = f.read.split("\n")[0]
+      Chef::Log.info("Result from undeploying #{application_name} from #{instance_name}: #{response}")
+    end
+
+    file war_name do
+      action :delete
+    end
+
+    directory "#{webapps_dir}/application_name" do
+      action :delete
+      recursive true
+    end
+
+    response[0,2] == "OK"
+  end
+
 end
 
 def deploy_application
@@ -141,7 +226,6 @@ def deploy_application
   war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
 
   Chef::Log.info("deploying #{application_name} from #{application_url}")
-
   remote_file war_name do
     source application_url
     owner tomcat_user
@@ -309,7 +393,7 @@ def create_tomcat_instance
     :support_credentials => true,
     :filter => "/*"
   }
-  
+
   instance_conf_files   = [
     "catalina.policy",
     "catalina.properties",

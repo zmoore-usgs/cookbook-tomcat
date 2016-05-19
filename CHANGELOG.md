@@ -1,3 +1,9 @@
+
+0.1.10
+------
+- [isuftin@usgs.gov] - Added Tomcat resource action to undeploy an application
+- [isuftin@usgs.gov] - Added Tomcat resource action to remove instances not in configuration
+
 0.1.9
 -----
 - [isuftin@usgs.gov] - Added sensitivity to templates
