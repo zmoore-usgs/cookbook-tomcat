@@ -1,4 +1,14 @@
 
+0.1.12
+------
+- [isuftin@usgs.gov] - Updated to version 8.0.36 default for Tomcat. 
+- [isuftin@usgs.gov] - Added some documentation for getting SHA256 for binary
+
+0.1.11
+------
+- [isuftin@usgs.gov] - Parameterized more context.xml templating
+- [isuftin@usgs.gov] - Updated CORS attribute parsing (Ruby hash entity vs string keys)
+
 0.1.10
 ------
 - [isuftin@usgs.gov] - Added Tomcat resource action to undeploy an application

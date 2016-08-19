@@ -382,16 +382,16 @@ def create_tomcat_instance
   instance_conf_path    = ::File.expand_path("conf", instance_home)
   tomcat_init_script    = "tomcat-#{name}"
   default_cors          = {
-    :enabled          => true,
-    :allowed          => {
-      :origins        => "*",
-      :methods        => ["GET", "POST", "HEAD", "OPTIONS"],
-      :headers        => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
+    "enabled"          => true,
+    "allowed"          => {
+      "origins"        => "*",
+      "methods"        => ["GET", "POST", "HEAD", "OPTIONS"],
+      "headers"        => ["Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
     },
-    :exposed_headers     => [],
-    :preflight_maxage    => 1800,
-    :support_credentials => true,
-    :filter => "/*"
+    "exposed_headers"     => [],
+    "preflight_maxage"    => 1800,
+    "support_credentials" => true,
+    "filter" => "/*"
   }
 
   instance_conf_files   = [

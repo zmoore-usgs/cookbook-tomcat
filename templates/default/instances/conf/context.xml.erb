@@ -20,15 +20,20 @@
   limitations under the License.
 -->
 <!-- The contents of this file will be loaded for each web application -->
-<Context  antiJARLocking="true" antiResourceLocking="true">
+<Context 
+  antiJARLocking="<%= @anti_jar_locking %>" 
+  antiResourceLocking="<%= @anti_resource_locking %>"
+  allowCasualMultipartParsing="<%= @allow_casual_multipart_parsing %>"
+  backgroundProcessorDelay="<%= @background_processor_delay %>"
+  >
 
     <!-- Default set of monitored resources. If one of these changes, the    -->
     <!-- web application will be reloaded.                                   -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     
     <% if @version.tr(',','').to_i  > 7 %>
-    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
-	<% end %>
+      <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+    <% end %>
 	
     <!-- Uncomment this to disable session persistence across Tomcat restarts -->
     <Manager pathname="" />

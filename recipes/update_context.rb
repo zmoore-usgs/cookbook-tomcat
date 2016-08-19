@@ -10,13 +10,21 @@ tomcat_group = node["wsi_tomcat"]["group"]["name"]
 tomcat_user  = node["wsi_tomcat"]["user"]["name"]
 tomcat_home  = node["wsi_tomcat"]["user"]["home_dir"]
 context_xml  = "context.xml"
-r            = []
-e            = []
+r            = Array.new
+e            = Array.new
+
 instances.each do |instance, attributes|
   conf_path = "#{tomcat_home}/instance/#{instance}/conf/#{context_xml}"
 
   if attributes.has_key?("context")
+
     Chef::Log.info("Updating #{instance} context")
+
+    anti_jar_locking = attributes["context"].fetch(:anti_jar_locking, true)
+    anti_resource_locking = attributes["context"].fetch(:anti_resource_locking, true)
+    allow_casual_multipart_parsing = attributes["context"].fetch(:allow_casual_multipart_parsing, false)
+    background_processor_delay = attributes["context"].fetch(:background_processor_delay, "-1")
+    container_sci_filter = attributes["context"].fetch(:container_sci_filter, "")
     original_resources    = attributes["context"].fetch(:resources, [])
     original_environments = attributes["context"].fetch(:environments, [])
 
@@ -66,6 +74,10 @@ instances.each do |instance, attributes|
     sensitive true
     variables(
       :version => node["wsi_tomcat"]["version"].split(".")[0],
+      :anti_jar_locking => anti_jar_locking,
+      :anti_resource_locking => anti_resource_locking,
+      :allow_casual_multipart_parsing => allow_casual_multipart_parsing,
+      :background_processor_delay => background_processor_delay,
       :resources    => r.flatten,
       :environments => e.flatten
     )
