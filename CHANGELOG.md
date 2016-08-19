@@ -1,3 +1,17 @@
+Tomcat Cookbook Changelog
+=========
+
+0.1.13
+------
+- [isuftin@usgs.gov] - Moved java installation out of dependencies cookbook. Should be done
+	at a higher level outside of this cookbook
+- [isuftin@usgs.gov] - Added DOI SSL helper cookbook to Berksfile. Only needs to exist in tests when
+	testing on DOI network
+
+0.1.12
+------
+- [isuftin@usgs.gov] - Updated to version 8.0.36 default for Tomcat. 
+- [isuftin@usgs.gov] - Added some documentation for getting SHA256 for binary
 
 0.1.12
 ------
