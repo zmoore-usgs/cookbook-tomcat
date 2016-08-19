@@ -68,6 +68,11 @@ suites:
       "wsi_tomcat" : {
         "instances" : {
           "default" : {
+            "cors" : {
+              "allowed" : {
+                "headers" : [ "Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Authorization" ]
+              }
+            },
             "application" : {
               "probe" : {
                 "url" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war",
