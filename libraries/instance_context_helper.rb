@@ -1,4 +1,5 @@
 class Chef::Recipe::ContextHelper
+
   # Runs every element in the incoming resources array through the
   # normalize function
   def self.normalize_resources(incoming_resources)
@@ -10,39 +11,24 @@ class Chef::Recipe::ContextHelper
   end
 
   # Normalize incoming hash to fill out what a context resource entry should look like
-  # http://tomcat.apache.org/tomcat-7.0-doc/config/context.html#Resource_Definitions
+  # http://tomcat.apache.org/tomcat-8.0-doc/config/context.html#Resource_Definitions
   def self.normalize_resource(incoming_resource)
-    @default_resource                           = {
-      "name"                                    => "jdbc/insert_name_here",
-      "description"                             => "",
-      "auth"                                    => "Container",
-      "type"                                    => "javax.sql.DataSource",
-      "username"                                => "",
-      "password"                                => "",
-      "driver_class"                            => "oracle.jdbc.OracleDriver",
-      "url"                                     => "jdbc:oracle:thin:@some.db.address.usgs.gov:1521:db",
-      "max_active"                              => "10",
-      "max_idle"                                => "10",
-      "remove_abandoned"                        => "true",
-      "remove_abandoned_on_borrow"              => "true",
-      "remove_abandoned_timeout"                => "true",
-      "log_abandoned"                           => "true",
-      "test_on_borrow"                          => "true",
-      "default_auto_commit"                     => "false",
-      "validation_query"                        => "SELECT 1 FROM DUAL",
-      "access_to_underlying_connection_allowed" => "true",
-      "pool_prepared_statements"                => "true",
-      "max_open_prepared_statements"            => "400"
-    }
+
+    # TODO: I will want to put some sort of validation here
+    # if it makes sense. However, I can't depend on this always
+    # being a database resource so the logic would have to branch
+    # which would increase complexity.
+
+    @default_resource                           = {}
 
     @default_resource.merge(incoming_resource)
   end
 
   # Normalize incoming hash to fill out what a context environment entry should look like
-  # http://tomcat.apache.org/tomcat-7.0-doc/config/context.html#Environment_Entries
+  # http://tomcat.apache.org/tomcat-8.0-doc/config/context.html#Environment_Entries
   def self.normalize_environment(incoming_environment)
     @default_environment = {
-      "name" => "insert_name_here",
+      "name" => "you_did_not_configure_me_correctly",
       "type" => "java.lang.String",
       "value" => "",
       "description" => "",

@@ -187,15 +187,11 @@ suites:
       }
     }
 
-
   # For test suites, can test using Postgres:
   # $ docker run --name postgres -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:9.5.2
   - name: default-jdbc-connect
     run_list:
-      - recipe[stig]
-      - recipe[doi_ssl_filtering]
       - recipe[java]
-      - recipe[doi_ssl_filtering::java]
       - recipe[wsi_tomcat::install_deps]
       - recipe[wsi_tomcat::create_group]
       - recipe[wsi_tomcat::create_user]
@@ -203,6 +199,7 @@ suites:
       - recipe[wsi_tomcat::commons_daemon]
       - recipe[wsi_tomcat::create_tomcat_base]
       - recipe[wsi_tomcat::create_tomcat_instances]
+      - recipe[wsi_tomcat::download_libs]
       - recipe[wsi_tomcat::update_context]
       - recipe[wsi_tomcat::deploy_application] 
     data_path: test/files
@@ -217,7 +214,14 @@ suites:
           }
       },
       "wsi_tomcat" : {
+       "lib_sources" : [
+            {
+              "name" : "postgres-jdbc.jar",
+              "url" : "https://jdbc.postgresql.org/download/postgresql-9.4-1202.jdbc41.jar"
+            }
+          ],
         "instances" : {
+         
           "default" : {
             "cors" : {
               "allowed" : {
@@ -237,18 +241,20 @@ suites:
               "server"
             ],
             "context" : {
-              "encrypted_environments_data_bag" : {},
+              "encrypted_environments_data_bag" : {
+                "data_bag_name" : "wsi_tomcat-_default",
+                "data_bag_item" : "credentials",
+                "extract_fields" : []
+              },
               "environments" : [],
               "resources" : [{
-                "description" : "token storage database",
                 "name" : "jdbc/cidaAuthDS",
-                "max_active" : "50",
-                "remove_abandoned_timeout" : "60",
                 "url" : "jdbc:postgresql://192.168.99.100:5432/postgres",
-                "driver_class" : "org.postgresql.Driver",
-                "validation_query" : "select 1",
-                "jdbc_interceptors" : "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer",
-                "default_auto_commit" : "true",
+                "auth" : "container",
+                "type" : "javax.sql.DataSource",
+                "driverClassName" : "org.postgresql.Driver",
+                "validationQuery" : "select 1",
+                "jdbcInterceptors" : "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer",
                 "encrypted_attributes" : {
                   "data_bag_name" : "wsi_tomcat-_default",
                   "data_bag_item" : "credentials",
