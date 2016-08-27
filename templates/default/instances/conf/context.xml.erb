@@ -59,6 +59,7 @@
                     <% if r.has_key?("max_active") %>maxActive="<%= r["max_active"] %>"<% end %>
                     <% if r.has_key?("max_idle") %>maxIdle="<%= r["max_idle"] %>"<% end %>
                     <% if r.has_key?("remove_abandoned") %>removeAbandoned="<%= r["remove_abandoned"] %>"<% end %>
+                    <% if r.has_key?("remove_abandoned_on_borrow") %>removeAbandonedOnBorrow="<%= r["remove_abandoned_on_borrow"] %>"<% end %>
                     <% if r.has_key?("remove_abandoned_timeout") %>removeAbandonedTimeout="<%= r["remove_abandoned_timeout"] %>"<% end %>
                     <% if r.has_key?("log_abandoned") %>logAbandoned="<%= r["log_abandoned"] %>"<% end %>
                     <% if r.has_key?("test_on_borrow") %>testOnBorrow="<%= r["test_on_borrow"] %>"<% end %>

@@ -132,6 +132,7 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 #        "max_active" => "value",
 #        "max_idle" => "value",
 #        "remove_abandoned" => "value",
+#        "remove_abandoned_on_borrow" => "value",
 #        "remove_abandoned_timeout" => "value",
 #        "log_abandoned" => "value",
 #        "test_on_borrow" => "value",

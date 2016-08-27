@@ -31,16 +31,6 @@ platforms:
       box: bento/centos-6.7
       box_url: bento/centos-6.7
       provider: vmware_fusion
-  - name: centos-6.6-vbox
-    driver:
-      box: chef/centos-6.6
-      box_url: chef/centos-6.6
-      provider: virtualbox
-  - name: centos-6.6-vmware
-    driver:
-      box: bento/centos-6.6
-      box_url: bento/centos-6.6
-      provider: vmware_fusion
 
 suites:
   - name: default

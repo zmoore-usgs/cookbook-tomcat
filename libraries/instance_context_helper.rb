@@ -24,6 +24,7 @@ class Chef::Recipe::ContextHelper
       "max_active"                              => "10",
       "max_idle"                                => "10",
       "remove_abandoned"                        => "true",
+      "remove_abandoned_on_borrow"              => "true",
       "remove_abandoned_timeout"                => "true",
       "log_abandoned"                           => "true",
       "test_on_borrow"                          => "true",
