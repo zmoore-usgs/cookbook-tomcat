@@ -3,6 +3,7 @@ Tomcat Cookbook Changelog
 
 0.1.14
 ------
+- [isuftin@usgs.gov] - Added database testing to Kitchen suite
 - [isuftin@usgs.gov] - Moved Java cookbook dependency version to Berksfile
 - [isuftin@usgs.gov] - Fix how JAVA_HOME gets persisted to Tomcat scripts
 - [isuftin@usgs.gov] - Adding more context.xml attributes 

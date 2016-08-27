@@ -10,6 +10,8 @@
 user_name            = node["wsi_tomcat"]["user"]["name"]
 group_name           = node["wsi_tomcat"]["group"]["name"]
 tomcat_home          = node["wsi_tomcat"]["user"]["home_dir"]
+# TODO: java_home may not exist if the JAVA cookbook is not used to
+# install Java.
 java_home            = node["java"]["java_home"]
 manager_archive_name = node["wsi_tomcat"]["archive"]["manager_name"]
 archives_dir         = File.expand_path("archives", tomcat_home)
@@ -65,17 +67,14 @@ execute "archive manager webapp" do
   not_if { File.exists?(File.expand_path(manager_archive_name, archives_dir))}
 end
 
-execute "archive tomcat-juli" do
-  command "/bin/cp #{juli_jar_name} #{archives_dir}"
+remote_file "#{archives_dir}/#{juli_jar_name}" do
+  source "file://#{tomcat_home}/bin/#{juli_jar_name}"
   user user_name
   group group_name
-  cwd File.expand_path("bin", tomcat_home)
-  not_if { File.exists?(File.expand_path(juli_jar_name, archives_dir))}
 end
 
 delete_home_dirs.each do |dir|
   full_path  = File.expand_path(dir, tomcat_home);
-
   directory "remove directory #{full_path} in tomcat home" do
     path full_path
     recursive true
@@ -85,7 +84,6 @@ end
 
 delete_bin_files.each do |file|
   full_path  = File.expand_path(file, bin_dir);
-
   file "remove file #{full_path} in tomcat bin" do
     path full_path
     action :delete
@@ -94,7 +92,6 @@ end
 
 delete_home_files.each do |file|
   full_path  = File.expand_path(file, tomcat_home);
-
   file "remove file #{full_path} in tomcat home" do
     path full_path
     action :delete
@@ -139,6 +136,7 @@ template "#{tomcat_home}/.bashrc" do
   group group_name
   mode 0644
   variables(
+    :java_home => java_home,
     :tomcat_home => tomcat_home
   )
 end
