@@ -21,7 +21,6 @@
 -->
 <!-- The contents of this file will be loaded for each web application -->
 <Context 
-  antiJARLocking="<%= @anti_jar_locking %>" 
   antiResourceLocking="<%= @anti_resource_locking %>"
   allowCasualMultipartParsing="<%= @allow_casual_multipart_parsing %>"
   backgroundProcessorDelay="<%= @background_processor_delay %>"
@@ -47,6 +46,10 @@
         <% @resources.each do |r| -%>
             <Resource 
              <% r.each_pair do |k,v| -%>
+             <%# 
+                Surround string elements with quotes. Otherwise
+                just output the value 
+              %>
              <%= k %>="<%= v %>"
              <% end -%>
             />
