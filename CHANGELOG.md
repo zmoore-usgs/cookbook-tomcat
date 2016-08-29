@@ -9,7 +9,7 @@ Tomcat Cookbook Changelog
 - [isuftin@usgs.gov] - Set JAVA_HOME in .bashrc
 - [isuftin@usgs.gov] - Fix how JAVA_HOME gets persisted to Tomcat scripts
 - [isuftin@usgs.gov] - Adding more context.xml attributes 
-- [isuftin@usgs.gov] - Added APR installation recipe.
+- [isuftin@usgs.gov] - Added APR installation recipe
 
 0.1.13
 ------
