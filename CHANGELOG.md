@@ -1,6 +1,16 @@
 Tomcat Cookbook Changelog
 =========
 
+0.2.0
+------
+- [isuftin@usgs.gov] - Major switch to how context.xml resource parameters are set. Allowing cookbooks to pass parameters directly instead of translating. This saves me having to deal with what is probably useless maintenance. 
+- [isuftin@usgs.gov] - Added database testing to Kitchen suite
+- [isuftin@usgs.gov] - Moved Java cookbook dependency version to Berksfile
+- [isuftin@usgs.gov] - Set JAVA_HOME in .bashrc
+- [isuftin@usgs.gov] - Fix how JAVA_HOME gets persisted to Tomcat scripts
+- [isuftin@usgs.gov] - Adding more context.xml attributes 
+- [isuftin@usgs.gov] - Added APR installation recipe
+
 0.1.13
 ------
 - [isuftin@usgs.gov] - Moved java installation out of dependencies cookbook. Should be done

@@ -11,7 +11,7 @@
 
 # Just in case... we have an X11 display and aren't running in headless mode.
 unset DISPLAY
-
+JAVA_HOME=<%= @java_home %>
 CATALINA_HOME=<%= @tomcat_home %>
 PID_DIR=$CATALINA_HOME/run
 export CATALINA_HOME

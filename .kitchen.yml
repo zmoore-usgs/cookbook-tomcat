@@ -31,20 +31,11 @@ platforms:
       box: bento/centos-6.7
       box_url: bento/centos-6.7
       provider: vmware_fusion
-  - name: centos-6.6-vbox
-    driver:
-      box: chef/centos-6.6
-      box_url: chef/centos-6.6
-      provider: virtualbox
-  - name: centos-6.6-vmware
-    driver:
-      box: bento/centos-6.6
-      box_url: bento/centos-6.6
-      provider: vmware_fusion
 
 suites:
   - name: default
     run_list:
+      - recipe[java]
       - recipe[wsi_tomcat::install_deps]
       - recipe[wsi_tomcat::create_group]
       - recipe[wsi_tomcat::create_user]
@@ -192,17 +183,25 @@ suites:
             }
             ]
           }
-
-
-
         }
       }
     }
 
-  - name: default-with-stig
+  # For test suites, can test using Postgres:
+  # $ docker run --name postgres -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:9.5.2
+  - name: default-jdbc-connect
     run_list:
-      - recipe[stig]
-      - recipe[wsi_tomcat::default]
+      - recipe[java]
+      - recipe[wsi_tomcat::install_deps]
+      - recipe[wsi_tomcat::create_group]
+      - recipe[wsi_tomcat::create_user]
+      - recipe[wsi_tomcat::get_tomcat]
+      - recipe[wsi_tomcat::commons_daemon]
+      - recipe[wsi_tomcat::create_tomcat_base]
+      - recipe[wsi_tomcat::create_tomcat_instances]
+      - recipe[wsi_tomcat::download_libs]
+      - recipe[wsi_tomcat::update_context]
+      - recipe[wsi_tomcat::deploy_application] 
     data_path: test/files
     data_bags_path: './test/integration/default/data_bags/'
     encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
@@ -213,5 +212,188 @@ suites:
           "oracle" : {
                "accept_oracle_download_terms" : true
           }
+      },
+      "wsi_tomcat" : {
+       "lib_sources" : [
+            {
+              "name" : "postgres-jdbc.jar",
+              "url" : "https://jdbc.postgresql.org/download/postgresql-9.4-1202.jdbc41.jar"
+            }
+          ],
+        "instances" : {
+         
+          "default" : {
+            "cors" : {
+              "allowed" : {
+                "headers" : [ "Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Authorization" ]
+              }
+            },
+            "application" : {
+              "probe" : {
+                "url" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war",
+                "final_name" : "probe"
+              }
+            },
+            "user" : {
+              "disable_admin_users" : false
+            },
+            "server_opts" : [
+              "server"
+            ],
+            "context" : {
+              "encrypted_environments_data_bag" : {
+                "data_bag_name" : "wsi_tomcat-_default",
+                "data_bag_item" : "credentials",
+                "extract_fields" : []
+              },
+              "environments" : [],
+              "resources" : [{
+                "name" : "jdbc/cidaAuthDS",
+                "url" : "jdbc:postgresql://192.168.99.100:5432/postgres",
+                "auth" : "container",
+                "type" : "javax.sql.DataSource",
+                "factory" : "org.apache.tomcat.jdbc.pool.DataSourceFactory",
+                "driverClassName" : "org.postgresql.Driver",
+                "validationQuery" : "select 1",
+                "testOnBorrow" : true,
+                "testOnConnect" : true,
+                "testOnReturn" : true,
+                "testWhileIdle" : true,
+                "jdbcInterceptors" : "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState; org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer",
+                "encrypted_attributes" : {
+                  "data_bag_name" : "wsi_tomcat-_default",
+                  "data_bag_item" : "credentials",
+                  "field_map" : {
+                    "database.username" : "username",
+                    "database.password" : "password"
+                  }
+                }
+              }]
+            },
+            "service_definitions" : [
+            {
+              "name" : "Catalina",
+              "thread_pool" : {
+                "max_threads" : 200,
+                "daemon" : "true",
+                "min_spare_threads" : 25,
+                "max_idle_time" : 60000
+              },
+              "connector" : {
+                "port" : 8080
+              },
+              "ssl_connector" : {
+                "enabled" : true,
+                "wsi_tomcat_keys_data_bag" : "wsi_tomcat-_default",
+                "wsi_tomcat_keys_data_item" : "keystores",
+                "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
+                "ssl_key_file" : "file:///tmp/kitchen/data/certs/client.key",
+                "trust_certs" : [
+                  {"name" : "www.host1.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"},
+                  {"name" : "www.host2.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"}
+                ]
+              },
+              "engine" : { 
+                "host" : [ 
+                  "name" : "localhost" 
+                ] 
+              }
+            }
+            ]
+          }
+        }
+      }
+    }
+
+
+  - name: default-apr
+    run_list:
+      - recipe[java]
+      - recipe[wsi_tomcat::install_deps]
+      - recipe[wsi_tomcat::create_group]
+      - recipe[wsi_tomcat::create_user]
+      - recipe[wsi_tomcat::get_tomcat]
+      - recipe[wsi_tomcat::install_apr]
+      - recipe[wsi_tomcat::commons_daemon]
+      - recipe[wsi_tomcat::create_tomcat_base]
+      - recipe[wsi_tomcat::create_tomcat_instances]
+      - recipe[wsi_tomcat::download_libs]
+      - recipe[wsi_tomcat::update_context]
+      - recipe[wsi_tomcat::deploy_application] 
+    data_path: test/files
+    data_bags_path: './test/integration/default/data_bags/'
+    encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
+    attributes: {
+      "java" : {
+          "install_flavor" : "oracle",
+          "jdk_version" : "8",
+          "oracle" : {
+               "accept_oracle_download_terms" : true
+          }
+      },
+      "wsi_tomcat" : {
+       "lib_sources" : [],
+        "instances" : {
+         
+          "default" : {
+            "cors" : {
+              "allowed" : {
+                "headers" : [ "Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Authorization" ]
+              }
+            },
+            "application" : {
+              "probe" : {
+                "url" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war",
+                "final_name" : "probe"
+              }
+            },
+            "user" : {
+              "disable_admin_users" : false
+            },
+            "server_opts" : [
+              "server",
+              "Djava.library.path=/usr/local/apr/lib"
+            ],
+            "context" : {
+              "encrypted_environments_data_bag" : {
+                "data_bag_name" : "wsi_tomcat-_default",
+                "data_bag_item" : "credentials",
+                "extract_fields" : []
+              },
+              "environments" : [],
+              "resources" : []
+            },
+            "service_definitions" : [
+            {
+              "name" : "Catalina",
+              "thread_pool" : {
+                "max_threads" : 200,
+                "daemon" : "true",
+                "min_spare_threads" : 25,
+                "max_idle_time" : 60000
+              },
+              "connector" : {
+                "port" : 8080
+              },
+              "ssl_connector" : {
+                "enabled" : true,
+                "wsi_tomcat_keys_data_bag" : "wsi_tomcat-_default",
+                "wsi_tomcat_keys_data_item" : "keystores",
+                "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
+                "ssl_key_file" : "file:///tmp/kitchen/data/certs/client.key",
+                "trust_certs" : [
+                  {"name" : "www.host1.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"},
+                  {"name" : "www.host2.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"}
+                ]
+              },
+              "engine" : { 
+                "host" : [ 
+                  "name" : "localhost" 
+                ] 
+              }
+            }
+            ]
+          }
+        }
       }
     }

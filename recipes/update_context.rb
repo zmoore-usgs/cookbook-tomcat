@@ -13,6 +13,7 @@ context_xml  = "context.xml"
 r            = Array.new
 e            = Array.new
 
+
 instances.each do |instance, attributes|
   conf_path = "#{tomcat_home}/instance/#{instance}/conf/#{context_xml}"
 
@@ -41,6 +42,11 @@ instances.each do |instance, attributes|
           data_bag_item = encrypted_attributes["data_bag_item"]
           field_map = encrypted_attributes["field_map"]
           data_bag = data_bag_item(data_bag_name, data_bag_item)
+
+          # I don't want this value to come through to the
+          # actual context file. I got what I need from this
+          # variable, so delete it from the hash
+          res.delete("encrypted_attributes")
 
           field_map.each do |k, v|
             res[v] = data_bag[k]

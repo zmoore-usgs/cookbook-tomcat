@@ -21,7 +21,6 @@
 -->
 <!-- The contents of this file will be loaded for each web application -->
 <Context 
-  antiJARLocking="<%= @anti_jar_locking %>" 
   antiResourceLocking="<%= @anti_resource_locking %>"
   allowCasualMultipartParsing="<%= @allow_casual_multipart_parsing %>"
   backgroundProcessorDelay="<%= @background_processor_delay %>"
@@ -34,7 +33,7 @@
     <% if @version.tr(',','').to_i  > 7 %>
       <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
     <% end %>
-	
+  
     <!-- Uncomment this to disable session persistence across Tomcat restarts -->
     <Manager pathname="" />
 
@@ -44,31 +43,16 @@
     <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
     -->
     <% if defined?(@resources) %>
-
         <% @resources.each do |r| -%>
             <Resource 
-                    <% if r.has_key?("description") %>description="<%=r["description"] %>"<% end %>
-                    <% if r.has_key?("name") %>name="<%= r["name"] %>"<% end %>
-                    <% if r.has_key?("auth") %>auth="<%= r["auth"] %>"<% end %>
-                    <% if r.has_key?("type") %>type="<%= r["type"] %>"<% end %>
-                    <% if r.has_key?("username") %>username="<%= r["username"] %>"<% end %>
-                    <% if r.has_key?("password") %>password="<%= r["password"] %>"<% end %>
-                    <% if r.has_key?("factory") %>factory="<%= r["factory"] %>"<% end %>
-                    <% if r.has_key?("driver_class") %>driverClassName="<%= r["driver_class"] %>"<% end %>
-                    <% if r.has_key?("url") %>url="<%= r["url"] %>"<% end %>
-                    <% if r.has_key?("max_active") %>maxActive="<%= r["max_active"] %>"<% end %>
-                    <% if r.has_key?("max_idle") %>maxIdle="<%= r["max_idle"] %>"<% end %>
-                    <% if r.has_key?("remove_abandoned") %>removeAbandoned="<%= r["remove_abandoned"] %>"<% end %>
-                    <% if r.has_key?("remove_abandoned_timeout") %>removeAbandonedTimeout="<%= r["remove_abandoned_timeout"] %>"<% end %>
-                    <% if r.has_key?("log_abandoned") %>logAbandoned="<%= r["log_abandoned"] %>"<% end %>
-                    <% if r.has_key?("test_on_borrow") %>testOnBorrow="<%= r["test_on_borrow"] %>"<% end %>
-                    <% if r.has_key?("default_auto_commit") %>defaultAutoCommit="<%= r["default_auto_commit"] %>"<% end %>
-                    <% if r.has_key?("validation_query") %>validationQuery="<%= r["validation_query"] %>"<% end %>
-                    <% if r.has_key?("access_to_underlying_connection_allowed") %>accessToUnderlyingConnectionAllowed="<%= r["access_to_underlying_connection_allowed"] %>"<% end %>
-                    <% if r.has_key?("pool_prepared_statements") %>poolPreparedStatements="<%= r["pool_prepared_statements"] %>"<% end %>
-                    <% if r.has_key?("jdbc_interceptors") %>jdbcInterceptors="<%= r["jdbc_interceptors"] %>"<% end %>
-                    <% if r.has_key?("max_open_prepared_statements") %>maxOpenPreparedStatements="<%= r["max_open_prepared_statements"] %>"<% end %>
-                    />
+             <% r.each_pair do |k,v| -%>
+             <%# 
+                Surround string elements with quotes. Otherwise
+                just output the value 
+              %>
+             <%= k %>="<%= v %>"
+             <% end -%>
+            />
         <% end -%>
 
     <% end %>

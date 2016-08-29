@@ -13,6 +13,10 @@ default["wsi_tomcat"]["deploy"]["remove_unlisted_applications"] = true
 # Set the version of Tomcat to install
 default["wsi_tomcat"]["version"]      = "8.0.36"
 
+# APR Installation
+default["wsi_tomcat"]["apr"]["apr_version"]      = "1.5.2"
+default["wsi_tomcat"]["apr"]["openssl_version"]      = "1.0.2h"
+
 # Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
 default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
   "http://mirror.olnevhost.net/pub/apache/",
@@ -132,6 +136,7 @@ default["wsi_tomcat"]["instances"]["default"]["service_definitions"] = [{
 #        "max_active" => "value",
 #        "max_idle" => "value",
 #        "remove_abandoned" => "value",
+#        "remove_abandoned_on_borrow" => "value",
 #        "remove_abandoned_timeout" => "value",
 #        "log_abandoned" => "value",
 #        "test_on_borrow" => "value",

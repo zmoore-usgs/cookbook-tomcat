@@ -80,6 +80,7 @@ describe file("/opt/tomcat/.bashrc") do
   it { should be_file }
   it { should be_owned_by 'tomcat' }
   it { should be_grouped_into 'tomcat' }
+  it { should contain 'JAVA_HOME=/' }
 end
 
 describe file("/opt/tomcat/archives/tomcat-juli.jar") do
