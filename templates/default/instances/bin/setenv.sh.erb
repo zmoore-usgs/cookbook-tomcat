@@ -6,8 +6,6 @@
 # things. Most changes should go in catalinaopts.sh. The following comments
 # show default variable contents.
 
-#				--dekester
-
 # export INSTANCE_NAME="${name}"
 # export CWD="$(pwd)"
 # export CATALINA_HOME="/opt/tomcat"
@@ -27,9 +25,11 @@
 #                -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
 #                -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
 
-# export JAVA_HOME="<%= @java_home %>"
-
 # Please don't change the next three lines.
+<% @setenv_opts.each do |opt| -%>
+<%= opt %>
+<% end -%>
+
 CATALINA_OPTS="" # Default to empty string
 source $CATALINA_BASE/bin/catalinaopts.sh
 export CATALINA_OPTS

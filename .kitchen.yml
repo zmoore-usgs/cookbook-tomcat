@@ -132,7 +132,7 @@ suites:
               "disable_admin_users" : false
             },
             "server_opts" : [
-              "server"
+              "-server"
             ],
             "service_definitions" : [
             {
@@ -238,7 +238,7 @@ suites:
               "disable_admin_users" : false
             },
             "server_opts" : [
-              "server"
+              "-server"
             ],
             "context" : {
               "encrypted_environments_data_bag" : {
@@ -350,9 +350,12 @@ suites:
             "user" : {
               "disable_admin_users" : false
             },
+            "setenv_opts" : [
+              "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CATALINA_HOME/lib:/usr/local/apr/lib",
+              "export LD_LIBRARY_PATH"
+            ],
             "server_opts" : [
-              "server",
-              "Djava.library.path=/usr/local/apr/lib"
+              "-server"
             ],
             "context" : {
               "encrypted_environments_data_bag" : {
@@ -377,6 +380,9 @@ suites:
               },
               "ssl_connector" : {
                 "enabled" : true,
+                "apr_enabled" : true,
+                "ssl_certificate_file" : "/tmp/kitchen/data/certs/client.crt",
+                "ssl_certificate_key_file" : "/tmp/kitchen/data/certs/client.key",
                 "wsi_tomcat_keys_data_bag" : "wsi_tomcat-_default",
                 "wsi_tomcat_keys_data_item" : "keystores",
                 "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
@@ -397,3 +403,4 @@ suites:
         }
       }
     }
+    

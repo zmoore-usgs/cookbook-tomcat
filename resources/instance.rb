@@ -46,8 +46,15 @@ fqdn = node["fqdn"]
 attribute :server_opts,
   :kind_of => [Array, String],
 :default => lazy { |r| [
-    "XX:HeapDumpPath=$CATALINA_HOME/heapdumps/#{fqdn}/#{r.name}"
+    "-XX:HeapDumpPath=$CATALINA_HOME/heapdumps/#{fqdn}/#{r.name}"
 ]}
+
+# Used in: create, deploy_app
+# Is optional: true
+# An array of strings to add to the server
+attribute :setenv_opts,
+  :kind_of => [Array, String],
+  :default => []
 
 # Used in: deploy_app
 # Is optional: false

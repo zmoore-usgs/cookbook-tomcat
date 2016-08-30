@@ -4,5 +4,5 @@
 # Please use the following format in this file: CATALINA_OPTS="$CATALINA_OPTS <option>"
 
 <% @server_opts.each do |opt| -%>
-CATALINA_OPTS="$CATALINA_OPTS -<%= "#{opt}" %>"
+CATALINA_OPTS="$CATALINA_OPTS <%= "#{opt}" %>"
 <% end -%>

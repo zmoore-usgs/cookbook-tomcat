@@ -1,6 +1,12 @@
 Tomcat Cookbook Changelog
 =========
 
+0.2.1
+------
+- [isuftin@usgs.gov] - Fixing APR implementation.
+- [isuftin@usgs.gov] - Adding ability to add options to setenv
+- [isuftin@usgs.gov] - Fleshing out server.xml options
+
 0.2.0
 ------
 - [isuftin@usgs.gov] - Major switch to how context.xml resource parameters are set. Allowing cookbooks to pass parameters directly instead of translating. This saves me having to deal with what is probably useless maintenance. 

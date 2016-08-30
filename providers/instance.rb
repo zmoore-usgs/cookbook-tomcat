@@ -123,6 +123,7 @@ def load_current_resource
   @current_resource.cors(@new_resource.cors)
   @current_resource.tomcat_home(@new_resource.tomcat_home)
   @current_resource.server_opts(@new_resource.server_opts)
+  @current_resource.setenv_opts(@new_resource.setenv_opts)
   @current_resource.auto_start(@new_resource.auto_start)
   @current_resource.application_name(@new_resource.application_name)
   if instance_exists?(@current_resource.name)
@@ -365,6 +366,7 @@ def create_tomcat_instance
   service_definitions   = sd_keys["service_definitions"]
   keystore_password     = sd_keys["keystore_password"]
   server_opts           = Array.new(current_resource.server_opts)
+  setenv_opts           = Array.new(current_resource.setenv_opts)
   tomcat_home           = node["wsi_tomcat"]["user"]["home_dir"]
   fqdn                  = node["fqdn"]
   cors                  = current_resource.cors
@@ -405,8 +407,8 @@ def create_tomcat_instance
     "web.xml"
   ]
 
-  server_opts.push("Djavax.net.ssl.trustStore=#{tomcat_home}/ssl/truststore")
-  server_opts.push("Djavax.net.ssl.trustStorePassword=#{keystore_password}")
+  server_opts.push("-Djavax.net.ssl.trustStore=#{tomcat_home}/ssl/truststore")
+  server_opts.push("-Djavax.net.ssl.trustStorePassword=#{keystore_password}")
 
   databag_name = node["wsi_tomcat"]['data_bag_config']['bag_name']
   credentials_attribute = node["wsi_tomcat"]['data_bag_config']['credentials_attribute']
@@ -482,6 +484,9 @@ def create_tomcat_instance
     owner tomcat_user
     group tomcat_group
     mode 0744
+    variables(
+      :setenv_opts => setenv_opts
+    )
     sensitive true
   end
 
