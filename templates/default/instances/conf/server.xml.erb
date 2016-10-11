@@ -84,13 +84,13 @@
                  APR (HTTP/AJP) Connector: /docs/apr.html
                  Define a non-SSL HTTP/1.1 Connector on port 8080
             -->
-            <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/http.html -->
+            <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/http.html -->
             <Connector
                 port="<%= d.connector.port %>"
                 executor="<%= d.name %>ThreadPool"
                 protocol="<%= d.connector.key?("protocol") ? d.connector.protocol : 'HTTP/1.1' %>"
                 allowTrace="<%= d.connector.key?("allow_trace") ? d.connector.allow_trace : false %>"
-                asyncTimeout="<%= d.connector.key?("async_timeout") ? d.connector.async_timeout : 10000 %>"
+                asyncTimeout="<%= d.connector.key?("async_timeout") ? d.connector.async_timeout : 30000 %>"
                 enableLookups="<%= d.connector.key?("enable_lookups") ? d.connector.enable_lookups : false %>"
                 <% if d.connector.key?("proxy_port") %>
                 proxyPort="<%= d.connector.proxy_port %>"
@@ -147,24 +147,80 @@
             <% if d.ssl_connector.enabled == true %>
               <Connector
                   port="<%= d.connector.port + 363 %>"
-                  protocol="<%= d.ssl_connector.key?("protocol") ? d.ssl_connector.protocol : "HTTP/1.1" %>"
-                  <% if d.ssl_connector.key?("algorithm") %>
+                  secure="<%= d.ssl_connector.key?("secure") ? d.ssl_connector.secure : "true" %>"
+                  keystoreFile="${catalina.home}/ssl/<%= d.name%>.jks" 
+                  keystorePass="<%= @keystore_password %>"
+                  <% if d.ssl_connector.key?("ssl_protocol") %>
+                  SSLProtocol="<%= d.ssl_connector.ssl_protocol %>"
+                  <% end  %>
+              <% if d.ssl_connector.key?("apr_enabled") && d.ssl_connector.apr_enabled == true %>
+                  maxThreads="<%= d.ssl_connector.key?("max_threads") ? d.ssl_connector.max_threads : "100" %>"
+                  enableLookups="<%= d.ssl_connector.key?("enable_lookups") ? d.ssl_connector.enable_lookups : "false" %>"
+                  disableUploadTimeout="<%= d.ssl_connector.key?("disable_upload_timeout") ? d.ssl_connector.disable_upload_timeout : "true" %>"
+                  acceptCount="<%= d.ssl_connector.key?("accept_count") ? d.ssl_connector.accept_count : "100" %>"
+                  SSLEnabled="<%= d.ssl_connector.key?("ssl_enabled") ? d.ssl_connector.ssl_enabled : "true" %>"
+                  <% if d.ssl_connector.key?("ssl_certificate_file") %>
+                  SSLCertificateFile="<%= d.ssl_connector.ssl_certificate_file %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_certificate_key_file") %>
+                  SSLCertificateKeyFile="<%= d.ssl_connector.ssl_certificate_key_file %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_ca_certificate_path") %>
+                  SSLCACertificatePath="<%= d.ssl_connector.ssl_ca_certificate_path %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_ca_revocation_file") %>
+                  SSLCARevocationFile="<%= d.ssl_connector.ssl_ca_revocation_file %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_ca_revocation_path") %>
+                  SSLCARevocationPath="<%= d.ssl_connector.ssl_ca_revocation_path %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_certificate_chain_file") %>
+                  SSLCertificateChainFile="<%= d.ssl_connector.ssl_certificate_chain_file %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_ca_certificate_file") %>
+                  SSLCACertificateFile="<%= d.ssl_connector.ssl_ca_certificate_file %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_ca_certificate_path") %>
+                  SSLCACertificatePath="<%= d.ssl_connector.ssl_ca_certificate_path %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_ca_revocation_file") %>
+                  SSLCARevocationFile="<%= d.ssl_connector.ssl_ca_revocation_file %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_ca_revocation_path") %>
+                  SSLCARevocationPath="<%= d.ssl_connector.ssl_ca_revocation_path %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_certificate_chain_file") %>
+                  SSLCertificateChainFile="<%= d.ssl_connector.ssl_certificate_chain_file %>"
+                  <% end  %>
+                  <% if d.ssl_connector.key?("ssl_certificate_chain_file") %>
+                  SSLCertificateKeyFile="<%= d.ssl_connector.ssl_certificate_chain_file %>"
+                  <% end  %>
+                  SSLCipherSuite="<%= d.ssl_connector.key?('cipher_suite') ? d.ssl_connector.cipher_suite : 'HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5' %>"
+                  SSLDisableCompression="<%= d.ssl_connector.key?('ssl_disable_compression') ? d.ssl_connector.ssl_disable_compression : 'false' %>"
+                  SSLHonorCipherOrder="<%= d.ssl_connector.key?('ssl_honor_cipher_order') ? d.ssl_connector.ssl_honor_cipher_order : 'false' %>"
+                  <% if @keystore_password %>
+                  SSLPassword="<%= @keystore_password %>"
+                  <% end  %>
+                  SSLVerifyClient="<%= d.ssl_connector.key?('ssl_verify_client') ? d.ssl_connector.ssl_verify_client : 'none' %>"
+                  SSLVerifyDepth="<%= d.ssl_connector.key?('ssl_verify_depth') ? d.ssl_connector.ssl_verify_depth : '10' %>"
+                  SSLDisableSessionTickets="<%= d.ssl_connector.key?('ssl_disable_session_tickets') ? d.ssl_connector.ssl_disable_session_tickets : 'false' %>"
+              <% else %>
+                  protocol="<%= d.ssl_connector.key?('protocol') ? d.ssl_connector.protocol : 'HTTP/1.1' %>"
+                  <% if d.ssl_connector.key?('algorithm') %>
                   algorithm="<%= d.ssl_connector.algorithm %>"
                   <% end  %>
                   executor="<%= d.name %>ThreadPool"
                   SSLEnabled="<%= d.ssl_connector.enabled %>"
                   keystoreFile="${catalina.home}/ssl/<%= d.name%>.jks" 
-                  keystorePass="<%= @keystore_password %>" 
                   truststoreFile="${catalina.home}/ssl/truststore"
                   truststorePass="<%= @keystore_password %>"
                   sslProtocol="TLS"
-                  ciphers="<%= d.ssl_connector.key?("cipher_suite") ? d.ssl_connector.cipher_suite : "ALL:!LOW:!EXP:!SSLv2" %>"
-                  scheme="https"
-                  secure="true"
+                  ciphers="<%= d.ssl_connector.key?("cipher_suite") ? d.ssl_connector.cipher_suite : 'ALL:!LOW:!EXP:!SSLv2' %>"
+              <% end %>
               />
             <% end  %>
             
-            <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/ajp.html -->
+            <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/ajp.html -->
             <Connector
                 port="<%= d.connector.port - 71 %>"
                 protocol="AJP/1.3"
@@ -178,7 +234,7 @@
                 tomcatAuthentication="true"
             />
             
-            <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/engine.html -->
+            <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/engine.html -->
             <Engine name="<%= d.engine.key?("name") ? d.engine.name : d.name %>" 
                 defaultHost="<%= d.engine.key?("default_host") ? d.engine.default_host : 'localhost' %>" 
                 jvmRoute="<%= d.engine.key?("jvm_route") ? d.engine.jvm_route : 'default' %>"
@@ -186,14 +242,13 @@
                 backgroundProcessorDelay="<%= d.engine.key?("background_processor_delay") ? d.engine.background_processor_delay : 10 %>"
                 >
                 
-                <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/realm.html -->
+                <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/realm.html -->
                 <Realm className="org.apache.catalina.realm.LockOutRealm">
-                <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
-                       resourceName="UserDatabase"/>
+                <Realm className="org.apache.catalina.realm.UserDatabaseRealm" resourceName="UserDatabase"/>
                 </Realm>
                 
                 <% d.engine.host.each do |host| %>
-                    <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/host.html -->
+                    <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/host.html -->
                     <Host name="<%= host.key?("name") ? host.name : 'localhost' %>"  
                         appBase="<%= host.key?("app_base") ? host.app_base : 'webapps' %>"
                         xmlbase="<%= host.key?("xml_base") ? host.xml_base : 'conf' %>"
@@ -212,7 +267,7 @@
                         workDir="<%= host.key?("work_dir") ? host.work_dir : 'work' %>"
                         >
                     
-                        <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/valve.html -->
+                        <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/valve.html -->
                         <Valve className="org.apache.catalina.valves.AccessLogValve" 
                             directory="logs"
                             prefix="<%= host.key?("name") ? host.name : 'localhost' %>_access_log." 

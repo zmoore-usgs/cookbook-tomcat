@@ -7,6 +7,7 @@
 # has been downloaded and unpackaged. Run this after get_tomcat recipe
 
 package 'gcc'
+package 'perl'
 package 'make'
 
 mirrors = node["wsi_tomcat"]["file"]["archive"]["mirrors"]
@@ -84,4 +85,6 @@ execute 'Compile Native APR' do
   not_if  { File.directory?("/usr/local/apr/lib") }
 end
 
-# ./config && make depend && make && make install
+link '/usr/lib/apr' do
+  to '/usr/local/apr/lib/'
+end
