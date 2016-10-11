@@ -23,7 +23,11 @@ default["wsi_tomcat"]["file"]["archive"]["mirrors"] = [
   "http://apache.mirrors.lucidnetworks.net/",
   "http://www.webhostingreviewjam.com/mirror/",
   "http://mirror.nexcess.net/apache/",
-  "http://archive.apache.org/dist/"
+  "http://archive.apache.org/dist/",
+  "ftp://apache.mirrors.tds.net/pub/apache.org/",
+  "ftp://apache.cs.utah.edu/apache.org/",
+  "ftp://ftp.osuosl.org/pub/apache/",
+  "ftp://mirror.reverse.net/pub/apache/"
 ]
 # Chef will verify the SHA256 checksum of the downloaded archive
 # Generate SHA256 checksum for a file:
