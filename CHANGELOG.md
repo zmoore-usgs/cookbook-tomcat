@@ -1,6 +1,10 @@
 Tomcat Cookbook Changelog
 =========
 
+0.2.2
+------
+- [isuftin@usgs.gov] - Quick fix for SSL configuration breaking
+
 0.2.1
 ------
 - [isuftin@usgs.gov] - Fixing APR implementation.

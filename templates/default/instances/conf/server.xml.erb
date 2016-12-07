@@ -211,10 +211,8 @@
                   <% end  %>
                   executor="<%= d.name %>ThreadPool"
                   SSLEnabled="<%= d.ssl_connector.enabled %>"
-                  keystoreFile="${catalina.home}/ssl/<%= d.name%>.jks" 
                   truststoreFile="${catalina.home}/ssl/truststore"
                   truststorePass="<%= @keystore_password %>"
-                  sslProtocol="TLS"
                   ciphers="<%= d.ssl_connector.key?("cipher_suite") ? d.ssl_connector.cipher_suite : 'ALL:!LOW:!EXP:!SSLv2' %>"
               <% end %>
               />
