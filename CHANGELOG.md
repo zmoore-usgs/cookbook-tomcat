@@ -6,6 +6,7 @@ Tomcat Cookbook Changelog
 - [isuftin@usgs.gov] - Fixing APR implementation.
 - [isuftin@usgs.gov] - Adding ability to add options to setenv
 - [isuftin@usgs.gov] - Fleshing out server.xml options
+- [isuftin@usgs.gov] - Fixing a breaking bug when some attributes were not included in server definitions 
 
 0.2.0
 ------

@@ -29,9 +29,9 @@ if node["wsi_tomcat"]["deploy"]["remove_unlisted_instances"] && File.directory?(
 end
 
 node["wsi_tomcat"]["instances"].each do |name, attributes|
-  service_definitions = attributes.service_definitions
-  server_opts = attributes.server_opts
-  setenv_opts = attributes.setenv_opts
+  service_definitions = attributes.key?("service_definitions") ? attributes.service_definitions : []
+  server_opts = attributes.key?("server_opts") ? attributes.server_opts : []
+  setenv_opts = attributes.key?("setenv_opts") ? attributes.setenv_opts : []
   cors = attributes.key?("cors") ? attributes.cors : { :enabled => false }
   auto_start = attributes.key?("auto_start") ? attributes.auto_start : true
 
