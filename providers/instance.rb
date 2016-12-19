@@ -334,14 +334,24 @@ def load_service_definitions_and_keys (service_definitions)
             group group
             mode 00600
             sensitive true
+            notifies :run, 'bash[make_keystore_from_new_file]', :immediately 
             not_if { ::File.exists?("#{ssl_dir}/#{host}.Catalina.crt") }
+          end
+
+          bash 'make_keystore_from_new_file' do
+            cwd ssl_dir
+            code <<-EOH
+            keytool -import -noprompt -trustcacerts -alias #{host} -file #{ssl_dir}/#{host}.#{name}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
+            EOH
+            sensitive true
+            action :nothing
           end
         else
           # Create CRT
           bash 'make_keystore' do
             cwd ssl_dir
             code <<-EOH
-            keytool -import -noprompt -trustcacerts -alias #{host} -file #{host}.#{name}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
+            keytool -import -noprompt -trustcacerts -alias #{host} -file #{ssl_dir}/#{host}.#{name}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
             EOH
             sensitive true
             not_if { ::File.exists?("#{ssl_dir}/#{host}.Catalina.crt") }
