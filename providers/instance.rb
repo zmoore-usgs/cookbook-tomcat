@@ -343,7 +343,7 @@ def load_service_definitions_and_keys (service_definitions)
             code <<-EOH
             keytool -import -noprompt -trustcacerts -alias #{host} -file #{ssl_dir}/#{host}.#{name}.crt -keystore truststore -srcstorepass #{keystore_password} -deststorepass #{keystore_password}
             EOH
-            # sensitive true
+            sensitive true
             action :nothing
           end
         else
