@@ -5,12 +5,12 @@
 #
 # Description: Sets up the tomcat user, home directory, etc
 
-group_name = node["wsi_tomcat"]["group"]["name"]
-user_name = node["wsi_tomcat"]["user"]["name"]
-home_dir = node["wsi_tomcat"]["user"]["home_dir"]
+group_name = node['wsi_tomcat']['group']['name']
+user_name = node['wsi_tomcat']['user']['name']
+home_dir = node['wsi_tomcat']['user']['home_dir']
 
-user user_name do 
-  comment "Tomcat user used to access tomcat services"
+user user_name do
+  comment 'Tomcat user used to access tomcat services'
   system true
   gid group_name
   home home_dir

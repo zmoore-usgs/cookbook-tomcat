@@ -7,64 +7,67 @@
 #
 # http://scottwb.com/blog/2014/01/24/defeating-the-infamous-chef-3694-warning/
 
-user_name            = node["wsi_tomcat"]["user"]["name"]
-group_name           = node["wsi_tomcat"]["group"]["name"]
-tomcat_home          = node["wsi_tomcat"]["user"]["home_dir"]
+user_name            = node['wsi_tomcat']['user']['name']
+group_name           = node['wsi_tomcat']['group']['name']
+tomcat_home          = node['wsi_tomcat']['user']['home_dir']
 # TODO: java_home may not exist if the JAVA cookbook is not used to
 # install Java.
-java_home            = node["java"]["java_home"]
-manager_archive_name = node["wsi_tomcat"]["archive"]["manager_name"]
-archives_dir         = File.expand_path("archives", tomcat_home)
-bin_dir              = File.expand_path("bin", tomcat_home)
-juli_jar_name        = "tomcat-juli.jar"
-tomcat_init_script   = "tomcat-initscript.sh"
+java_home            = node['java']['java_home']
+manager_archive_name = node['wsi_tomcat']['archive']['manager_name']
+archives_dir         = File.expand_path('archives', tomcat_home)
+bin_dir              = File.expand_path('bin', tomcat_home)
+juli_jar_name        = 'tomcat-juli.jar'
+tomcat_init_script   = 'tomcat-initscript.sh'
 
-create_home_dirs = [
-  "instance",
-  "heapdumps",
-  "data",
-  "run",
-  "share",
-  "ssl",
-  "ssltmp",
-  "archives"
-]
-delete_home_dirs = [
-  "temp",
-  "work",
-  "webapps"
-]
-delete_home_files = [
-  "LICENSE",
-  "NOTICE",
-  "RELEASE-NOTES",
-  "RUNNING.txt"
-]
-delete_bin_files = [
-  "shutdown.bat",
-  "version.bat",
-  "digest.bat",
-  "tool-wrapper.bat",
-  "startup.bat",
-  "catalina.bat",
-  "setclasspath.bat",
-  "configtest.bat"
-]
+create_home_dirs = %w(
+  instance
+  heapdumps
+  data
+  run
+  share
+  ssl
+  ssltmp
+  archives
+)
+
+delete_home_dirs = %w(
+  temp
+  work
+  webapps
+)
+
+delete_home_files = %w(
+  LICENSE
+  NOTICE
+  RELEASE-NOTES
+  RUNNING.txt
+)
+
+delete_bin_files = %w(
+  shutdown.bat
+  version.bat
+  digest.bat
+  tool-wrapper.bat
+  startup.bat
+  catalina.bat
+  setclasspath.bat
+  configtest.bat
+)
 
 create_home_dirs.each do |dir|
   directory File.expand_path(dir, tomcat_home) do
     owner user_name
     group group_name
-    only_if { File.exists?(tomcat_home) }
+    only_if { File.exist?(tomcat_home) }
   end
 end
 
-execute "archive manager webapp" do
+execute 'archive manager webapp' do
   command "/bin/tar -czvf #{File.expand_path(manager_archive_name, archives_dir)} manager"
   user user_name
   group group_name
-  cwd File.expand_path("webapps", tomcat_home)
-  not_if { File.exists?(File.expand_path(manager_archive_name, archives_dir))}
+  cwd File.expand_path('webapps', tomcat_home)
+  not_if { File.exist?(File.expand_path(manager_archive_name, archives_dir)) }
 end
 
 remote_file "#{archives_dir}/#{juli_jar_name}" do
@@ -74,7 +77,7 @@ remote_file "#{archives_dir}/#{juli_jar_name}" do
 end
 
 delete_home_dirs.each do |dir|
-  full_path  = File.expand_path(dir, tomcat_home);
+  full_path = File.expand_path(dir, tomcat_home)
   directory "remove directory #{full_path} in tomcat home" do
     path full_path
     recursive true
@@ -83,7 +86,7 @@ delete_home_dirs.each do |dir|
 end
 
 delete_bin_files.each do |file|
-  full_path  = File.expand_path(file, bin_dir);
+  full_path = File.expand_path(file, bin_dir)
   file "remove file #{full_path} in tomcat bin" do
     path full_path
     action :delete
@@ -91,7 +94,7 @@ delete_bin_files.each do |file|
 end
 
 delete_home_files.each do |file|
-  full_path  = File.expand_path(file, tomcat_home);
+  full_path = File.expand_path(file, tomcat_home)
   file "remove file #{full_path} in tomcat home" do
     path full_path
     action :delete
@@ -99,44 +102,44 @@ delete_home_files.each do |file|
 end
 
 template "#{bin_dir}/tomcat" do
-  source "bin/tomcat.erb"
+  source 'bin/tomcat.erb'
   owner user_name
   group group_name
   mode 0755
   variables(
-    :tomcat_home => tomcat_home,
-    :java_home => java_home,
-    :tomcat_user => user_name
+    tomcat_home: tomcat_home,
+    java_home: java_home,
+    tomcat_user: user_name
   )
 end
 
 template "Install #{tomcat_init_script} script" do
-  path "/etc/init.d/tomcat"
+  path '/etc/init.d/tomcat'
   source "#{tomcat_init_script}.erb"
-  owner "root"
-  group "root"
+  owner 'root'
+  group 'root'
   mode 0755
   variables(
-    :tomcat_home => tomcat_home,
-    :java_home => java_home,
-    :tomcat_user => user_name
+    tomcat_home: tomcat_home,
+    java_home: java_home,
+    tomcat_user: user_name
   )
 end
 
 template "#{tomcat_home}/.bash_profile" do
-  source ".bash_profile.erb"
+  source '.bash_profile.erb'
   owner user_name
   group group_name
   mode 0644
 end
 
 template "#{tomcat_home}/.bashrc" do
-  source ".bashrc.erb"
+  source '.bashrc.erb'
   owner user_name
   group group_name
   mode 0644
   variables(
-    :java_home => java_home,
-    :tomcat_home => tomcat_home
+    java_home: java_home,
+    tomcat_home: tomcat_home
   )
 end
