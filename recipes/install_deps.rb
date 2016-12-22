@@ -7,4 +7,4 @@
 # install Tomcat
 
 # gcc is needed to compile Tomcat's JSVC module
-package "gcc"
+package 'gcc'

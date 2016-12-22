@@ -1,8 +1,14 @@
 Tomcat Cookbook Changelog
 =========
 
+0.2.4
+------
+- [isuftin@usgs.gov] - Added recipe to update catalinaopts on a running server
+- [isuftin@usgs.gov] - Fixed majority of Rubocop complaints
+
 0.2.3
 ------
+- [isuftin@usgs.gov] - Update Tomcat trust store
 
 0.2.2
 ------
@@ -13,16 +19,16 @@ Tomcat Cookbook Changelog
 - [isuftin@usgs.gov] - Fixing APR implementation.
 - [isuftin@usgs.gov] - Adding ability to add options to setenv
 - [isuftin@usgs.gov] - Fleshing out server.xml options
-- [isuftin@usgs.gov] - Fixing a breaking bug when some attributes were not included in server definitions 
+- [isuftin@usgs.gov] - Fixing a breaking bug when some attributes were not included in server definitions
 
 0.2.0
 ------
-- [isuftin@usgs.gov] - Major switch to how context.xml resource parameters are set. Allowing cookbooks to pass parameters directly instead of translating. This saves me having to deal with what is probably useless maintenance. 
+- [isuftin@usgs.gov] - Major switch to how context.xml resource parameters are set. Allowing cookbooks to pass parameters directly instead of translating. This saves me having to deal with what is probably useless maintenance.
 - [isuftin@usgs.gov] - Added database testing to Kitchen suite
 - [isuftin@usgs.gov] - Moved Java cookbook dependency version to Berksfile
 - [isuftin@usgs.gov] - Set JAVA_HOME in .bashrc
 - [isuftin@usgs.gov] - Fix how JAVA_HOME gets persisted to Tomcat scripts
-- [isuftin@usgs.gov] - Adding more context.xml attributes 
+- [isuftin@usgs.gov] - Adding more context.xml attributes
 - [isuftin@usgs.gov] - Added APR installation recipe
 
 0.1.13
@@ -34,12 +40,12 @@ Tomcat Cookbook Changelog
 
 0.1.12
 ------
-- [isuftin@usgs.gov] - Updated to version 8.0.36 default for Tomcat. 
+- [isuftin@usgs.gov] - Updated to version 8.0.36 default for Tomcat.
 - [isuftin@usgs.gov] - Added some documentation for getting SHA256 for binary
 
 0.1.12
 ------
-- [isuftin@usgs.gov] - Updated to version 8.0.36 default for Tomcat. 
+- [isuftin@usgs.gov] - Updated to version 8.0.36 default for Tomcat.
 - [isuftin@usgs.gov] - Added some documentation for getting SHA256 for binary
 
 0.1.11
