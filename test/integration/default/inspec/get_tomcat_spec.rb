@@ -1,4 +1,4 @@
-require 'spec_helper'
+
 
 describe file('/opt/tomcat') do
   it { should be_directory }
@@ -10,12 +10,12 @@ end
 
 # Should contain the Tomcat tar.gz file
 describe command('ls /opt/*.gz') do
-	its(:stdout) { should contain('tar.gz')}
+  its('stdout') { should include 'tar.gz' }
 end
 
 # Should contain the apache-tomcat directory
 describe command('ls /opt/') do
-	its(:stdout) { should contain('apache-tomcat-')}
+  its('stdout') { should include 'apache-tomcat-' }
 end
 
 # The unpackaged directory should be a symlink

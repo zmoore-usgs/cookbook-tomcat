@@ -10,27 +10,21 @@ driver:
 provisioner:
   name: chef_zero
 
+verifier:
+  name: inspec
+  format: documentation
+
 platforms:
   - name: centos-7.1-vbox
     driver:
       box: bento/centos-7.1
       box_url: bento/centos-7.1
       provider: virtualbox
-  - name: centos-7.1-vmware
-    driver:
-      box: bento/centos-7.1
-      box_url: bento/centos-7.1
-      provider: vmware_fusion
   - name: centos-6.7-vbox
     driver:
       box: bento/centos-6.7
       box_url: bento/centos-6.7
       provider: virtualbox
-  - name: centos-6.7-vmware
-    driver:
-      box: bento/centos-6.7
-      box_url: bento/centos-6.7
-      provider: vmware_fusion
 
 suites:
   - name: default
@@ -44,7 +38,7 @@ suites:
       - recipe[wsi_tomcat::create_tomcat_base]
       - recipe[wsi_tomcat::create_tomcat_instances]
       - recipe[wsi_tomcat::update_context]
-      - recipe[wsi_tomcat::deploy_application] 
+      - recipe[wsi_tomcat::deploy_application]
     data_path: test/files
     data_bags_path: './test/integration/default/data_bags/'
     encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
@@ -92,7 +86,7 @@ suites:
                 "enabled" : true,
                 "wsi_tomcat_keys_data_bag" : "wsi_tomcat-_default",
                 "wsi_tomcat_keys_data_item" : "keystores",
-                
+
                 # Provided Certs
 
                 "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
@@ -117,10 +111,10 @@ suites:
                 # ]
 
               },
-              "engine" : { 
-                "host" : [ 
-                  "name" : "localhost" 
-                ] 
+              "engine" : {
+                "host" : [
+                  "name" : "localhost"
+                ]
               }
             }
             ]
@@ -150,7 +144,7 @@ suites:
                 "enabled" : true,
                 "wsi_tomcat_keys_data_bag" : "wsi_tomcat-_default",
                 "wsi_tomcat_keys_data_item" : "keystores",
-                
+
                 # Provided Certs
 
                 "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
@@ -175,10 +169,10 @@ suites:
                 # ]
 
               },
-              "engine" : { 
-                "host" : [ 
-                  "name" : "localhost" 
-                ] 
+              "engine" : {
+                "host" : [
+                  "name" : "localhost"
+                ]
               }
             }
             ]
@@ -201,7 +195,7 @@ suites:
       - recipe[wsi_tomcat::create_tomcat_instances]
       - recipe[wsi_tomcat::download_libs]
       - recipe[wsi_tomcat::update_context]
-      - recipe[wsi_tomcat::deploy_application] 
+      - recipe[wsi_tomcat::deploy_application]
     data_path: test/files
     data_bags_path: './test/integration/default/data_bags/'
     encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
@@ -221,7 +215,7 @@ suites:
             }
           ],
         "instances" : {
-         
+
           "default" : {
             "cors" : {
               "allowed" : {
@@ -293,10 +287,10 @@ suites:
                   {"name" : "www.host2.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"}
                 ]
               },
-              "engine" : { 
-                "host" : [ 
-                  "name" : "localhost" 
-                ] 
+              "engine" : {
+                "host" : [
+                  "name" : "localhost"
+                ]
               }
             }
             ]
@@ -319,7 +313,7 @@ suites:
       - recipe[wsi_tomcat::create_tomcat_instances]
       - recipe[wsi_tomcat::download_libs]
       - recipe[wsi_tomcat::update_context]
-      - recipe[wsi_tomcat::deploy_application] 
+      - recipe[wsi_tomcat::deploy_application]
     data_path: test/files
     data_bags_path: './test/integration/default/data_bags/'
     encrypted_data_bag_secret_key_path: './test/integration/default/encrypted_data_bag_secret'
@@ -334,7 +328,7 @@ suites:
       "wsi_tomcat" : {
        "lib_sources" : [],
         "instances" : {
-         
+
           "default" : {
             "cors" : {
               "allowed" : {
@@ -392,10 +386,10 @@ suites:
                   {"name" : "www.host2.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"}
                 ]
               },
-              "engine" : { 
-                "host" : [ 
-                  "name" : "localhost" 
-                ] 
+              "engine" : {
+                "host" : [
+                  "name" : "localhost"
+                ]
               }
             }
             ]
@@ -403,4 +397,3 @@ suites:
         }
       }
     }
-    

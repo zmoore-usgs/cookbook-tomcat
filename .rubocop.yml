@@ -1,0 +1,28 @@
+AllCops:
+  DisplayCopNames: true
+  Include:
+    - Berksfile
+    - Gemfile
+    - Rakefile
+    - Thorfile
+    - Guardfile
+  Exclude:
+    - vendor/**/*
+    - test/**/*
+    - spec/**/*
+
+# TODO: Whittle down the exceptions over time 
+LineLength:
+  Enabled: false
+MethodLength:
+  Enabled: false
+BlockLength:
+  Enabled: false
+NumericLiteralPrefix:
+  Enabled: false
+AbcSize:
+  Enabled: false
+CyclomaticComplexity:
+  Enabled: false
+PerceivedComplexity:
+  Enabled: false

@@ -9,3 +9,6 @@ version          '0.2.4'
 supports         'centos', '>= 6.5'
 
 depends 'java'
+
+source_url 'https://github.com/USGS-CIDA/cookbook-tomcat'
+issues_url 'https://github.com/USGS-CIDA/cookbook-tomcat/issues'
