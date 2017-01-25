@@ -10,6 +10,11 @@ describe 'wsi_tomcat::create_tomcat_base' do
     end.converge(described_recipe)
   end
 
+  before do
+    # https://github.com/sethvargo/chefspec/issues/250
+    allow(File).to receive(:exist?).and_call_original
+  end
+
   it 'creates home directories' do
     %w(
       instance
@@ -23,11 +28,6 @@ describe 'wsi_tomcat::create_tomcat_base' do
     ).each do |dir|
       expect(chef_run).to create_directory("/opt/tomcat/#{dir}")
     end
-  end
-
-  before do
-    # https://github.com/sethvargo/chefspec/issues/250
-    allow(File).to receive(:exist?).and_call_original
   end
 
   it 'archive manager webapp' do
