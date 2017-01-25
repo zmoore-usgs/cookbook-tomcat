@@ -1,7 +1,3 @@
-
-
-tomcat = 'tomcat'
-
 # Verify that java is installed
 describe command('java -version') do
   its(:exit_status) { should eq 0 }
