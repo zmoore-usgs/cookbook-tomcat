@@ -25,6 +25,11 @@ describe 'wsi_tomcat::create_tomcat_base' do
     end
   end
 
+  before do
+    # https://github.com/sethvargo/chefspec/issues/250
+    allow(File).to receive(:exist?).and_call_original
+  end
+
   it 'archive manager webapp' do
     chef_run.node.normal[:wsi_tomcat][:user][:home_dir] = '/opt/tomcat'
     chef_run.node.normal[:wsi_tomcat][:archive][:manager_name] = 'some-archive.tar.gz'
