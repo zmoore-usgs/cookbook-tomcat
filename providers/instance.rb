@@ -428,16 +428,14 @@ def create_tomcat_instance
 
   databag_name = node['wsi_tomcat']['data_bag_config']['bag_name']
   credentials_attribute = node['wsi_tomcat']['data_bag_config']['credentials_attribute']
-  
+
   if Chef::Config[:solo]
     Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-  else
-    if search(databag_name, "id:#{credentials_attribute}").any?
-      credentials = data_bag_item(databag_name, credentials_attribute)
-      tomcat_admin_pass = credentials[name]['tomcat_admin_pass']
-      tomcat_script_pass = credentials[name]['tomcat_script_pass']
-      tomcat_jmx_pass = credentials[name]['tomcat_jmx_pass']
-    end
+  elsif search(databag_name, "id:#{credentials_attribute}").any?
+    credentials = data_bag_item(databag_name, credentials_attribute)
+    tomcat_admin_pass = credentials[name]['tomcat_admin_pass']
+    tomcat_script_pass = credentials[name]['tomcat_script_pass']
+    tomcat_jmx_pass = credentials[name]['tomcat_jmx_pass']
   end
 
   Chef::Log.info "Creating Instance #{name}"
