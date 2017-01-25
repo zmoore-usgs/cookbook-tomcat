@@ -26,6 +26,9 @@ describe 'wsi_tomcat::create_tomcat_base' do
       ssltmp
       archives
     ).each do |dir|
+      allow(File).to receive(:exist?)
+        .with("/opt/tomcat")
+        .and_return(true)
       expect(chef_run).to create_directory("/opt/tomcat/#{dir}")
     end
   end
