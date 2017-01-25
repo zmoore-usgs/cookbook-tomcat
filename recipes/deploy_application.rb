@@ -42,7 +42,7 @@ if node['wsi_tomcat']['deploy']['remove_unlisted_applications']
           # /manager:running:0:manager
           response_arr = f.read.split('\n')
           response_arr.each_with_index do |r, i|
-            if i == 0
+            if i.zero?
               success = r[0, 2] == 'OK'
             elsif r[0, 1] == '/'
               deployed_apps.push(r.split(':')[-1, 1])

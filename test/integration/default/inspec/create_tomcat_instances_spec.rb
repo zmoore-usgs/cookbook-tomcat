@@ -1,4 +1,4 @@
-require 'spec_helper'
+
 
 describe file('/opt/tomcat/instance/default') do
   it { should be_directory }
@@ -83,8 +83,8 @@ end
 
 describe command('/sbin/chkconfig') do
   its(:stdout) { should match /(tomcat-default\s.*0:off\s.*1:off\s.*2:on\s.*3:on\s.*4:on\s.*5:off\s.*6:off)/ }
-  end  
-  
+  end
+
   describe command('service tomcat status default') do
     its(:stdout) { should match /is running/ }
 end

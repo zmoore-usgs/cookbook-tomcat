@@ -1,4 +1,4 @@
-require 'spec_helper'
+
 
 # https://github.com/rspec/rspec-expectations/blob/master/Should.md
 RSpec.configure do |config|

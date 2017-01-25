@@ -1,4 +1,4 @@
-require 'spec_helper'
+
 
 # Check to make sure Java is installed
 describe command('echo $JAVA_HOME') do
@@ -7,7 +7,7 @@ end
 
 # Where is it installed?
 describe command('which java') do
-  its(:stdout) { should contain('/usr/bin/java')}
+  its('stdout') { should include '/usr/bin/java' }
 end
 
 # Check to make sure gcc is installed

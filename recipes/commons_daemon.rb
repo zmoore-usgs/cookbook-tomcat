@@ -21,7 +21,7 @@ directory 'Create BCDP build dir' do
   owner user_name
   group group_name
   recursive true
-  only_if { ! ::File.exist?("#{tomcat_home}/bin/jsvc") }
+  only_if { !::File.exist?("#{tomcat_home}/bin/jsvc") }
 end
 
 execute 'Unpack BCDP source' do
@@ -29,7 +29,7 @@ execute 'Unpack BCDP source' do
   group group_name
   command "/bin/tar xvf #{tomcat_home}/bin/commons-daemon-native.tar.gz --strip=1 -C #{unpack_directory}"
   not_if "test -n \"$(ls -A #{unpack_directory})\""
-  only_if { ! ::File.exist?("#{tomcat_home}/bin/jsvc") }
+  only_if { !::File.exist?("#{tomcat_home}/bin/jsvc") }
 end
 
 execute 'Run configure on BCDP source' do
@@ -51,7 +51,7 @@ end
 
 execute 'Copy executable to tomcat bin' do
   command "/bin/cp #{work_directory}/jsvc  #{tomcat_home}/bin"
-  only_if { ! ::File.exist?("#{tomcat_home}/bin/jsvc") }
+  only_if { !::File.exist?("#{tomcat_home}/bin/jsvc") }
 end
 
 file 'set permissions on BCDP binary' do

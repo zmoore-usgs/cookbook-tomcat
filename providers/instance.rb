@@ -32,7 +32,7 @@ end
 
 action :start do
   if @current_resource.exists
-    if is_started?(current_resource.name)
+    if started?(current_resource.name)
       Chef::Log.info "Tomcat instance #{@new_resource} already started - nothing to do."
       new_resource.updated_by_last_action(false)
     else
@@ -52,7 +52,7 @@ end
 
 action :stop do
   if @current_resource.exists
-    if is_started?(current_resource.name)
+    if started?(current_resource.name)
       converge_by("Stop #{@new_resource}") do
         cmd_str = "/sbin/service tomcat stop #{current_resource.name}"
         execute cmd_str do
@@ -140,7 +140,7 @@ end
 
 def remove_tomcat_instance?(name)
   return false unless instance_exists?(name)
-  if is_started?(name)
+  if started?(name)
     cmd_str = "/sbin/service tomcat stop #{name}"
     execute cmd_str do
       user 'root'
@@ -167,7 +167,7 @@ def application_exists?(name)
   ::File.exist?(war_name)
 end
 
-def is_started?(name)
+def started?(name)
   Chef::Log.debug "Checking to see if Tomcat instance '#{name}' is started"
   cmd_str = "/sbin/service tomcat status #{name}"
   cmd = Mixlib::ShellOut.new(cmd_str)
@@ -396,7 +396,7 @@ def create_tomcat_instance
     'enabled'          => true,
     'allowed'          => {
       'origins'        => '*',
-      'methods'        => %w( GET POST HEAD OPTIONS ),
+      'methods'        => %w(GET POST HEAD OPTIONS),
       'headers'        => [
         'Origin',
         'Accept',
@@ -428,11 +428,16 @@ def create_tomcat_instance
 
   databag_name = node['wsi_tomcat']['data_bag_config']['bag_name']
   credentials_attribute = node['wsi_tomcat']['data_bag_config']['credentials_attribute']
-  if search(databag_name, "id:#{credentials_attribute}").any?
-    credentials = data_bag_item(databag_name, credentials_attribute)
-    tomcat_admin_pass = credentials[name]['tomcat_admin_pass']
-    tomcat_script_pass = credentials[name]['tomcat_script_pass']
-    tomcat_jmx_pass = credentials[name]['tomcat_jmx_pass']
+  
+  if Chef::Config[:solo]
+    Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+  else
+    if search(databag_name, "id:#{credentials_attribute}").any?
+      credentials = data_bag_item(databag_name, credentials_attribute)
+      tomcat_admin_pass = credentials[name]['tomcat_admin_pass']
+      tomcat_script_pass = credentials[name]['tomcat_script_pass']
+      tomcat_jmx_pass = credentials[name]['tomcat_jmx_pass']
+    end
   end
 
   Chef::Log.info "Creating Instance #{name}"
@@ -445,7 +450,7 @@ def create_tomcat_instance
   end
 
   # Create the required directories in the instance directory
-  %w( bin conf lib logs temp webapps work ).each do |dir|
+  %w(bin conf lib logs temp webapps work).each do |dir|
     Chef::Log.info "Creating Instance subdirectory #{dir}"
     directory ::File.expand_path(dir, instance_home) do
       owner tomcat_user
@@ -478,7 +483,7 @@ def create_tomcat_instance
     end
   end
 
-  %w( start stop ).each do |bin_file|
+  %w(start stop).each do |bin_file|
     Chef::Log.info "Templating bin file #{bin_file}"
     template "#{tomcat_bin_path}/#{bin_file}_#{name}" do
       source "instances/bin/#{bin_file}.erb"
