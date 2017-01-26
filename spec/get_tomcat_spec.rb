@@ -1,5 +1,5 @@
 require "spec_helper"
-tc_version = '8.0.39'
+tc_version = '8.0.41'
 describe "wsi_tomcat::get_tomcat" do
    let (:chef_run) do |runner|
      ChefSpec::SoloRunner.new do |runner|
