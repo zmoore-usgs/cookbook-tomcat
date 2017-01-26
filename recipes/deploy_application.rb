@@ -33,7 +33,7 @@ if tc_node['deploy']['remove_unlisted_applications']
 
       begin
         deployed_apps = ManagerClient.get_deployed_applications(port, tomcat_script_pass)
-
+        puts "DEPLOYED APPS: #{deployed_apps}"
         deployed_apps.each do |appname, _attr|
           # Don't delete the manager app if it's supposed to exist
           next unless appname != 'manager' || (appname == 'manager' && node['wsi_tomcat']['disable_manager'])
