@@ -1,5 +1,8 @@
 Tomcat Cookbook Changelog
 =========
+0.2.5
+-----
+- [isuftin@usgs.gov] - Created a Tomcat Manager communication library 
 
 0.2.4
 ------
