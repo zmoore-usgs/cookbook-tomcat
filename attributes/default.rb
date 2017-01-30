@@ -11,7 +11,7 @@ default['wsi_tomcat']['deploy']['remove_unlisted_instances'] = true
 default['wsi_tomcat']['deploy']['remove_unlisted_applications'] = true
 
 # Set the version of Tomcat to install
-default['wsi_tomcat']['version'] = '8.0.39'
+default['wsi_tomcat']['version'] = '8.0.41'
 
 # APR Installation
 default['wsi_tomcat']['apr']['apr_version'] = '1.5.2'
@@ -38,7 +38,7 @@ default['wsi_tomcat']['file']['archive']['mirrors'] = [
 # MacOS example:
 # openssl dgst -sha256 apache-tomcat-8.0.36.tar.gz
 # SHA256(apache-tomcat-8.0.36.tar.gz)= 7963464d86faf8416b92fb2b04c70da9759c7c332e1700c1e9f581883b4db664
-default['wsi_tomcat']['file']['archive']['checksum'] = '4093aa19f70ebb2749d40fa81486971c1dc7f275da188f1436c62faedaf51e9a'
+default['wsi_tomcat']['file']['archive']['checksum'] = 'a57204b5434755b5767299bbcd32e3afd2d6327cafa6b8372077f824aa7176d7'
 
 # Some credentials are stored in an encrypted data bag
 default['wsi_tomcat']['data_bag_config']['bag_name'] = 'wsi_tomcat-_default'

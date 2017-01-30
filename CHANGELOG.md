@@ -1,5 +1,9 @@
 Tomcat Cookbook Changelog
 =========
+0.2.5
+-----
+- [isuftin@usgs.gov] - Created a Tomcat Manager communication library
+- [isuftin@usgs.gov] - Fixed a bug with application undeploying
 
 0.2.4
 ------

@@ -61,10 +61,3 @@ file 'set permissions on BCDP binary' do
   group group_name
   only_if { ::File.exist?("#{tomcat_home}/bin/jsvc") }
 end
-
-directory 'Delete BCDP build dir' do
-  path unpack_directory
-  recursive true
-  action :delete
-  only_if { ::File.exist?("#{tomcat_home}/bin/jsvc") }
-end

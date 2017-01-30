@@ -178,37 +178,34 @@ end
 
 def undeploy_application?(application_name)
   instance_name          = current_resource.name
-  tomcat_home_dir        = node['wsi_tomcat']['user']['home_dir']
+  tc_node                = node['wsi_tomcat']
+  tomcat_home_dir        = tc_node['user']['home_dir']
   instances_dir          = ::File.expand_path('instance', tomcat_home_dir)
   instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
   webapps_dir            = ::File.expand_path('webapps', instance_dir)
   war_name               = ::File.expand_path("#{application_name}.war", webapps_dir)
 
-  node['wsi_tomcat']['instances'][instance_name]['service_definitions'].each do |sd, _sd_att|
+  tc_node['instances'][instance_name]['service_definitions'].each do |sd, _sd_att|
     port = sd['connector']['port']
-    databag_name = node['wsi_tomcat']['data_bag_config']['bag_name']
-    credentials_attribute = node['wsi_tomcat']['data_bag_config']['credentials_attribute']
+    databag_name = tc_node['data_bag_config']['bag_name']
+    credentials_attribute = tc_node['data_bag_config']['credentials_attribute']
     tomcat_script_pass = data_bag_item(databag_name, credentials_attribute)[instance_name]['tomcat_script_pass']
-    response = ''
-    open(
-      "http://127.0.0.1:#{port}/manager/text/undeploy?path=/#{application_name}",
-      http_basic_authentication: ['tomcat-script', tomcat_script_pass.to_s]
-    ) do |f|
-      # First result will be the response for this command
-      response = f.read.split("\n")[0]
-      Chef::Log.info("Result from undeploying #{application_name} from #{instance_name}: #{response}")
-    end
 
-    file war_name do
-      action :delete
-    end
+    begin
+      Chef::Recipe::ManagerClient.undeploy_application(port, tomcat_script_pass, application_name)
 
-    directory "#{webapps_dir}/application_name" do
-      action :delete
-      recursive true
-    end
+      file war_name do
+        action :delete
+      end
 
-    response[0, 2] == 'OK'
+      directory "#{webapps_dir}/#{application_name}" do
+        action :delete
+        recursive true
+      end
+    rescue => e
+      # There was an issue communicating with the server.
+      Chef::Log.error "Unable to undeploy application #{e}. Continuing."
+    end
   end
 end
 
