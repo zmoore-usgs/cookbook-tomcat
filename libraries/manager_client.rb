@@ -44,7 +44,6 @@ class Chef
       # cannot be undeployed for some reason, an exception is thrown. Otherwise,
       # the server response is returned
       def self.undeploy_application(port, tomcat_script_pass, application_name)
-        puts "HERE!!!!"
         open(
           "http://127.0.0.1:#{port}/manager/text/undeploy?path=/#{application_name}",
           http_basic_authentication: ['tomcat-script', tomcat_script_pass.to_s]
