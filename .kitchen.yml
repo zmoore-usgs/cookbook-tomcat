@@ -29,10 +29,7 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[doi_ssl_filtering]
-      - recipe[doi_ssl_filtering::kitchen]
       - recipe[java]
-      - recipe[doi_ssl_filtering::java]
       - recipe[wsi_tomcat::install_deps]
       - recipe[wsi_tomcat::create_group]
       - recipe[wsi_tomcat::create_user]
