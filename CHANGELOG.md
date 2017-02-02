@@ -1,5 +1,11 @@
 Tomcat Cookbook Changelog
 =========
+
+1.0.0
+-----
+- [isuftin@usgs.gov] - Created a Tomcat application resource which provides the
+ability to deploy and undeploy applications
+
 0.2.5
 -----
 - [isuftin@usgs.gov] - Created a Tomcat Manager communication library

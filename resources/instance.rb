@@ -1,4 +1,4 @@
-actions :create, :remove, :start, :stop, :restart, :deploy_app, :undeploy_app
+actions :create, :remove, :start, :stop, :restart
 default_action :create
 
 # Used in: create, start, stop, restart, deploy_app

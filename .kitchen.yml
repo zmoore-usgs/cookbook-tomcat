@@ -60,16 +60,28 @@ suites:
             },
             "application" : {
               "probe" : {
-                "url" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war",
-                "final_name" : "probe"
+                "location" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.RC1/probe.war",
+                "path" : "/probe",
+                "type" : "war"
               }
             },
             "user" : {
               "disable_admin_users" : false
             },
-            "server_opts" : [
-              "-server"
-            ],
+            "server_opts" : [],
+            "context": {
+              "encrypted_environments_data_bag": {
+                "data_bag_name": "wsi_tomcat-_default",
+                "data_bag_item": "credentials",
+                "extract_fields": []
+              },
+              "resources": [
+
+              ],
+              "environments": [
+
+              ]
+            },
             "service_definitions" : [
             {
               "name" : "Catalina",
@@ -86,87 +98,12 @@ suites:
                 "enabled" : true,
                 "wsi_tomcat_keys_data_bag" : "wsi_tomcat-_default",
                 "wsi_tomcat_keys_data_item" : "keystores",
-
-                # Provided Certs
-
                 "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
                 "ssl_key_file" : "file:///tmp/kitchen/data/certs/client.key",
                 "trust_certs" : [
                   {"name" : "www.host1.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"},
                   {"name" : "www.host2.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"}
                 ]
-
-                # Create Certs
-                # "directory_info" : {
-                #   "name" : "gov.usgs.cida",
-                #   "org_unit" : "DevOps",
-                #   "org" : "CIDA",
-                #   "locality" : "Middleton",
-                #   "state" : "WI",
-                #   "country" : "US"
-                # },
-                # "trust_certs" : [
-                #   {"name" : "www.host1.com"},
-                #   {"name" : "www.host2.com"}
-                # ]
-
-              },
-              "engine" : {
-                "host" : [
-                  "name" : "localhost"
-                ]
-              }
-            }
-            ]
-          },
-
-
-          "test" : {
-            "user" : {
-              "disable_admin_users" : false
-            },
-            "server_opts" : [
-              "-server"
-            ],
-            "service_definitions" : [
-            {
-              "name" : "Catalina",
-              "thread_pool" : {
-                "max_threads" : 200,
-                "daemon" : "true",
-                "min_spare_threads" : 25,
-                "max_idle_time" : 60000
-              },
-              "connector" : {
-                "port" : 8081
-              },
-              "ssl_connector" : {
-                "enabled" : true,
-                "wsi_tomcat_keys_data_bag" : "wsi_tomcat-_default",
-                "wsi_tomcat_keys_data_item" : "keystores",
-
-                # Provided Certs
-
-                "ssl_cert_file" : "file:///tmp/kitchen/data/certs/client.crt",
-                "ssl_key_file" : "file:///tmp/kitchen/data/certs/client.key",
-                "trust_certs" : [
-                  {"name" : "www.host1.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"},
-                  {"name" : "www.host2.com", "path" : "file:///tmp/kitchen/data/certs/client.crt"}
-                ]
-
-                # Create Certs
-                # "directory_info" : {
-                #   "name" : "gov.usgs.cida",
-                #   "org_unit" : "DevOps",
-                #   "org" : "CIDA",
-                #   "locality" : "Middleton",
-                #   "state" : "WI",
-                #   "country" : "US"
-                # },
-                # "trust_certs" : [
-                #   {"name" : "www.host1.com"},
-                #   {"name" : "www.host2.com"}
-                # ]
 
               },
               "engine" : {
