@@ -5,18 +5,19 @@
 #
 # Description: Deploys application(s) to a specified tomcat instance
 
-require 'open-uri'
-
 tc_node = node['wsi_tomcat']
 instances = tc_node['instances']
 
 instances.each do |instance, attributes|
   next unless attributes.key?('application')
-  attributes.application.each do |application, _app_attributes|
-    Chef::Log.info("Deploying #{application}")
-    wsi_tomcat_instance instance do
-      application_name application
-      action :deploy_app
+  attributes.application.each do |application, application_attributes|
+    tomcat_application application do
+      instance_name instance
+      version application_attributes.member?('version') ? application_attributes['version'] : ''
+      location application_attributes['location']
+      path application_attributes['path']
+      type application_attributes['type']
+      action :deploy
     end
   end
 end
@@ -32,19 +33,22 @@ if tc_node['deploy']['remove_unlisted_applications']
       tomcat_script_pass = data_bag_item(databag_name, credentials_attribute)[instance]['tomcat_script_pass']
 
       begin
-        deployed_apps = ManagerClient.get_deployed_applications(port, tomcat_script_pass)
-        puts "DEPLOYED APPS: #{deployed_apps}"
-        deployed_apps.each do |appname, _attr|
-          # Don't delete the manager app if it's supposed to exist
-          next unless appname != 'manager' || (appname == 'manager' && node['wsi_tomcat']['disable_manager'])
-          next if attributes.application.keys.include?(appname)
-          wsi_tomcat_instance instance do
-            application_name appname
-            action :undeploy_app
+        deployed_apps = Helper::ManagerClient.get_deployed_applications(port, tomcat_script_pass)
+        deployed_apps.each do |path, _state, _session_count, name|
+          version = name.split('#').length > 1 ? name.split('#')[-1] : ''
+          name = name.split('#').length > 1 ? name.split('#')[1] : name
+          # Don't delete the manager app
+          next unless name != 'manager'
+          next if attributes.application.keys.include?(name)
+          tomcat_application name do
+            instance_name instance
+            version version
+            path path
+            action :undeploy
           end
         end
-      rescue
-        # There was an issue communicating with the server. Exit recipe.
+      rescue => e
+        Chef::Log.error(e)
         return false
       end
     end

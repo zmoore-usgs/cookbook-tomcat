@@ -85,39 +85,6 @@ action :restart do
   end
 end
 
-action :deploy_app do
-  if @current_resource.exists
-    if !application_exists?(current_resource.application_name)
-      converge_by("Deploying #{current_resource.application_name} to #{@new_resource}") do
-        deploy_application
-        new_resource.updated_by_last_action(true)
-      end
-    else
-      Chef::Log.info "Tomcat application #{current_resource.application_name} exists."
-      new_resource.updated_by_last_action(false)
-    end
-  else
-    Chef::Log.info "Tomcat instance #{@new_resource} does not exist."
-    new_resource.updated_by_last_action(false)
-  end
-end
-
-action :undeploy_app do
-  if @current_resource.exists
-    if !application_exists?(current_resource.application_name)
-      Chef::Log.info "Tomcat application #{current_resource.application_name} does not exist."
-      new_resource.updated_by_last_action(false)
-    else
-      converge_by("Undeploying #{current_resource.application_name} from #{@new_resource}") do
-        new_resource.updated_by_last_action(undeploy_application?(current_resource.application_name))
-      end
-    end
-  else
-    Chef::Log.info "Tomcat instance #{@new_resource} does not exist."
-    new_resource.updated_by_last_action(false)
-  end
-end
-
 def load_current_resource
   @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
@@ -174,61 +141,6 @@ def started?(name)
   matcher = Regexp.new("(#{name}).*(is running).*", Regexp::IGNORECASE)
   cmd.run_command
   matcher.match(cmd.stdout)
-end
-
-def undeploy_application?(application_name)
-  instance_name          = current_resource.name
-  tc_node                = node['wsi_tomcat']
-  tomcat_home_dir        = tc_node['user']['home_dir']
-  instances_dir          = ::File.expand_path('instance', tomcat_home_dir)
-  instance_dir           = ::File.expand_path(current_resource.name, instances_dir)
-  webapps_dir            = ::File.expand_path('webapps', instance_dir)
-  war_name               = ::File.expand_path("#{application_name}.war", webapps_dir)
-
-  tc_node['instances'][instance_name]['service_definitions'].each do |sd, _sd_att|
-    port = sd['connector']['port']
-    databag_name = tc_node['data_bag_config']['bag_name']
-    credentials_attribute = tc_node['data_bag_config']['credentials_attribute']
-    tomcat_script_pass = data_bag_item(databag_name, credentials_attribute)[instance_name]['tomcat_script_pass']
-
-    begin
-      Chef::Recipe::ManagerClient.undeploy_application(port, tomcat_script_pass, application_name)
-
-      file war_name do
-        action :delete
-      end
-
-      directory "#{webapps_dir}/#{application_name}" do
-        action :delete
-        recursive true
-      end
-    rescue => e
-      # There was an issue communicating with the server.
-      Chef::Log.error "Unable to undeploy application #{e}. Continuing."
-    end
-  end
-end
-
-def deploy_application
-  instance_name          = current_resource.name
-  application_name       = current_resource.application_name
-  application_url        = node['wsi_tomcat']['instances'][instance_name]['application'][application_name]['url']
-  application_final_name = node['wsi_tomcat']['instances'][instance_name]['application'][application_name]['final_name']
-  tomcat_user            = node['wsi_tomcat']['user']['name']
-  tomcat_group           = node['wsi_tomcat']['group']['name']
-  tomcat_home_dir        = node['wsi_tomcat']['user']['home_dir']
-  instances_dir          = ::File.expand_path('instance', tomcat_home_dir)
-  instance_dir           = ::File.expand_path(instance_name, instances_dir)
-  webapps_dir            = ::File.expand_path('webapps', instance_dir)
-  war_name               = ::File.expand_path("#{application_final_name}.war", webapps_dir)
-
-  Chef::Log.info("deploying #{application_name} from #{application_url}")
-  remote_file war_name do
-    source application_url
-    owner tomcat_user
-    group tomcat_group
-    backup false
-  end
 end
 
 # will check for ssl=true and load/create keys from encrypted data_bags

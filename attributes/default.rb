@@ -1,6 +1,9 @@
-# Name of the group to create for the tomcat user. This probably should remain default
+# Name of the username and group to create for the tomcat user.
+# This probably should remain default unless there's a specific reason to change
 default['wsi_tomcat']['group']['name'] = 'tomcat'
 default['wsi_tomcat']['user']['name'] = 'tomcat'
+# Home directory of the Tomcat user. All Tomcat instances are stored in this
+# directory
 default['wsi_tomcat']['user']['home_dir'] = '/opt/tomcat'
 
 # If an instance is not listed in the Chef configuration but appears running on
@@ -8,16 +11,20 @@ default['wsi_tomcat']['user']['home_dir'] = '/opt/tomcat'
 default['wsi_tomcat']['deploy']['remove_unlisted_instances'] = true
 # If an application is not listed in the Chef configuration but appears running on
 # the system, should the application be removed?
+# Note, the manager application is never removed
 default['wsi_tomcat']['deploy']['remove_unlisted_applications'] = true
 
 # Set the version of Tomcat to install
+# Note: This cookbook has been tested against the Tomcat 7.x and 8.0.x versions.
+# 8.5.x and 9.x have not yet been tested
 default['wsi_tomcat']['version'] = '8.0.41'
 
-# APR Installation
+# APR Installation - Both attributes used by the install_apr recipe
 default['wsi_tomcat']['apr']['apr_version'] = '1.5.2'
 default['wsi_tomcat']['apr']['openssl_version'] = '1.0.2h'
 
-# Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab from them in order until completed
+# Tomcat mirrors. Feel free to add more mirrors as needed. Chef will try to grab
+# from them in order until completed
 default['wsi_tomcat']['file']['archive']['mirrors'] = [
   'http://mirror.olnevhost.net/pub/apache/',
   'http://apache.mirrors.lucidnetworks.net/',
@@ -29,6 +36,7 @@ default['wsi_tomcat']['file']['archive']['mirrors'] = [
   'ftp://ftp.osuosl.org/pub/apache/',
   'ftp://mirror.reverse.net/pub/apache/'
 ]
+
 # Chef will verify the SHA256 checksum of the downloaded archive
 # Generate SHA256 checksum for a file:
 # http://www.openoffice.org/download/checksums.html#hash_win
@@ -45,6 +53,8 @@ default['wsi_tomcat']['data_bag_config']['bag_name'] = 'wsi_tomcat-_default'
 # This stores Tomcat passwords for things like the Tomcat manager application
 # Example can be found in test/integration/default/credentials_unencrypted.json
 # Each tomcat instance should have its own top-level credentials object
+# ** Always include the tomcat_script_pass as it will be used to communicate with
+# the running Tomcat server
 # {
 #   'id' : 'credentials',
 #   'default' : {
@@ -58,9 +68,9 @@ default['wsi_tomcat']['data_bag_config']['credentials_attribute'] = 'credentials
 # Instances definition
 # port = The port that the tomcat instance will run on
 # ssl  = Optional. Defines SSL configuration for instance.
-#   ssl.enabled = Defines whether SSL will be used on instance
+# ssl.enabled = Defines whether SSL will be used on instance
 # user = Defines credentials for various tomcat users
-#    See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access
+# See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access
 default['wsi_tomcat']['instances']['default']['cors']['enabled'] = true
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['origins'] = '*'
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['methods'] = %w(
@@ -89,9 +99,6 @@ default['wsi_tomcat']['instances']['default']['context']['attributes']['anti_res
 default['wsi_tomcat']['instances']['default']['context']['attributes']['allow_casual_multipart_parsing'] = false
 default['wsi_tomcat']['instances']['default']['context']['attributes']['background_processor_delay'] = '-1'
 default['wsi_tomcat']['instances']['default']['context']['attributes']['container_sci_filter'] = ''
-
-# TODO
-# default['wsi_tomcat']['instances']['default']['context']['class_name'] = ''
 
 default['wsi_tomcat']['instances']['default']['service_definitions'] = [{
   'name' => 'Catalina',
@@ -127,12 +134,15 @@ default['wsi_tomcat']['instances']['default']['service_definitions'] = [{
 
 # You can add as many applications as needed by using the following...
 # default['wsi_tomcat']['instances']['default']['application']['app1'] = {
-#   'url' => app1Url,
-#   'final_name' => app1Name
+#   'location' => 'https://artifact.server.org/location/of/your/webapp1.war',
+#   'path' => '/launch_context_path',
+#   'type' => 'war'
 # }
 # default['wsi_tomcat']['instances']['default']['application']['app2'] = {
-#   'url' => app2Url,
-#   'final_name' => app2Name
+#   'location' => 'https://artifact.server.org/location/of/your/webapp2.war',
+#   'path' => '/launch_context_path2',
+#   'type' => 'war',
+#   'version' => '1'
 # }
 
 # if you want to set resource entries in context.xml, notice encrypted attributes entry
@@ -178,7 +188,6 @@ default['wsi_tomcat']['instances']['default']['service_definitions'] = [{
 #   'data_bag_item' => 'name_of_item_in_data_bag',
 #   'extract_fields' => ['field1', 'field2', 'field3']
 # }
-default['wsi_tomcat']['disable_manager'] = false
 
 default['wsi_tomcat']['archive']['manager_name'] = 'manager_war.tar.gz'
 
