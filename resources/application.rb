@@ -88,6 +88,8 @@ load_current_value do
   deployed deployed_app_names.include?(full_name)
 end
 
+# Deploys an application
+#
 action :deploy do
   if location.to_s.strip.empty?
     Chef::Application.fatal!('tomcat_application resource deploy action requires a location')
@@ -129,6 +131,8 @@ action :deploy do
   end
 end
 
+# Undeploys an application
+#
 action :undeploy do
   if application_deployed?
     ruby_block "Undeploy #{name}" do
@@ -142,6 +146,8 @@ action :undeploy do
   end
 end
 
+# Reloads an application
+#
+# @todo Provide the ability to reload applications when needed
 action :reload do
-  # TODO: Provide the ability to reload applications when needed
 end

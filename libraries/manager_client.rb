@@ -63,11 +63,11 @@ module Helper
     # @param tomcat_script_pass [String] Provides the password used with the manager
     #   application. This password is for the tomcat-script user, `fuh438hr73`
     # @param application_path [String] The context path the application should be undeployed from,`/probe`
-    # @param aplication_version [String] Optional. The version of the application, `1.0.3M4`
+    # @param application_version [String] Optional. The version of the application, `1.0.3M4`
     # @return [String] The server response, `OK - Undeployed application at context path /examples`
     # @raise [Error] If the server responds with an error
     # @since 1.0.0
-    def self.undeploy_application(port, tomcat_script_pass, application_path, *application_version)
+    def self.undeploy_application(port, tomcat_script_pass, application_path, application_version)
       undeploy_command = '/manager/text/undeploy'
       undeploy_command << "?path=#{application_path}"
       undeploy_command << "&version=#{application_version}" unless application_version.to_s.strip.empty?
@@ -91,7 +91,7 @@ module Helper
     # @param port [String] Defines the port that the target Tomcat server is listening on, `8080`
     # @param tomcat_script_pass [String] Provides the password used with the manager
     #   application. This password is for the tomcat-script user, `fuh438hr73`
-    # @param aplication_version [String] Optional. The version of the application.
+    # @param application_version [String] Optional. The version of the application.
     #   This provides the ability to do parallel deployment.
     #   See: https://tomcat.apache.org/tomcat-8.0-doc/config/context.html#Parallel_deployment, `1.0.3M4`
     # @param application_location [String] Points to the location of the deployable
