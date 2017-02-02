@@ -4,6 +4,7 @@ module Helper
   # Cookbook Name:: wsi_tomcat
   # Module:: Helper::ManagerClient
   # @author Ivan Suftin < isuftin@usgs.gov >
+  # @since 1.0.0
   #
   # Description: Helper functions to communicate with the Tomcat manager application
   module ManagerClient
@@ -13,6 +14,18 @@ module Helper
     # @param port [String] Defines the port that the target Tomcat server is listening on, `8080`
     # @param tomcat_script_pass [String] Provides the password used with the manager
     #   application. This password is for the tomcat-script user, `fuh438hr73`
+    # @return [String] The server response,
+    #   `OK - Listed applications for virtual host localhost
+    #   `/webdav:running:0:webdav`
+    #   `/examples:running:0:examples`
+    #   `/manager:running:0:manager`
+    #   `/:running:0:ROOT`
+    #   `/test:running:0:test##2`
+    #   `/test:running:0:test##1`
+    # @raise [Error] If the server responds with an error
+    # @note This method is a helper method for other methods. A recipe would
+    #   probably not need to use this directly
+    # @since 1.0.0
     def self.get_deployed_applications(port, tomcat_script_pass)
       deployed_apps = []
       begin
@@ -52,6 +65,8 @@ module Helper
     # @param application_path [String] The context path the application should be undeployed from,`/probe`
     # @param aplication_version [String] Optional. The version of the application, `1.0.3M4`
     # @return [String] The server response, `OK - Undeployed application at context path /examples`
+    # @raise [Error] If the server responds with an error
+    # @since 1.0.0
     def self.undeploy_application(port, tomcat_script_pass, application_path, *application_version)
       undeploy_command = '/manager/text/undeploy'
       undeploy_command << "?path=#{application_path}"
@@ -83,6 +98,8 @@ module Helper
     #   artifact that is on the same file system as the Tomcat server, `file:/tmp/deployable.war`
     # @param application_path [String] The context path the application should be launched into,`/probe`
     # @return [String] The server response, `OK - Deployed application at context path /foo`
+    # @raise [Error] If the server responds with an error
+    # @since 1.0.0
     def self.deploy_application(port, tomcat_script_pass, application_version, application_location, application_path, tag = '')
       deploy_command = '/manager/text/deploy'
       deploy_command << "?path=#{application_path}"
