@@ -8,7 +8,7 @@
 tc_node = node['wsi_tomcat']
 node['wsi_tomcat']['instances'].each do |instance, attributes|
   next unless attributes.key?('application')
-  next unless lambda { Helper::TomcatInstance.ready?(node, instance) }
+  next unless -> { Helper::TomcatInstance.ready?(node, instance) }
 
   port = Helper::TomcatInstance.ports(node, instance)[0]
   attributes.application.each do |application, application_attributes|
