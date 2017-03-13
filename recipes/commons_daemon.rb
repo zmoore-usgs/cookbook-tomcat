@@ -10,11 +10,7 @@ group_name = node['wsi_tomcat']['group']['name']
 tomcat_home = node['wsi_tomcat']['user']['home_dir']
 unpack_directory = "#{Chef::Config[:file_cache_path]}/opt/commons_daemon"
 work_directory = "#{unpack_directory}/unix"
-java_home = -> { node['java']['java_home'] } # This needs lazy evaluation
-# TODO: Does java_home still need lazy evaluation now that the JAVA cookbook
-# has been moved out as a dependency of this cookbook?
-# node["java"]["java_home"] may not even exist if the cookbook author
-# decides not to use the JAVA cookbook
+java_home = node['java']['java_home']
 
 directory 'Create BCDP build dir' do
   path unpack_directory
@@ -33,11 +29,11 @@ execute 'Unpack BCDP source' do
 end
 
 execute 'Run configure on BCDP source' do
-  command "./configure --with-java=#{java_home.call}"
+  command "./configure --with-java=#{java_home}"
   user user_name
   group group_name
   cwd work_directory
-  environment 'JAVA_HOME' => java_home.call
+  environment 'JAVA_HOME' => java_home
   not_if { File.exist?("#{work_directory}/config.status") || File.exist?("#{tomcat_home}/bin/jsvc") }
 end
 

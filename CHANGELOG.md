@@ -1,6 +1,12 @@
 Tomcat Cookbook Changelog
 =========
 
+1.0.1
+-----
+- [isuftin@usgs.gov] - Use the third party Java cookbook's java_home attribtue to
+dictate JAVA_HOME for this cookbook. The Java cookbook version 1.47.0 introduced
+breaking changes for this
+
 1.0.0
 -----
 - [isuftin@usgs.gov] - Created a Tomcat application resource which provides the
