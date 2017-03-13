@@ -1,6 +1,12 @@
 Tomcat Cookbook Changelog
 =========
 
+1.0.2
+-----
+- [isuftin@usgs.gov] - Created a new function (Helper::TomcatInstance.ready?) to
+allow testing whether or not Tomcat is accepting connections. This is used internally
+to verify if it is safe yet to begin deploying/undeploying applications. 
+
 1.0.1
 -----
 - [isuftin@usgs.gov] - Use the third party Java cookbook's java_home attribtue to
