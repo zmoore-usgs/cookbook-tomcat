@@ -220,7 +220,7 @@ def load_service_definitions_and_keys(service_definitions)
       bash 'make_truststore' do
         cwd ssl_dir
         code <<-EOH
-        cp $JAVA_HOME/jre/lib/security/cacerts #{ssl_dir}/truststore
+        cp #{node['java']['java_home']}/jre/lib/security/cacerts #{ssl_dir}/truststore
         keytool -storepasswd -keystore truststore -storepass changeit -new #{keystore_password}
         EOH
         sensitive true
