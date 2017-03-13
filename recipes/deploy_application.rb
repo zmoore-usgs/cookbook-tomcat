@@ -20,7 +20,8 @@ node['wsi_tomcat']['instances'].each do |instance, attributes|
 
   port = Helper::TomcatInstance.ports(node, instance)[0]
   attributes.application.each do |application, application_attributes|
-    tomcat_application application do
+    tomcat_application "Deploy Tomcat application #{application}" do
+      name application
       instance_name instance
       version application_attributes.member?('version') ? application_attributes['version'] : ''
       location application_attributes['location']
@@ -44,7 +45,8 @@ node['wsi_tomcat']['instances'].each do |instance, attributes|
       # Don't delete the manager app
       next unless name != 'manager'
       next if attributes.application.keys.include?(name)
-      tomcat_application name do
+      tomcat_application "Undeploy Tomcat application #{name}" do
+        name name
         instance_name instance
         version version
         path path
