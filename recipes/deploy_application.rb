@@ -6,10 +6,11 @@
 # Description: Deploys application(s) to a specified tomcat instance
 
 tc_node = node['wsi_tomcat']
-instances = tc_node['instances']
-
-instances.each do |instance, attributes|
+node['wsi_tomcat']['instances'].each do |instance, attributes|
   next unless attributes.key?('application')
+  next unless lambda { Helper::TomcatInstance.ready?(node, instance) }
+
+  port = Helper::TomcatInstance.ports(node, instance)[0]
   attributes.application.each do |application, application_attributes|
     tomcat_application application do
       instance_name instance
@@ -20,37 +21,29 @@ instances.each do |instance, attributes|
       action :deploy
     end
   end
-end
 
-if tc_node['deploy']['remove_unlisted_applications']
-  instances.each do |instance, attributes|
-    next unless attributes.key?('application')
-    instances[instance]['service_definitions'].each do |sd, _sd_attr|
-      # Get the current applications for each instance
-      port = sd['connector']['port'].to_s
-      databag_name = node['wsi_tomcat']['data_bag_config']['bag_name']
-      credentials_attribute = node['wsi_tomcat']['data_bag_config']['credentials_attribute']
-      tomcat_script_pass = data_bag_item(databag_name, credentials_attribute)[instance]['tomcat_script_pass']
+  next unless tc_node['deploy']['remove_unlisted_applications']
+  databag_name = tc_node['data_bag_config']['bag_name']
+  credentials_attribute = tc_node['data_bag_config']['credentials_attribute']
+  tomcat_script_pass = data_bag_item(databag_name, credentials_attribute)[instance]['tomcat_script_pass']
 
-      begin
-        deployed_apps = Helper::ManagerClient.get_deployed_applications(port, tomcat_script_pass)
-        deployed_apps.each do |path, _state, _session_count, name|
-          version = name.split('#').length > 1 ? name.split('#')[-1] : ''
-          name = name.split('#').length > 1 ? name.split('#')[1] : name
-          # Don't delete the manager app
-          next unless name != 'manager'
-          next if attributes.application.keys.include?(name)
-          tomcat_application name do
-            instance_name instance
-            version version
-            path path
-            action :undeploy
-          end
-        end
-      rescue => e
-        Chef::Log.error(e)
-        return false
+  begin
+    deployed_apps = Helper::ManagerClient.get_deployed_applications(port, tomcat_script_pass)
+    deployed_apps.each do |path, _state, _session_count, name|
+      version = name.split('#').length > 1 ? name.split('#')[-1] : ''
+      name = name.split('#').length > 1 ? name.split('#')[1] : name
+      # Don't delete the manager app
+      next unless name != 'manager'
+      next if attributes.application.keys.include?(name)
+      tomcat_application name do
+        instance_name instance
+        version version
+        path path
+        action :undeploy
       end
     end
+  rescue => e
+    Chef::Log.error(e)
+    return false
   end
 end
