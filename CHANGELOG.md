@@ -1,11 +1,15 @@
 Tomcat Cookbook Changelog
 =========
 
+1.0.3
+-----
+- [isuftin@usgs.gov] - Updated method for delayed check for a running Tomcat 
+
 1.0.2
 -----
 - [isuftin@usgs.gov] - Created a new function (Helper::TomcatInstance.ready?) to
 allow testing whether or not Tomcat is accepting connections. This is used internally
-to verify if it is safe yet to begin deploying/undeploying applications. 
+to verify if it is safe yet to begin deploying/undeploying applications.
 
 1.0.1
 -----
