@@ -35,19 +35,13 @@ module Helper
       port = ports(node, instance_name)[0]
 
       check_count = 0
-      Chef::Log.info "Checking if Tomcat server is ready"
+      Chef::Log.info 'Checking if Tomcat server is ready'
       begin
         Timeout.timeout(1) do
-          # begin
-            sleep 1
-            s = TCPSocket.new('127.0.0.1', port)
-            s.close
-            return true
-          # rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-          #   check_count += 1
-          #   Chef::Log.info "Tomcat server not yet ready. Check #{check_count} of #{max_attempts}"
-          #   retry if check_count < max_attempts
-          # end
+          sleep 1
+          s = TCPSocket.new('127.0.0.1', port)
+          s.close
+          return true
         end
       rescue Timeout::Error, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
         check_count += 1
