@@ -1,21 +1,21 @@
 require "spec_helper"
 
 describe "wsi_tomcat::create_tomcat_instances" do
-  let(:chef_run) do
+  let(:chef_run) do |_runner|
     ChefSpec::ServerRunner.new do |node, server|
       server.create_data_bag('test', {
 
-                               'id' => 'credentials',
-                               'default' => {
-                                 'tomcat_admin_pass' => 'tomcat-admin',
-                                 'tomcat_script_pass' => 'tomcat-script-admin',
-                                 'tomcat_jmx_pass' => 'tomcat-jmx'
-                               },
-                               'test' => {
-                                 'tomcat_admin_pass' => 'tomcat-admin',
-                                 'tomcat_script_pass' => 'tomcat-script-admin',
-                                 'tomcat_jmx_pass' => 'tomcat-jmx'
-                               }
+         'id' => 'credentials',
+         'default' => {
+           'tomcat_admin_pass' => 'tomcat-admin',
+           'tomcat_script_pass' => 'tomcat-script-admin',
+           'tomcat_jmx_pass' => 'tomcat-jmx'
+         },
+         'test' => {
+           'tomcat_admin_pass' => 'tomcat-admin',
+           'tomcat_script_pass' => 'tomcat-script-admin',
+           'tomcat_jmx_pass' => 'tomcat-jmx'
+         }
 
       })
       node.default[:wsi_tomcat][:data_bag_config][:bag_name] = 'test'

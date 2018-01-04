@@ -3,7 +3,7 @@ require "spec_helper"
 cache_dir = '/tmp'
 
 describe "wsi_tomcat::commons_daemon" do
-  let (:chef_run) do |runner|
+  let (:chef_run) do |_runner|
     ChefSpec::SoloRunner.new(file_cache_path: cache_dir) do |runner|
       runner.node.default[:wsi_tomcat][:user][:home_dir] = "/opt/tomcat"
       runner.node.default[:java][:java_home] = "/usr/lib/jvm/java"

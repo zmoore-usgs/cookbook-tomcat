@@ -9,22 +9,15 @@ driver:
 
 provisioner:
   name: chef_zero
+  # require_chef_omnibus: "12.21.20"
 
 verifier:
   name: inspec
   format: documentation
 
 platforms:
-  - name: centos-7.1-vbox
-    driver:
-      box: bento/centos-7.1
-      box_url: bento/centos-7.1
-      provider: virtualbox
-  - name: centos-6.8-vbox
-    driver:
-      box: bento/centos-6.8
-      box_url: bento/centos-6.8
-      provider: virtualbox
+  - name: centos-6.9
+  - name: centos-7.4
 
 suites:
   - name: default
