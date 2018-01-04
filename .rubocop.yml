@@ -10,6 +10,7 @@ AllCops:
     - vendor/**/*
     - test/**/*
     - spec/**/*
+    - attributes/**/*
 
 # TODO: Whittle down the exceptions over time
 RescueStandardError:
