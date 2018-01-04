@@ -22,11 +22,10 @@ end
 action :remove do
   if @current_resource.exists
     converge_by("Remove #{@new_resource}") do
-      new_resource.updated_by_last_action(remove_tomcat_instance?(current_resource.name))
+      remove_tomcat_instance?(current_resource.name)
     end
   else
     Chef::Log.info "Tomcat instance #{@new_resource} does not exist - nothing to do."
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -34,19 +33,16 @@ action :start do
   if @current_resource.exists
     if started?(current_resource.name)
       Chef::Log.info "Tomcat instance #{@new_resource} already started - nothing to do."
-      new_resource.updated_by_last_action(false)
     else
       converge_by("Start #{@new_resource}") do
         cmd_str = "/sbin/service tomcat start #{current_resource.name}"
         execute cmd_str do
           user 'root'
         end
-        new_resource.updated_by_last_action(true)
       end
     end
   else
     Chef::Log.info "Tomcat instance #{@new_resource} does not exist."
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -58,15 +54,12 @@ action :stop do
         execute cmd_str do
           user 'root'
         end
-        new_resource.updated_by_last_action(true)
       end
     else
       Chef::Log.info "Tomcat instance #{@new_resource} already started - nothing to do."
-      new_resource.updated_by_last_action(false)
     end
   else
     Chef::Log.info "Tomcat instance #{@new_resource} does not exist."
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -77,11 +70,9 @@ action :restart do
       execute cmd_str do
         user 'root'
       end
-      new_resource.updated_by_last_action(true)
     end
   else
     Chef::Log.info "Tomcat instance #{@new_resource} does not exist."
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -477,5 +468,4 @@ def create_tomcat_instance
     group 'root'
     only_if { auto_start }
   end
-  new_resource.updated_by_last_action(true)
 end
