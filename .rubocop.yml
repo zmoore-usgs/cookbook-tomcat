@@ -14,8 +14,6 @@ AllCops:
 # TODO: Whittle down the exceptions over time
 RescueStandardError:
   Enabled: false
-RescueWithoutErrorClass:
-  Enabled: false
 LineLength:
   Enabled: false
 MethodLength:
