@@ -12,6 +12,8 @@ AllCops:
     - spec/**/*
 
 # TODO: Whittle down the exceptions over time
+RescueWithoutErrorClass:
+  Enabled: false
 LineLength:
   Enabled: false
 MethodLength:
@@ -28,3 +30,5 @@ PerceivedComplexity:
   Enabled: false
 Metrics/ParameterLists:
   Max: 7
+HeredocDelimiterNaming:
+  Enabled: false

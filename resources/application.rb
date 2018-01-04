@@ -60,7 +60,7 @@ property  :deployed_apps,
           Array
 property  :type,
           String,
-          equal_to: %w(war xml dir),
+          equal_to: %w[war xml dir],
           desired_state: false,
           default: 'war'
 

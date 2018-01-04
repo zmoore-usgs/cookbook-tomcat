@@ -86,7 +86,8 @@ action :restart do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource.name)
+  @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource
+.name)
   @current_resource.name(@new_resource.name)
   @current_resource.service_definitions(@new_resource.service_definitions)
   @current_resource.cors(@new_resource.cors)
@@ -305,7 +306,7 @@ def create_tomcat_instance
     'enabled'          => true,
     'allowed'          => {
       'origins'        => '*',
-      'methods'        => %w(GET POST HEAD OPTIONS),
+      'methods'        => %w[GET POST HEAD OPTIONS],
       'headers'        => [
         'Origin',
         'Accept',
@@ -321,7 +322,7 @@ def create_tomcat_instance
     'filter' => '/*'
   }
 
-  instance_conf_files = %w(
+  instance_conf_files = %w[
     catalina.policy
     catalina.properties
     logging.properties
@@ -330,7 +331,7 @@ def create_tomcat_instance
     server.xml
     tomcat-users.xml
     web.xml
-  )
+  ]
 
   server_opts.push("-Djavax.net.ssl.trustStore=#{tomcat_home}/ssl/truststore")
   server_opts.push("-Djavax.net.ssl.trustStorePassword=#{keystore_password}")
@@ -357,7 +358,7 @@ def create_tomcat_instance
   end
 
   # Create the required directories in the instance directory
-  %w(bin conf lib logs temp webapps work).each do |dir|
+  %w[bin conf lib logs temp webapps work].each do |dir|
     Chef::Log.info "Creating Instance subdirectory #{dir}"
     directory ::File.expand_path(dir, instance_home) do
       owner tomcat_user
@@ -390,7 +391,7 @@ def create_tomcat_instance
     end
   end
 
-  %w(start stop).each do |bin_file|
+  %w[start stop].each do |bin_file|
     Chef::Log.info "Templating bin file #{bin_file}"
     template "#{tomcat_bin_path}/#{bin_file}_#{name}" do
       source "instances/bin/#{bin_file}.erb"
