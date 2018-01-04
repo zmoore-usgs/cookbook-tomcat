@@ -18,7 +18,7 @@ lib_sources.each do |libs|
     group tomcat_group
     backup false
     action :create
-    notifies :create, 'ruby_block[restart_instances]', :immediate
+    notifies :run, 'ruby_block[restart_instances]', :immediate
   end
 
   # A new lib was downloaded. Due to this, the Tomcat instances should be restarted

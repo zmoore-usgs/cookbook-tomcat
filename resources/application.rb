@@ -6,16 +6,6 @@ property  :version,
           [String, NilClass],
           default: '',
           desired_state: false
-property  :name,
-          String,
-          required: true,
-          name_property: true,
-          desired_state: false,
-          callbacks: {
-            'Name may not be empty' => lambda do |v|
-              !v.to_s.strip.empty?
-            end
-          }
 property  :location,
           String,
           desired_state: false,
