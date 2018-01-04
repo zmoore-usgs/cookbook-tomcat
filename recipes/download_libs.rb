@@ -17,6 +17,19 @@ lib_sources.each do |libs|
     owner tomcat_user
     group tomcat_group
     backup false
-    :create
+    action :create
+    notifies :create, 'ruby_block[restart_instances]', :immediate
+  end
+
+  # A new lib was downloaded. Due to this, the Tomcat instances should be restarted
+  # so they can pick it up via classloader
+  ruby_block 'restart_instances' do
+    block do
+      node['wsi_tomcat']['instances'].each do |instance, _attributes|
+        t_i = Chef::Resource::WsiTomcatInstance.new(instance, run_context)
+        t_i.run_action(:restart)
+      end
+    end
+    action :nothing
   end
 end

@@ -1,6 +1,11 @@
 Tomcat Cookbook Changelog
 =========
 
+1.0.4
+-----
+- [isuftin@usgs.gov] - If there are new libs downloaded, Tomcat will restart immediately
+- [isuftin@usgs.gov] - If the context.xml gets updates, Tomcat will restart immediately
+
 1.0.3
 -----
 - [isuftin@usgs.gov] - Updated method for delayed check for a running Tomcat 
