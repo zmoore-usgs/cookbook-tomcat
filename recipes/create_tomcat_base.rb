@@ -19,7 +19,7 @@ bin_dir              = File.expand_path('bin', tomcat_home)
 juli_jar_name        = 'tomcat-juli.jar'
 tomcat_init_script   = 'tomcat-initscript.sh'
 
-create_home_dirs = %w(
+create_home_dirs = %w[
   instance
   heapdumps
   data
@@ -28,22 +28,22 @@ create_home_dirs = %w(
   ssl
   ssltmp
   archives
-)
+]
 
-delete_home_dirs = %w(
+delete_home_dirs = %w[
   temp
   work
   webapps
-)
+]
 
-delete_home_files = %w(
+delete_home_files = %w[
   LICENSE
   NOTICE
   RELEASE-NOTES
   RUNNING.txt
-)
+]
 
-delete_bin_files = %w(
+delete_bin_files = %w[
   shutdown.bat
   version.bat
   digest.bat
@@ -52,7 +52,7 @@ delete_bin_files = %w(
   catalina.bat
   setclasspath.bat
   configtest.bat
-)
+]
 
 create_home_dirs.each do |dir|
   directory File.expand_path(dir, tomcat_home) do

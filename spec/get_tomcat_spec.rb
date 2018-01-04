@@ -1,7 +1,7 @@
 require "spec_helper"
 tc_version = '8.0.41'
 describe "wsi_tomcat::get_tomcat" do
-   let (:chef_run) do |runner|
+   let (:chef_run) do |_runner|
      ChefSpec::SoloRunner.new do |runner|
        runner.node.default[:wsi_tomcat][:version] = tc_version
        runner.node.default[:wsi_tomcat][:group][:name] = 'tomcat'

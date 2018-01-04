@@ -6,16 +6,6 @@ property  :version,
           [String, NilClass],
           default: '',
           desired_state: false
-property  :name,
-          String,
-          required: true,
-          name_property: true,
-          desired_state: false,
-          callbacks: {
-            'Name may not be empty' => lambda do |v|
-              !v.to_s.strip.empty?
-            end
-          }
 property  :location,
           String,
           desired_state: false,
@@ -60,7 +50,7 @@ property  :deployed_apps,
           Array
 property  :type,
           String,
-          equal_to: %w(war xml dir),
+          equal_to: %w[war xml dir],
           desired_state: false,
           default: 'war'
 

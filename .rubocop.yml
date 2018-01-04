@@ -10,8 +10,11 @@ AllCops:
     - vendor/**/*
     - test/**/*
     - spec/**/*
+    - attributes/**/*
 
 # TODO: Whittle down the exceptions over time
+RescueStandardError:
+  Enabled: false
 LineLength:
   Enabled: false
 MethodLength:
@@ -28,3 +31,5 @@ PerceivedComplexity:
   Enabled: false
 Metrics/ParameterLists:
   Max: 7
+HeredocDelimiterNaming:
+  Enabled: false

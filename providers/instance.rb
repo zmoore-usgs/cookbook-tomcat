@@ -22,11 +22,10 @@ end
 action :remove do
   if @current_resource.exists
     converge_by("Remove #{@new_resource}") do
-      new_resource.updated_by_last_action(remove_tomcat_instance?(current_resource.name))
+      remove_tomcat_instance?(current_resource.name)
     end
   else
     Chef::Log.info "Tomcat instance #{@new_resource} does not exist - nothing to do."
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -34,19 +33,16 @@ action :start do
   if @current_resource.exists
     if started?(current_resource.name)
       Chef::Log.info "Tomcat instance #{@new_resource} already started - nothing to do."
-      new_resource.updated_by_last_action(false)
     else
       converge_by("Start #{@new_resource}") do
         cmd_str = "/sbin/service tomcat start #{current_resource.name}"
         execute cmd_str do
           user 'root'
         end
-        new_resource.updated_by_last_action(true)
       end
     end
   else
     Chef::Log.info "Tomcat instance #{@new_resource} does not exist."
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -58,15 +54,12 @@ action :stop do
         execute cmd_str do
           user 'root'
         end
-        new_resource.updated_by_last_action(true)
       end
     else
       Chef::Log.info "Tomcat instance #{@new_resource} already started - nothing to do."
-      new_resource.updated_by_last_action(false)
     end
   else
     Chef::Log.info "Tomcat instance #{@new_resource} does not exist."
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -77,16 +70,15 @@ action :restart do
       execute cmd_str do
         user 'root'
       end
-      new_resource.updated_by_last_action(true)
     end
   else
     Chef::Log.info "Tomcat instance #{@new_resource} does not exist."
-    new_resource.updated_by_last_action(false)
   end
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource.name)
+  @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource
+.name)
   @current_resource.name(@new_resource.name)
   @current_resource.service_definitions(@new_resource.service_definitions)
   @current_resource.cors(@new_resource.cors)
@@ -305,7 +297,7 @@ def create_tomcat_instance
     'enabled'          => true,
     'allowed'          => {
       'origins'        => '*',
-      'methods'        => %w(GET POST HEAD OPTIONS),
+      'methods'        => %w[GET POST HEAD OPTIONS],
       'headers'        => [
         'Origin',
         'Accept',
@@ -321,7 +313,7 @@ def create_tomcat_instance
     'filter' => '/*'
   }
 
-  instance_conf_files = %w(
+  instance_conf_files = %w[
     catalina.policy
     catalina.properties
     logging.properties
@@ -330,7 +322,7 @@ def create_tomcat_instance
     server.xml
     tomcat-users.xml
     web.xml
-  )
+  ]
 
   server_opts.push("-Djavax.net.ssl.trustStore=#{tomcat_home}/ssl/truststore")
   server_opts.push("-Djavax.net.ssl.trustStorePassword=#{keystore_password}")
@@ -357,7 +349,7 @@ def create_tomcat_instance
   end
 
   # Create the required directories in the instance directory
-  %w(bin conf lib logs temp webapps work).each do |dir|
+  %w[bin conf lib logs temp webapps work].each do |dir|
     Chef::Log.info "Creating Instance subdirectory #{dir}"
     directory ::File.expand_path(dir, instance_home) do
       owner tomcat_user
@@ -390,7 +382,7 @@ def create_tomcat_instance
     end
   end
 
-  %w(start stop).each do |bin_file|
+  %w[start stop].each do |bin_file|
     Chef::Log.info "Templating bin file #{bin_file}"
     template "#{tomcat_bin_path}/#{bin_file}_#{name}" do
       source "instances/bin/#{bin_file}.erb"
@@ -476,5 +468,4 @@ def create_tomcat_instance
     group 'root'
     only_if { auto_start }
   end
-  new_resource.updated_by_last_action(true)
 end

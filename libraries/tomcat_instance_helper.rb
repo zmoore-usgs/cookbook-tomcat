@@ -22,7 +22,11 @@ module Helper
       data_bag_name = instance['context']['encrypted_environments_data_bag']['data_bag_name']
       data_bag_item = instance['context']['encrypted_environments_data_bag']['data_bag_item']
 
-      Chef::EncryptedDataBagItem.load(
+      # I am ignoring FoodCritic F086 here because the Chef resource data_bag_item
+      # is not available at this module level
+      # http://www.foodcritic.io/#FC086
+      # TODO : Figure out how to get data_bag_item available at this level
+      Chef::EncryptedDataBagItem.load( # ~FC086
         data_bag_name,
         data_bag_item
       )[instance_name]['tomcat_script_pass']
