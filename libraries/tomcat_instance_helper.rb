@@ -10,7 +10,7 @@ module Helper
       ports = []
       defs = instance['service_definitions']
       defs.each do |x|
-        ports.push(x['connector']['port']) unless !x.connector || !x.connector.port
+        ports.push(x['connector']['port']) unless !x['connector'] || !x['connector']['port']
       end
       ports
     end

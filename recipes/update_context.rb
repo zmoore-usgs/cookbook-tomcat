@@ -75,6 +75,12 @@ instances.each do |instance, attributes|
     end
   end
 
+  # Restart if context changed
+  wsi_tomcat_instance 'restart' do
+    name instance
+    action :nothing
+  end
+
   template conf_path do
     owner tomcat_user
     group tomcat_group
@@ -90,11 +96,5 @@ instances.each do |instance, attributes|
       environments: e.flatten
     )
     notifies :restart, 'wsi_tomcat_instance[restart]', :immediate
-  end
-
-  # Restart if context changed
-  wsi_tomcat_instance 'restart' do
-    name instance
-    action :nothing
   end
 end
