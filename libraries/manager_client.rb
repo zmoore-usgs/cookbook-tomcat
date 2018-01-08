@@ -116,7 +116,7 @@ module Helper
         response = f.read
         status = response.split(' ')[0]
         raise response unless status == 'OK'
-        Chef::Log.info "Deplopyed new application to #{application_path}"
+        Chef::Log.info "Deployed new application to #{application_path}"
         return response
       end
     rescue => e

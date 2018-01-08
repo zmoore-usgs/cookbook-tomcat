@@ -90,11 +90,11 @@ action :deploy do
   end
 
   if application_deployed?
-    Chef::Log.info "Application #{full_name} already deployed"
+    Chef::Log.info "Application #{name} already deployed"
     return true
   end
 
-  Chef::Log.info("Deploying #{full_name} at #{path} from #{location}")
+  Chef::Log.info("Deploying #{name} at #{path} from #{location}")
 
   artifact_directory = ::File.join(node['wsi_tomcat']['user']['home_dir'], 'instance', instance_name, 'artifacts')
   artifact_filename = "#{name}#{'_' + version unless version.to_s.strip.empty?}.#{type}"
