@@ -7,7 +7,7 @@ end
 # Used to interact with Tomcat Manager via REST API
 require 'open-uri'
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
