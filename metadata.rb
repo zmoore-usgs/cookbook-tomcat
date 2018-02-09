@@ -5,7 +5,7 @@ license          'CPL-1.0'
 description      'Installs and configures the Apache Tomcat servlet container '
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 
-version          '1.0.4'
+version          '1.0.5'
 supports         'centos', '>= 6.5'
 chef_version     '>= 12.0.0'
 depends 'java'
