@@ -89,16 +89,17 @@ action :deploy do
     Chef::Application.fatal!('tomcat_application resource deploy action requires a type')
   end
 
-  if application_deployed?
-    Chef::Log.info "Application #{full_name} already deployed"
+  artifact_directory = ::File.join(node['wsi_tomcat']['user']['home_dir'], 'instance', instance_name, 'artifacts')
+  artifact_filename = "#{name}#{'_' + version unless version.to_s.strip.empty?}.#{type}"
+  artifact_destination = ::File.join(artifact_directory, artifact_filename)
+
+  if ::File.exist?(artifact_destination)
+    Chef::Log.info "Application #{name} already deployed"
     return true
   end
 
   Chef::Log.info("Deploying #{full_name} at #{path} from #{location}")
 
-  artifact_directory = ::File.join(node['wsi_tomcat']['user']['home_dir'], 'instance', instance_name, 'artifacts')
-  artifact_filename = "#{name}#{'_' + version unless version.to_s.strip.empty?}.#{type}"
-  artifact_destination = ::File.join(artifact_directory, artifact_filename)
   tomcat_user = node['wsi_tomcat']['user']['name']
   tomcat_group = node['wsi_tomcat']['user']['group']
 
@@ -114,10 +115,16 @@ action :deploy do
     backup false
   end
 
-  ruby_block "Deploy #{name}" do
-    block do
-      Helper::ManagerClient.deploy_application(instance_port, instance_script_pass, version, artifact_destination, path, tag)
-    end
+  webapps_directory = ::File.join(node['wsi_tomcat']['user']['home_dir'], 'instance', instance_name, 'webapps')
+  webapps_filename = "#{name}.#{type}"
+  webapps_destination = ::File.join(webapps_directory, webapps_filename)
+
+  bash 'copy_war_file' do
+    cwd artifact_directory
+    user tomcat_user
+    code <<-EOF
+	  cp #{artifact_filename} #{webapps_destination}
+	EOF
   end
 end
 

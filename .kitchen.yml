@@ -53,9 +53,10 @@ suites:
             },
             "application" : {
               "probe" : {
-                "location" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.RC1/probe.war",
+                "location" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.RC2/probe.war",
                 "path" : "/probe",
-                "type" : "war"
+                "type" : "war",
+                "version" : "3.0.0.RC2"
               }
             },
             "user" : {

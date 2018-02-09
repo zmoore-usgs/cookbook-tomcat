@@ -50,9 +50,8 @@ node['wsi_tomcat']['instances'].each do |instance, attributes|
       begin
         port = Helper::TomcatInstance.ports(node, instance)[0]
         deployed_apps = Helper::ManagerClient.get_deployed_applications(port, tomcat_script_pass)
-        deployed_apps.each do |_path, _state, _session_count, name|
+        deployed_apps.each do |path, _state, _session_count, name|
           version = name.split('#').length > 1 ? name.split('#')[-1] : ''
-          name = name.split('#').length > 1 ? name.split('#')[1] : name
           # Don't delete the manager app
           next unless name != 'manager'
           next if attributes.application.keys.include?(name)
@@ -65,7 +64,7 @@ node['wsi_tomcat']['instances'].each do |instance, attributes|
           app.name name
           app.instance_name instance
           app.version version
-          app.path oath
+          app.path path
           app.run_action(:undeploy)
         end
       rescue => e
