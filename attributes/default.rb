@@ -129,7 +129,27 @@ default['wsi_tomcat']['instances']['default']['service_definitions'] = [{
       'country' => 'US'
     }
   },
-  'engine' => { 'host' => ['name' => 'localhost'] }
+  'engine' => {
+    'host' => [
+      {
+        'name' => 'localhost',
+        # http://tomcat.apache.org/tomcat-8.0-doc/config/valve.html#Access_Logging
+        'access_log' => {
+          'directory' => 'logs',
+          'prefix' => 'access_log',
+          'suffix' => 'txt',
+          'file_date_format' => '.yyyy-MM-dd.',
+          'rotatable' => true,
+          'rename_on_rotate' => false,
+          'pattern' => 'common',
+          'encoding' => '',
+          'locale' => 'en_US',
+          'request_attributes_enabled' => false,
+          'bufferes' => false,
+          'max_log_message_buffer_size' => '256'
+        }
+      }
+    ] }
 }]
 
 # You can add as many applications as needed by using the following...

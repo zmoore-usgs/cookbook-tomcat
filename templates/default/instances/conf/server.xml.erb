@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<!-- 
-    !!!!!!! This file created by Chef !!!!!!! 
+<!--
+    !!!!!!! This file created by Chef !!!!!!!
     Any edits to this file will be overwritten
 -->
 
@@ -33,12 +33,12 @@
   -->
   <!--APR library loader. Documentation at /docs/apr.html -->
   <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
-  
+
   <% if @version.tr(',','').to_i  <= 7 %>
   <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html -->
   <Listener className="org.apache.catalina.core.JasperListener" />
   <% end %>
-  
+
   <!-- Prevent memory leaks due to use of particular java/javax APIs-->
   <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
@@ -58,7 +58,7 @@
               pathname="conf/tomcat-users.xml" />
   </GlobalNamingResources>
 
-    
+
     <% @service_definitions.each do |d| %>
         <!-- A "Service" is a collection of one or more "Connectors" that share
              a single "Container" Note:  A "Service" is not itself a "Container",
@@ -66,17 +66,17 @@
              Documentation at /docs/config/service.html
          -->
         <Service name="<%= d.name %>">
-            
+
             <!-- http://tomcat.apache.org/tomcat-7.0-doc/config/executor.html -->
             <Executor
                 name="<%= d.name %>ThreadPool"
-                namePrefix="<%= d.name %>-exec-" 
+                namePrefix="<%= d.name %>-exec-"
                 maxThreads="<%= d.thread_pool.max_threads %>"
-                daemon="<%= d.thread_pool.daemon %>" 
+                daemon="<%= d.thread_pool.daemon %>"
                 minSpareThreads="<%= d.thread_pool.min_spare_threads %>"
                 maxIdleTime="<%= d.thread_pool.max_idle_time %>"
             />
-           
+
             <!-- A "Connector" represents an endpoint by which requests are received
                  and responses are returned. Documentation at :
                  Java HTTP Connector: /docs/config/http.html (blocking & non-blocking)
@@ -143,12 +143,12 @@
                 useIPVHosts="<%= d.connector.key?("use_ipv_hosts") ? d.connector.use_ipv_hosts : false %>"
                 xpoweredBy="<%= d.connector.key?("x_powered_by") ? d.connector.x_powered_by : false %>"
             />
-            
+
             <% if d.ssl_connector.enabled == true %>
               <Connector
                   port="<%= d.connector.port + 363 %>"
                   secure="<%= d.ssl_connector.key?("secure") ? d.ssl_connector.secure : "true" %>"
-                  keystoreFile="${catalina.home}/ssl/<%= d.name%>.jks" 
+                  keystoreFile="${catalina.home}/ssl/<%= d.name%>.jks"
                   keystorePass="<%= @keystore_password %>"
                   <% if d.ssl_connector.key?("ssl_protocol") %>
                   SSLProtocol="<%= d.ssl_connector.ssl_protocol %>"
@@ -217,7 +217,7 @@
               <% end %>
               />
             <% end  %>
-            
+
             <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/ajp.html -->
             <Connector
                 port="<%= d.connector.port - 71 %>"
@@ -231,23 +231,23 @@
                 pollerSize="8192"
                 tomcatAuthentication="true"
             />
-            
+
             <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/engine.html -->
-            <Engine name="<%= d.engine.key?("name") ? d.engine.name : d.name %>" 
-                defaultHost="<%= d.engine.key?("default_host") ? d.engine.default_host : 'localhost' %>" 
+            <Engine name="<%= d.engine.key?("name") ? d.engine.name : d.name %>"
+                defaultHost="<%= d.engine.key?("default_host") ? d.engine.default_host : 'localhost' %>"
                 jvmRoute="<%= d.engine.key?("jvm_route") ? d.engine.jvm_route : 'default' %>"
                 startStopThreads="<%= d.engine.key?("start_stop_threads") ? d.engine.start_stop_threads : 1 %>"
                 backgroundProcessorDelay="<%= d.engine.key?("background_processor_delay") ? d.engine.background_processor_delay : 10 %>"
                 >
-                
+
                 <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/realm.html -->
                 <Realm className="org.apache.catalina.realm.LockOutRealm">
                 <Realm className="org.apache.catalina.realm.UserDatabaseRealm" resourceName="UserDatabase"/>
                 </Realm>
-                
+
                 <% d.engine.host.each do |host| %>
                     <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/host.html -->
-                    <Host name="<%= host.key?("name") ? host.name : 'localhost' %>"  
+                    <Host name="<%= host.key?("name") ? host.name : 'localhost' %>"
                         appBase="<%= host.key?("app_base") ? host.app_base : 'webapps' %>"
                         xmlbase="<%= host.key?("xml_base") ? host.xml_base : 'conf' %>"
                         createDirs="<%= host.key?("create_dirs") ? host.create_dirs : true %>"
@@ -264,17 +264,35 @@
                         unpackWARs="<%= host.key?("unpack_wars") ? host.unpack_wars : true %>"
                         workDir="<%= host.key?("work_dir") ? host.work_dir : 'work' %>"
                         >
-                    
+
                         <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/valve.html -->
-                        <Valve className="org.apache.catalina.valves.AccessLogValve" 
-                            directory="logs"
-                            prefix="<%= host.key?("name") ? host.name : 'localhost' %>_access_log." 
-                            suffix=".txt"
-                            pattern="%h %l %u %t &quot;%r&quot; %s %b" 
-                            />
-                            <% unless @disable_manager %>
-                            <Context privileged="true" docBase="manager" path="/manager" reloadable="true"/>
-                            <% end %>
+                        <Valve className="org.apache.catalina.valves.AccessLogValve"
+                            directory="<%= host.key?("access_log") && host.access_log.key?("directory") ? host.access_log['directory'] : 'logs' %>"
+                            prefix="<%= host.key?("access_log") && host.access_log.key?("prefix") ? host.access_log['prefix'] : 'access_log' %>"
+                            suffix=".<%= host.key?("access_log") && host.access_log.key?("suffix") ? host.access_log['suffix'] : 'txt' %>"
+                            fileDateFormat="<%= host.key?("access_log") && host.access_log.key?("file_date_format") ? host.access_log['file_date_format'] : '.yyyy-MM-dd.' %>"
+                            rotatable="<%= host.key?("access_log") && host.access_log.key?("rotatable") ? host.access_log['rotatable'] : true %>"
+                            renameOnRotate="<%= host.key?("access_log") && host.access_log.key?("rename_on_rotate") ? host.access_log['rename_on_rotate'] : false %>"
+                            pattern="<%= host.key?("access_log") && host.access_log.key?("pattern") ? host.access_log['pattern'] : 'common' %>"
+                            encoding="<%= host.key?("access_log") && host.access_log.key?("encoding") ? host.access_log['encoding'] : '' %>"
+                            locale="<%= host.key?("access_log") && host.access_log.key?("locale") ? host.access_log['locale'] : 'en_US' %>"
+                            requestAttributesEnabled="<%= host.key?("access_log")  && host.access_log.key?("request_attributes_enabled") ? host.access_log['request_attributes_enabled'] : false %>"
+                            <% if host.key?("access_log") && host.access_log.key?("condition_if") %>
+                            conditionIf="<%= host.access_log['condition_if'] %>"
+                            <% end  %>
+                            <% if host.key?("access_log") && host.access_log.key?("condition_unless") %>
+                            conditionUnless="<%= host.access_log['condition_unless'] %>"
+                            <% end  %>
+                            <% if host.key?("access_log") && host.access_log.key?("condition") %>
+                            condition="<%= host.access_log['condition'] %>"
+                            <% end  %>
+                            buffered="<%= host.key?("access_log")  && host.access_log.key?("buffered") ? host.access_log['buffered'] : false %>"
+                            maxLogMessageBufferSize="<%= host.key?("access_log")  && host.access_log.key?("max_log_message_buffer_size") ? host.access_log['max_log_message_buffer_size'] : '256' %>"
+
+                          />
+                          <% unless @disable_manager %>
+                          <Context privileged="true" docBase="manager" path="/manager" reloadable="true"/>
+                          <% end %>
                     </Host>
                 <% end %>
             </Engine>
