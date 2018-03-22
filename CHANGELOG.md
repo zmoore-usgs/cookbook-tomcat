@@ -1,6 +1,18 @@
 Tomcat Cookbook Changelog
 =========
 
+Unreleased
+---
+- [isuftin@usgs.gov] - Removed minor OS version specifier from kitchen config
+
+1.0.5
+-----
+- [mamcderm@usgs.gov] - revert back to older style provisioner
+- [mamcderm@usgs.gov] - copy new war file to tomcat for auto deploy
+- [isutin@usgs.gov] - Update to metadata.rb to free up chef version
+- [isutin@usgs.gov] - Update to allow more defined tomcat logging
+- [isutin@usgs.gov] - Rubocop/rspec/etc fixes
+
 1.0.4
 -----
 - [isuftin@usgs.gov] - If there are new libs downloaded, Tomcat will restart immediately
@@ -8,7 +20,7 @@ Tomcat Cookbook Changelog
 
 1.0.3
 -----
-- [isuftin@usgs.gov] - Updated method for delayed check for a running Tomcat 
+- [isuftin@usgs.gov] - Updated method for delayed check for a running Tomcat
 
 1.0.2
 -----
