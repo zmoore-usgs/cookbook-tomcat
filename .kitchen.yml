@@ -16,8 +16,8 @@ verifier:
   format: documentation
 
 platforms:
-  - name: centos-6.9
-  - name: centos-7.4
+  - name: centos-6
+  - name: centos-7
 
 suites:
   - name: default
