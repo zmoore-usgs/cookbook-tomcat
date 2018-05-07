@@ -33,7 +33,7 @@ node['wsi_tomcat']['instances'].each do |name, attributes|
   cors = attributes.key?('cors') ? attributes['cors'] : { enabled: false }
   auto_start = attributes.key?('auto_start') ? attributes['auto_start'] : true
 
-  wsi_tomcat_instance name do
+  tomcat_instance name do
     service_definitions service_definitions
     server_opts server_opts
     setenv_opts setenv_opts

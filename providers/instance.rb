@@ -1,4 +1,5 @@
 # TODO: These methods are way too long and complicated. Run rubocop to get a feel.
+provides :tomcat_instance
 
 def whyrun_supported?
   true
@@ -77,8 +78,7 @@ action :restart do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::WsiTomcatInstance.new(@new_resource
-.name)
+  @current_resource = Chef::ResourceResolver.resolve(:tomcat_instance).new(@new_resource.name, run_context)
   @current_resource.name(@new_resource.name)
   @current_resource.service_definitions(@new_resource.service_definitions)
   @current_resource.cors(@new_resource.cors)
