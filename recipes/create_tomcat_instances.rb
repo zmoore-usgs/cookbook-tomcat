@@ -20,7 +20,7 @@ if node['wsi_tomcat']['deploy']['remove_unlisted_instances'] && File.directory?(
   instance_dirs.each do |inst_dir|
     next if instance_names.include? inst_dir
     # Found a possible Tomcat instance that is not listed in the config.
-    wsi_tomcat_instance inst_dir do
+    tomcat_instance inst_dir do
       action :remove
     end
   end

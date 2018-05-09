@@ -100,6 +100,16 @@ default['wsi_tomcat']['instances']['default']['context']['attributes']['allow_ca
 default['wsi_tomcat']['instances']['default']['context']['attributes']['background_processor_delay'] = '-1'
 default['wsi_tomcat']['instances']['default']['context']['attributes']['container_sci_filter'] = ''
 
+# The number of seconds to wait while checking to see if a Tomcat instance is ready after starting
+default['wsi_tomcat']['instances']['default']['ready_check_timeout'] = 60
+
+# Adds startup java opts to the Tomcat server
+# The default value here speeds up start times considerably
+# See https://wiki.apache.org/tomcat/HowTo/FasterStartUp
+default['wsi_tomcat']['instances']['default']['server_opts'] = [
+  "-Djava.security.egd=file:/dev/./urandom"
+]
+
 default['wsi_tomcat']['instances']['default']['service_definitions'] = [{
   'name' => 'Catalina',
   'thread_pool' => { 'max_threads' => 200, 'daemon' => 'true', 'min_spare_threads' => 25, 'max_idle_time' => 60_000 },

@@ -77,7 +77,6 @@ instances.each do |instance, attributes|
 
   # Restart if context changed
   tomcat_instance instance do
-    name instance
     action :nothing
   end
 

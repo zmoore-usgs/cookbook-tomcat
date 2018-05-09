@@ -6,6 +6,7 @@ property  :version,
           [String, NilClass],
           default: '',
           desired_state: false
+
 property  :location,
           String,
           desired_state: false,
@@ -14,6 +15,7 @@ property  :location,
               !v.to_s.strip.empty?
             end
           }
+
 property  :path,
           String,
           required: true,
@@ -23,9 +25,11 @@ property  :path,
               !v.to_s.strip.empty?
             end
           }
+
 property  :tag,
           String,
           desired_state: false
+
 property  :instance_name,
           String,
           required: true,
@@ -40,14 +44,19 @@ property  :instance_name,
               instances.key?(v)
             end
           }
+
 property  :instance_script_pass,
           String
+
 property  :instance_port,
           Integer
+
 property  :deployed,
           [TrueClass, FalseClass]
+
 property  :deployed_apps,
           Array
+
 property  :type,
           String,
           equal_to: %w[war xml dir],
@@ -56,14 +65,14 @@ property  :type,
 
 action_class do
   def full_name
-    full_name = name.dup
-    full_name << "###{version}" unless version.to_s.strip.empty?
+    full_name = new_resource.name.dup
+    full_name << "###{new_resource.version}" unless new_resource.version.to_s.strip.empty?
   end
 
   def application_deployed?
-    applications = Helper::ManagerClient.get_deployed_applications(instance_port, instance_script_pass).map { |y| y[3] }
-    full_name = name.dup
-    full_name << "###{version}" unless version.to_s.strip.empty?
+    applications = Helper::ManagerClient.get_deployed_applications(new_resource.instance_port, new_resource.instance_script_pass).map { |y| y[3] }
+    full_name = new_resource.name.dup
+    full_name << "###{new_resource.version}" unless version.to_s.strip.empty?
     applications.include?(full_name)
   end
 end
@@ -71,6 +80,13 @@ end
 load_current_value do
   instance_port Helper::TomcatInstance.ports(node, instance_name)[0]
   instance_script_pass Helper::TomcatInstance.script_pass(node, instance_name)
+
+  Chef::Log.info("Checking if Tomcat instance #{instance_name} is ready")
+  wait_time = node['wsi_tomcat']['instances']['default']['ready_check_timeout']
+  unless Helper::TomcatInstance.ready?(node, instance_name, wait_time)
+    raise "Tomcat instance #{instance_name} is not running"
+  end
+
   deployed_apps Helper::ManagerClient.get_deployed_applications(instance_port, instance_script_pass)
   full_name = name.dup
   full_name << "###{version}" unless version.to_s.strip.empty?
@@ -81,6 +97,18 @@ end
 # Deploys an application
 #
 action :deploy do
+  location = new_resource.location
+  type = new_resource.type
+  instance_name = new_resource.instance_name
+  name = new_resource.name
+  version = new_resource.version
+  path = new_resource.path
+
+  unless Helper::TomcatInstance.instance_exists?(node, instance_name)
+    Chef::Log.info "Tomcat instance #{instance_name} does not et exist"
+    return true
+  end
+
   if location.to_s.strip.empty?
     Chef::Application.fatal!('tomcat_application resource deploy action requires a location')
   end
@@ -131,13 +159,20 @@ end
 # Undeploys an application
 #
 action :undeploy do
+  instance_name = new_resource.instance_name
+  instance_port = new_resource.instance_port
+  instance_script_pass = new_resource.instance_script_pass
+  path = new_resource.path
+  version = new_resource.version
+
+  unless Helper::TomcatInstance.instance_exists?(node, instance_name)
+    Chef::Log.info "Tomcat instance #{instance_name} does not et exist"
+    return true
+  end
+
   if application_deployed?
-    ruby_block "Undeploy #{name}" do
-      block do
-        Chef::Log.info("Undeploying #{name}###{version} at #{path}")
-        Helper::ManagerClient.undeploy_application(instance_port, instance_script_pass, path, version)
-      end
-    end
+    Chef::Log.info("Undeploying #{name}###{version} at #{path}")
+    Helper::ManagerClient.undeploy_application(instance_port, instance_script_pass, path, version)
   else
     Chef::Log.info("Application #{name}###{version} at #{path} not deployed")
   end
