@@ -4,7 +4,18 @@ Tomcat Cookbook Changelog
 Unreleased
 ---
 - [isuftin@usgs.gov] - Removed minor OS version specifier from kitchen config
-
+- [isuftin@usgs.gov] - Added default server opt in attributes to allow for faster startup time
+- [isuftin@usgs.gov] - Removed ruby block processing from most recipes and helpers
+- [isuftin@usgs.gov] - Updated templates to not get key values using dot notation
+- [isuftin@usgs.gov] - Now working with latest current Chef client version (14.1.1)
+- [isuftin@usgs.gov] - Updated kitchen config to use latest PsiProbe app
+- [isuftin@usgs.gov] - Added the ability to dictate via attributes how long to wait
+for timeout when checking against a running Tomcat instance
+- [isuftin@usgs.gov] - Added functionality to the Tomcat instance helper to allow
+checking whether or not an instance is installed
+- [isuftin@usgs.gov] - Changed calls to wsi_tomcat_instance and WsiTomCatInstance
+to use tomcat_instance  
+- [isuftin@usgs.gov] - Removed usage of ruby_block from the deploy_application recipe
 1.0.5
 -----
 - [mamcderm@usgs.gov] - revert back to older style provisioner

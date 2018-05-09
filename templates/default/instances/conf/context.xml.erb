@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!--
     !!!!!!! This file created by Chef !!!!!!!
-    Any edits to this file will be overwritten 
+    Any edits to this file will be overwritten
 -->
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -20,7 +20,7 @@
   limitations under the License.
 -->
 <!-- The contents of this file will be loaded for each web application -->
-<Context 
+<Context
   antiResourceLocking="<%= @anti_resource_locking %>"
   allowCasualMultipartParsing="<%= @allow_casual_multipart_parsing %>"
   backgroundProcessorDelay="<%= @background_processor_delay %>"
@@ -29,11 +29,11 @@
     <!-- Default set of monitored resources. If one of these changes, the    -->
     <!-- web application will be reloaded.                                   -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
-    
+
     <% if @version.tr(',','').to_i  > 7 %>
       <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
     <% end %>
-  
+
     <!-- Uncomment this to disable session persistence across Tomcat restarts -->
     <Manager pathname="" />
 
@@ -44,11 +44,11 @@
     -->
     <% if defined?(@resources) %>
         <% @resources.each do |r| -%>
-            <Resource 
+            <Resource
              <% r.each_pair do |k,v| -%>
-             <%# 
+             <%#
                 Surround string elements with quotes. Otherwise
-                just output the value 
+                just output the value
               %>
              <%= k %>="<%= v %>"
              <% end -%>
@@ -56,19 +56,19 @@
         <% end -%>
 
     <% end %>
-    
+
     <% if defined?(@environments) %>
       <% @environments.each do |e| -%>
 
-          <Environment 
-              name="<%= e["name"] %>" 
-              type="<%= e["type"] %>" 
-              value="<%= e["value"] %>" 
-              description="<%= e["description"] %>" 
-              override="<%= e["override"] %>"
+          <Environment
+              name="<%= e['name'] %>"
+              type="<%= e['type'] %>"
+              value="<%= e['value'] %>"
+              description="<%= e['description'] %>"
+              override="<%= e['override'] %>"
               />
-               
+
       <% end -%>
     <% end %>
-    
+
 </Context>

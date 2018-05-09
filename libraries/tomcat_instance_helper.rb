@@ -4,6 +4,13 @@ require 'timeout'
 module Helper
   # Helper functions to get data out of Tomcat attribute definitions
   module TomcatInstance
+    def self.instance_exists?(node, instance_name = 'default')
+      tomcat_home = node['wsi_tomcat']['user']['home_dir']
+      instances_home = ::File.expand_path('instance', tomcat_home)
+      instance_home = ::File.expand_path(instance_name, instances_home)
+      ::File.exist?(instance_home) && ::File.directory?(instance_home)
+    end
+
     # Returns the ports defined for the instance
     def self.ports(node, instance_name = 'default')
       instance = node['wsi_tomcat']['instances'][instance_name]

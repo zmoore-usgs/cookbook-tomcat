@@ -20,7 +20,7 @@ if node['wsi_tomcat']['deploy']['remove_unlisted_instances'] && File.directory?(
   instance_dirs.each do |inst_dir|
     next if instance_names.include? inst_dir
     # Found a possible Tomcat instance that is not listed in the config.
-    wsi_tomcat_instance inst_dir do
+    tomcat_instance inst_dir do
       action :remove
     end
   end
@@ -33,7 +33,7 @@ node['wsi_tomcat']['instances'].each do |name, attributes|
   cors = attributes.key?('cors') ? attributes['cors'] : { enabled: false }
   auto_start = attributes.key?('auto_start') ? attributes['auto_start'] : true
 
-  wsi_tomcat_instance name do
+  tomcat_instance name do
     service_definitions service_definitions
     server_opts server_opts
     setenv_opts setenv_opts

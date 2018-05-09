@@ -9,7 +9,6 @@ driver:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: "12.21.20"
 
 verifier:
   name: inspec
@@ -53,10 +52,10 @@ suites:
             },
             "application" : {
               "probe" : {
-                "location" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.RC2/probe.war",
+                "location" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0/probe.war",
                 "path" : "/probe",
                 "type" : "war",
-                "version" : "3.0.0.RC2"
+                "version" : "3.0.0"
               }
             },
             "user" : {
