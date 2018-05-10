@@ -369,7 +369,7 @@ def create_tomcat_instance
       source "instances/conf/#{tpl}.erb"
       sensitive true
       variables(
-        version: node['wsi_tomcat']['version'].split('.')[0],
+        version: node['wsi_tomcat']['version'],
         disable_admin_users: node['wsi_tomcat']['instances'][name]['user']['disable_admin_users'],
         disable_manager: node['wsi_tomcat']['disable_manager'],
         tomcat_admin_pass: tomcat_admin_pass,

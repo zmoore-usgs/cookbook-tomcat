@@ -30,7 +30,7 @@
     <!-- web application will be reloaded.                                   -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
 
-    <% if @version.tr(',','').to_i  > 7 %>
+    <% if @version.split('.')[0].tr(',','').to_i  > 7 %>
       <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
     <% end %>
 
