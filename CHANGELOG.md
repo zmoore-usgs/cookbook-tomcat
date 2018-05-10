@@ -3,6 +3,9 @@ Tomcat Cookbook Changelog
 
 Unreleased
 ---
+- [isuftin@usgs.gov] - Added "LOGGING MANAGER" option to startup script
+- [isuftin@usgs.gov] - Added "org.apache.catalina.security.SecurityListener.UMASK"
+switch to Tomcat startup script
 - [isuftin@usgs.gov] - Removed minor OS version specifier from kitchen config
 - [isuftin@usgs.gov] - Added default server opt in attributes to allow for faster startup time
 - [isuftin@usgs.gov] - Removed ruby block processing from most recipes and helpers
@@ -16,6 +19,10 @@ checking whether or not an instance is installed
 - [isuftin@usgs.gov] - Changed calls to wsi_tomcat_instance and WsiTomCatInstance
 to use tomcat_instance  
 - [isuftin@usgs.gov] - Removed usage of ruby_block from the deploy_application recipe
+- [isuftin@usgs.gov] - Fixed the ruby_block in the download_libs recipe to be
+compatible with newer versions of chef client
+- [isuftin@usgs.gov] - Removed the usage of the name attribute in resource calls
+
 1.0.5
 -----
 - [mamcderm@usgs.gov] - revert back to older style provisioner
