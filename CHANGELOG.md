@@ -3,6 +3,8 @@ Tomcat Cookbook Changelog
 
 Unreleased
 ---
+- [isuftin@usgs.gov] - Updated logging.properties to meet 8.0.x installation. No
+changes currently needed to work with 8.5.x as changes in 8.5.x are commented out.
 - [isuftin@usgs.gov] - For Tomcat 8.0.x, activated CometConnectionManagerValve in
 context.xml. For Tomcat 8.5.x, removed CometConnectionManagerValve entirely
 - [isuftin@usgs.gov] - Updated catalina.properties template to conform to Tomcat 8.0.x
