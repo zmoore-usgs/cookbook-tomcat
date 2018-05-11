@@ -3,6 +3,10 @@ Tomcat Cookbook Changelog
 
 Unreleased
 ---
+- [isuftin@usgs.gov] - Updated catalina.properties template to conform to Tomcat 8.0.x
+and update to 8.5.x properties
+- [isuftin@usgs.gov] - Updated Catalina.policy template to remove comet and
+introduce websockets - http://tomcat.apache.org/migration-85.html#Comet_support_removed
 - [isuftin@usgs.gov] - Added "LOGGING MANAGER" option to startup script
 - [isuftin@usgs.gov] - Added "org.apache.catalina.security.SecurityListener.UMASK"
 switch to Tomcat startup script
