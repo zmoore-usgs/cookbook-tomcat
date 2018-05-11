@@ -20,3 +20,4 @@ bin/*
 
 doc/*
 .yardoc/*
+test/files
