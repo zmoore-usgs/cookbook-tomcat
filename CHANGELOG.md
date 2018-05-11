@@ -3,6 +3,7 @@ Tomcat Cookbook Changelog
 
 Unreleased
 ---
+- [isuftin@usgs.gov] - Fix version passing into update_context recipe
 - [isuftin@usgs.gov] - Updated mime types in web.xml
 - [isuftin@usgs.gov] - tomcat-users template xml header update
 - [isuftin@usgs.gov] - Changed server.xml SSL protocol and APR ssl protocol to default

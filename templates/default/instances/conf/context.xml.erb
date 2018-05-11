@@ -43,6 +43,7 @@
     <Manager pathname="" />
 
     <% if @version.tr('.','')[0..1].to_i < 85  -%>
+    <!-- <%= @version %> -->
     <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
     <% end -%>
 
