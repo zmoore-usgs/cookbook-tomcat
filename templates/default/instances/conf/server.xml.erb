@@ -30,7 +30,7 @@
      Documentation at /docs/config/server.html
  -->
 <Server port="-1" shutdown="SHUTDOWN">
-  <% if @version.split('.')[0].tr(',','').to_i  > 7 %>
+  <% if@version.tr(',','')[0].to_i  > 7 %>
   <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
   <% end %>
   <!-- Security listener. Documentation at /docs/config/listeners.html
@@ -39,7 +39,7 @@
   <!--APR library loader. Documentation at /docs/apr.html -->
   <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
 
-  <% if @version.split('.')[0].tr(',','').to_i  <= 7 %>
+  <% if @version.tr(',','')[0].to_i  <= 7 %>
   <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html -->
   <Listener className="org.apache.catalina.core.JasperListener" />
   <% end %>
