@@ -3,6 +3,9 @@ Tomcat Cookbook Changelog
 
 Unreleased
 ---
+- [isuftin@usgs.gov] - Changed server.xml SSL protocol and APR ssl protocol to default
+to org.apache.coyote.http11.Http11Nio2Protocol and org.apache.coyote.http11.Http11AprProtocol
+respectively
 - [isuftin@usgs.gov] - Updated logging.properties to meet 8.0.x installation. No
 changes currently needed to work with 8.5.x as changes in 8.5.x are commented out.
 - [isuftin@usgs.gov] - For Tomcat 8.0.x, activated CometConnectionManagerValve in

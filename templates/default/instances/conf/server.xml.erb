@@ -1,4 +1,9 @@
+<% if @version.tr('.','')[0..1].to_i == 85  -%>
+<?xml version='1.0' encoding='UTF-8'?>
+<% end -%>
+<% if @version.tr('.','')[0..1].to_i < 85  -%>
 <?xml version='1.0' encoding='utf-8'?>
+<% end -%>
 <!--
     !!!!!!! This file created by Chef !!!!!!!
     Any edits to this file will be overwritten
@@ -149,7 +154,7 @@
                 xpoweredBy="<%= connector.key?('x_powered_by') ? connector['x_powered_by'] : false %>"
             />
 
-            <% if ssl_connector['enabled'] == true %>
+            <% if ssl_connector['enabled'] == true -%>
               <Connector
                   port="<%= connector['port'] + 363 %>"
                   secure="<%= ssl_connector.key?('secure') ? ssl_connector['secure'] : "true" %>"
@@ -158,12 +163,15 @@
                   <% if ssl_connector.key?('ssl_protocol') %>
                   SSLProtocol="<%= ssl_connector['ssl_protocol'] %>"
                   <% end  %>
+              <%# TODO Add TLS VirtualHosting for Tomcat 8.5.x %>
+              <%# http://tomcat.apache.org/migration-85.html#TLS_virtual_hosting_and_multiple_certificate_support_added %>
               <% if ssl_connector.key?('apr_enabled') && ssl_connector['apr_enabled'] == true %>
                   maxThreads="<%= ssl_connector.key?('max_threads') ? ssl_connector['max_threads'] : "100" %>"
                   enableLookups="<%= ssl_connector.key?('enable_lookups') ? ssl_connector['enable_lookups'] : "false" %>"
                   disableUploadTimeout="<%= ssl_connector.key?('disable_upload_timeout') ? ssl_connector['disable_upload_timeout'] : "true" %>"
                   acceptCount="<%= ssl_connector.key?('accept_count') ? ssl_connector['accept_count'] : "100" %>"
                   SSLEnabled="<%= ssl_connector.key?('ssl_enabled') ? ssl_connector['ssl_enabled'] : "true" %>"
+                  protocol="<%= ssl_connector.key?('protocol') ? ssl_connector['protocol'] : 'org.apache.coyote.http11.Http11AprProtocol' %>"
                   <% if ssl_connector.key?('ssl_certificate_file') %>
                   SSLCertificateFile="<%= ssl_connector['ssl_certificate_file'] %>"
                   <% end  %>
@@ -210,7 +218,7 @@
                   SSLVerifyDepth="<%= ssl_connector.key?('ssl_verify_depth') ? ssl_connector['ssl_verify_depth'] : '10' %>"
                   SSLDisableSessionTickets="<%= ssl_connector.key?('ssl_disable_session_tickets') ? ssl_connector['ssl_disable_session_tickets'] : 'false' %>"
               <% else %>
-                  protocol="<%= ssl_connector.key?('protocol') ? ssl_connector['protocol'] : 'HTTP/1.1' %>"
+                  protocol="<%= ssl_connector.key?('protocol') ? ssl_connector['protocol'] : 'org.apache.coyote.http11.Http11Nio2Protocol' %>"
                   <% if ssl_connector.key?('algorithm') %>
                   algorithm="<%= ssl_connector['algorithm'] %>"
                   <% end  %>
@@ -221,7 +229,7 @@
                   ciphers="<%= ssl_connector.key?('cipher_suite') ? ssl_connector['cipher_suite'] : 'ALL:!LOW:!EXP:!SSLv2' %>"
               <% end %>
               />
-            <% end  %>
+            <% end -%>
 
             <!-- http://tomcat.apache.org/tomcat-8.0-doc/config/ajp.html -->
             <Connector
