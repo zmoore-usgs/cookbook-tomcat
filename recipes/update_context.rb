@@ -86,7 +86,7 @@ instances.each do |instance, attributes|
     source "instances/conf/#{context_xml}.erb"
     sensitive true
     variables(
-      version: node['wsi_tomcat']['version'].split('.')[0],
+      version: node['wsi_tomcat']['version'],
       anti_jar_locking: anti_jar_locking,
       anti_resource_locking: anti_resource_locking,
       allow_casual_multipart_parsing: allow_casual_multipart_parsing,

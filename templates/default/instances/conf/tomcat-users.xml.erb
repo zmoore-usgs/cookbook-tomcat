@@ -1,6 +1,11 @@
+<% if @version.tr('.','')[0..1].to_i == 85  -%>
+<?xml version='1.0' encoding='UTF-8'?>
+<% end -%>
+<% if @version.tr('.','')[0..1].to_i < 85  -%>
 <?xml version='1.0' encoding='utf-8'?>
-<!-- 
-    !!!!!!! This file created by Chef !!!!!!! 
+<% end -%>
+<!--
+    !!!!!!! This file created by Chef !!!!!!!
     Any edits to this file will be overwritten
 -->
 <!--

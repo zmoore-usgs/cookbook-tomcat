@@ -3,6 +3,23 @@ Tomcat Cookbook Changelog
 
 Unreleased
 ---
+- [isuftin@usgs.gov] - Fix version passing into update_context recipe
+- [isuftin@usgs.gov] - Updated mime types in web.xml
+- [isuftin@usgs.gov] - tomcat-users template xml header update
+- [isuftin@usgs.gov] - Changed server.xml SSL protocol and APR ssl protocol to default
+to org.apache.coyote.http11.Http11Nio2Protocol and org.apache.coyote.http11.Http11AprProtocol
+respectively
+- [isuftin@usgs.gov] - Updated logging.properties to meet 8.0.x installation. No
+changes currently needed to work with 8.5.x as changes in 8.5.x are commented out.
+- [isuftin@usgs.gov] - For Tomcat 8.0.x, activated CometConnectionManagerValve in
+context.xml. For Tomcat 8.5.x, removed CometConnectionManagerValve entirely
+- [isuftin@usgs.gov] - Updated catalina.properties template to conform to Tomcat 8.0.x
+and update to 8.5.x properties
+- [isuftin@usgs.gov] - Updated Catalina.policy template to remove comet and
+introduce websockets - http://tomcat.apache.org/migration-85.html#Comet_support_removed
+- [isuftin@usgs.gov] - Added "LOGGING MANAGER" option to startup script
+- [isuftin@usgs.gov] - Added "org.apache.catalina.security.SecurityListener.UMASK"
+switch to Tomcat startup script
 - [isuftin@usgs.gov] - Removed minor OS version specifier from kitchen config
 - [isuftin@usgs.gov] - Added default server opt in attributes to allow for faster startup time
 - [isuftin@usgs.gov] - Removed ruby block processing from most recipes and helpers
@@ -16,6 +33,10 @@ checking whether or not an instance is installed
 - [isuftin@usgs.gov] - Changed calls to wsi_tomcat_instance and WsiTomCatInstance
 to use tomcat_instance  
 - [isuftin@usgs.gov] - Removed usage of ruby_block from the deploy_application recipe
+- [isuftin@usgs.gov] - Fixed the ruby_block in the download_libs recipe to be
+compatible with newer versions of chef client
+- [isuftin@usgs.gov] - Removed the usage of the name attribute in resource calls
+
 1.0.5
 -----
 - [mamcderm@usgs.gov] - revert back to older style provisioner

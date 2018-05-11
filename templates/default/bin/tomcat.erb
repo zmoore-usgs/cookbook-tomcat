@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#     !!!!!!! This file created by Chef !!!!!!! 
+#     !!!!!!! This file created by Chef !!!!!!!
 #    Any edits to this file will be overwritten
 
 ##
@@ -11,6 +11,13 @@
 
 # Just in case... we have an X11 display and aren't running in headless mode.
 unset DISPLAY
+
+# Set UMASK unless it has been overridden
+if [ -z "$UMASK" ]; then
+    UMASK="0027"
+fi
+umask $UMASK
+
 JAVA_HOME=<%= @java_home %>
 CATALINA_HOME=<%= @tomcat_home %>
 PID_DIR=$CATALINA_HOME/run
@@ -40,7 +47,8 @@ setup_catalina_environ() {
                -Djava.endorsed.dirs=${JAVA_ENDORSED_DIRS} \
                -Djava.io.tmpdir=${CATALINA_BASE}/temp \
                -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
-               -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
+               -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties \
+               -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
     export JSVC="${CATALINA_HOME}/bin/jsvc"
     export JAVA_HOME="${JAVA_HOME}"
 
@@ -73,9 +81,9 @@ show_info() {
 	    failure; echo
 	    return
     fi
-    
+
     # Let's remove the line 'commons daemon process'.
-    ${JSVC} ${JSVC_OPTS} ${CATALINA_OPTS} -home ${JAVA_HOME} -pidfile /dev/null -version -outfile '&1' -errfile '&1' org.apache.catalina.startup.Bootstrap 2>&1 | grep -v "commons daemon process"
+    ${JSVC} ${LOGGING_MANAGER} ${JSVC_OPTS} ${CATALINA_OPTS} -home ${JAVA_HOME} -pidfile /dev/null -version -outfile '&1' -errfile '&1' org.apache.catalina.startup.Bootstrap 2>&1 | grep -v "commons daemon process"
 
     echo -e "\nEnvironment info for $name tomcat:\n"
     echo "INSTANCE_NAME = \"${name}\""
@@ -130,10 +138,10 @@ start_instance() {
 	failure; echo
 	return
     fi
-    
+
     # Launch the daemon
 
-    ${JSVC} ${JSVC_OPTS} ${CATALINA_OPTS} -home ${JAVA_HOME} ${JSVC_OUTPUT_OPTS} -pidfile ${pidfile} -showversion org.apache.catalina.startup.Bootstrap start
+    ${JSVC} ${LOGGING_MANAGER} ${JSVC_OPTS} ${CATALINA_OPTS} -home ${JAVA_HOME} ${JSVC_OUTPUT_OPTS} -pidfile ${pidfile} -showversion org.apache.catalina.startup.Bootstrap start
 
     pid_wait_time=300
     for i in `seq 1 $pid_wait_time`; do
@@ -285,7 +293,7 @@ reopen_instance() {
         failure; echo
         exit 1
     fi
-}   
+}
 
 status_instance() {
     name=$1
