@@ -3,6 +3,8 @@ Tomcat Cookbook Changelog
 
 Unreleased
 ---
+- [isuftin@usgs.gov] - For Tomcat 8.0.x, activated CometConnectionManagerValve in
+context.xml. For Tomcat 8.5.x, removed CometConnectionManagerValve entirely
 - [isuftin@usgs.gov] - Updated catalina.properties template to conform to Tomcat 8.0.x
 and update to 8.5.x properties
 - [isuftin@usgs.gov] - Updated Catalina.policy template to remove comet and

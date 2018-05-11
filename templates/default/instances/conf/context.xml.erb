@@ -1,4 +1,10 @@
+<% if @version.tr('.','')[0..1].to_i == 85  -%>
+<?xml version='1.0' encoding='UTF-8'?>
+<% end -%>
+<% if @version.tr('.','')[0..1].to_i < 85  -%>
 <?xml version='1.0' encoding='utf-8'?>
+<% end -%>
+
 <!--
     !!!!!!! This file created by Chef !!!!!!!
     Any edits to this file will be overwritten
@@ -34,14 +40,12 @@
       <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
     <% end %>
 
-    <!-- Uncomment this to disable session persistence across Tomcat restarts -->
     <Manager pathname="" />
 
-    <!-- Uncomment this to enable Comet connection tacking (provides events
-         on session expiration as well as webapp lifecycle) -->
-    <!--
+    <% if @version.tr('.','')[0..1].to_i < 85  -%>
     <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
-    -->
+    <% end -%>
+
     <% if defined?(@resources) %>
         <% @resources.each do |r| -%>
             <Resource
