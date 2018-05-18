@@ -82,12 +82,13 @@ load_current_value do
   instance_script_pass Helper::TomcatInstance.script_pass(node, instance_name)
 
   Chef::Log.info("Checking if Tomcat instance #{instance_name} is ready")
-  wait_time = node['wsi_tomcat']['instances']['default']['ready_check_timeout']
-  unless Helper::TomcatInstance.ready?(node, instance_name, wait_time)
+  max_attempts = node['wsi_tomcat']['instances']['default']['ready_check_timeout_attempts']
+  check_timeout = node['wsi_tomcat']['instances']['default']['ready_check_timeout_wait']
+  unless Helper::TomcatInstance.ready?(node, instance_name, max_attempts, check_timeout)
     raise "Tomcat instance #{instance_name} is not running"
   end
 
-  deployed_apps Helper::ManagerClient.get_deployed_applications(instance_port, instance_script_pass)
+  deployed_apps Helper::ManagerClient.get_deployed_applications(instance_port, instance_script_pass, max_attempts, check_timeout)
   full_name = name.dup
   full_name << "###{version}" unless version.to_s.strip.empty?
   deployed_app_names = deployed_apps.map { |y| y[3] }

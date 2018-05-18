@@ -26,12 +26,15 @@ module Helper
     # @note This method is a helper method for other methods. A recipe would
     #   probably not need to use this directly
     # @since 1.0.0
-    def self.get_deployed_applications(port, tomcat_script_pass)
+    def self.get_deployed_applications(port, tomcat_script_pass, max_attempts = 60, wait_timeout = 1)
       deployed_apps = []
+      check_count = 0
       begin
+        Chef::Log.info 'Querying Tomcat server for deployed applications'
         open(
           "http://127.0.0.1:#{port}/manager/text/list",
-          http_basic_authentication: ['tomcat-script', tomcat_script_pass.to_s]
+          http_basic_authentication: ['tomcat-script', tomcat_script_pass.to_s],
+          read_timeout: wait_timeout
         ) do |f|
           # Format coming back
           # OK - Listed applications for virtual host localhost
@@ -49,6 +52,10 @@ module Helper
         end
         return deployed_apps
       rescue => e
+        check_count += 1
+        Chef::Log.info "Tomcat server not yet ready. Check #{check_count} of #{max_attempts}"
+        sleep wait_timeout
+        retry if check_count < max_attempts
         Chef::Log.error "Error occurred when communicating with Tomcat server: #{e}"
         raise
       end

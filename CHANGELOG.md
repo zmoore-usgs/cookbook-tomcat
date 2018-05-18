@@ -3,6 +3,15 @@ Tomcat Cookbook Changelog
 
 Unreleased
 ---
+
+- [isuftin@usgs.gov] - In the manager client, the "get_deployed_applications"
+function now performs retries
+- [isuftin@usgs.gov] - Created a new recipe "undeploy_application" and moved the
+application undeploy functionality from the "deploy_application" recipe to this
+new recipe. This is a breaking change if you previously depended on the
+"deploy_application" to also undeploy applications for you
+- [isuftin@usgs.gov] - In the tomcat_application resource, added functionality
+to re-try if the "get deployed applications" function didn't work the first time
 - [isuftin@usgs.gov] - Fix version passing into update_context recipe
 - [isuftin@usgs.gov] - Updated mime types in web.xml
 - [isuftin@usgs.gov] - tomcat-users template xml header update
@@ -26,6 +35,8 @@ switch to Tomcat startup script
 - [isuftin@usgs.gov] - Updated templates to not get key values using dot notation
 - [isuftin@usgs.gov] - Now working with latest current Chef client version (14.1.1)
 - [isuftin@usgs.gov] - Updated kitchen config to use latest PsiProbe app
+- [isuftin@usgs.gov] - Added the ability to dictate via attributes how many attempts
+to make to check for a running Tomcat server
 - [isuftin@usgs.gov] - Added the ability to dictate via attributes how long to wait
 for timeout when checking against a running Tomcat instance
 - [isuftin@usgs.gov] - Added functionality to the Tomcat instance helper to allow

@@ -42,21 +42,20 @@ module Helper
     # Checks if a Tomcat instance is ready by attempting to connect at the
     # instance's port. Will check every 1 second for a specified number of
     # iterations denoted by the max_attempts attribute (default: 60)
-    def self.ready?(node, instance_name = 'default', max_attempts = 60)
+    def self.ready?(node, instance_name = 'default', max_attempts = 60, wait_timeout = 1)
       port = ports(node, instance_name)[0]
 
       check_count = 0
-      Chef::Log.info 'Checking if Tomcat server is ready'
       begin
-        Timeout.timeout(1) do
-          sleep 1
+        Timeout.timeout(wait_timeout) do
           s = TCPSocket.new('127.0.0.1', port)
           s.close
           return true
         end
-      rescue Timeout::Error, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+      rescue Timeout::Error, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ETIMEDOUT
         check_count += 1
         Chef::Log.info "Tomcat server not yet ready. Check #{check_count} of #{max_attempts}"
+        sleep wait_timeout
         retry if check_count < max_attempts
       end
     end
