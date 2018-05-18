@@ -30,6 +30,7 @@ suites:
       - recipe[wsi_tomcat::create_tomcat_base]
       - recipe[wsi_tomcat::create_tomcat_instances]
       - recipe[wsi_tomcat::update_context]
+      - recipe[wsi_tomcat::undeploy_application]
       - recipe[wsi_tomcat::deploy_application]
     data_path: test/files
     data_bags_path: './test/integration/default/data_bags/'

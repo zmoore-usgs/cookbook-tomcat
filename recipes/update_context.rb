@@ -18,8 +18,6 @@ instances.each do |instance, attributes|
 
   if attributes.key?('context')
 
-    Chef::Log.info("Updating #{instance} context")
-
     anti_jar_locking = attributes['context'].fetch(:anti_jar_locking, true)
     anti_resource_locking = attributes['context'].fetch(:anti_resource_locking, true)
     allow_casual_multipart_parsing = attributes['context'].fetch(:allow_casual_multipart_parsing, false)
@@ -79,6 +77,8 @@ instances.each do |instance, attributes|
   tomcat_instance instance do
     action :nothing
   end
+
+  Chef::Log.info("Updating #{instance} context")
 
   template conf_path do
     owner tomcat_user

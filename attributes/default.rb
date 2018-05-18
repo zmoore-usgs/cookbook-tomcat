@@ -100,8 +100,12 @@ default['wsi_tomcat']['instances']['default']['context']['attributes']['allow_ca
 default['wsi_tomcat']['instances']['default']['context']['attributes']['background_processor_delay'] = '-1'
 default['wsi_tomcat']['instances']['default']['context']['attributes']['container_sci_filter'] = ''
 
-# The number of seconds to wait while checking to see if a Tomcat instance is ready after starting
-default['wsi_tomcat']['instances']['default']['ready_check_timeout'] = 60
+# The number of attempts tp make while checking to see if a Tomcat instance is
+# ready after starting
+default['wsi_tomcat']['instances']['default']['ready_check_timeout_attempts'] = 120
+# The number of seconds to wait for a response from the server each time there's an
+# attemt to see if it's ready
+default['wsi_tomcat']['instances']['default']['ready_check_timeout_wait'] = 1
 
 # Adds startup java opts to the Tomcat server
 # The default value here speeds up start times considerably
