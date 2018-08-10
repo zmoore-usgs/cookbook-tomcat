@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Updated
+- [jmorris@usgs.gov] - Updated kitchen YAML so all test suites can converge
 
 ## [1.2.0] - 2017-05-18
 ### Updated

@@ -155,16 +155,15 @@ suites:
             },
             "application" : {
               "probe" : {
-                "url" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war",
-                "final_name" : "probe"
+                "location" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0/probe.war",
+                "path" : "/probe",
+                "type" : "war"
               }
             },
             "user" : {
               "disable_admin_users" : false
             },
-            "server_opts" : [
-              "-server"
-            ],
+            "server_opts" : [],
             "context" : {
               "encrypted_environments_data_bag" : {
                 "data_bag_name" : "wsi_tomcat-_default",
@@ -268,8 +267,9 @@ suites:
             },
             "application" : {
               "probe" : {
-                "url" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war",
-                "final_name" : "probe"
+                "location" : "https://github.com/psi-probe/psi-probe/releases/download/3.0.0/probe.war",
+                "path" : "/probe",
+                "type" : "war"
               }
             },
             "user" : {
@@ -279,9 +279,7 @@ suites:
               "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CATALINA_HOME/lib:/usr/local/apr/lib",
               "export LD_LIBRARY_PATH"
             ],
-            "server_opts" : [
-              "-server"
-            ],
+            "server_opts" : [],
             "context" : {
               "encrypted_environments_data_bag" : {
                 "data_bag_name" : "wsi_tomcat-_default",
