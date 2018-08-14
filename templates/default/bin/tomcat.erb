@@ -36,7 +36,7 @@ setup_catalina_environ() {
     export CATALINA_HOME=<%= @tomcat_home %>
     export CATALINA_BASE="$CATALINA_HOME/instance/$name"
     export CATALINA_CLASSPATH=""
-    export JAVA_ENDORSED_DIRS="$CATALINA_BASE/endorsed:$CATALINA_HOME/endorsed"
+    export JAVA_ENDORSED_DIRS=""
     export JSVC_OUTPUT_OPTS="-outfile $CATALINA_BASE/logs/catalina.out -errfile &1"
     export JSVC_OPTS=" -server \
                -cwd ${CWD} \
