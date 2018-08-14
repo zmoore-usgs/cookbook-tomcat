@@ -72,7 +72,7 @@ default['wsi_tomcat']['data_bag_config']['credentials_attribute'] = 'credentials
 # user = Defines credentials for various tomcat users
 # See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access
 default['wsi_tomcat']['instances']['default']['cors']['enabled'] = true
-default['wsi_tomcat']['instances']['default']['cors']['allowed']['origins'] = '*'
+default['wsi_tomcat']['instances']['default']['cors']['allowed']['origins'] = ''
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['methods'] = %w[
   GET
   POST
@@ -89,7 +89,7 @@ default['wsi_tomcat']['instances']['default']['cors']['allowed']['headers'] = %w
 ]
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['exposed_headers'] = []
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['preflight_maxage'] = 1800
-default['wsi_tomcat']['instances']['default']['cors']['allowed']['support_credentials'] = true
+default['wsi_tomcat']['instances']['default']['cors']['allowed']['support_credentials'] = false
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['filter'] = '/*'
 default['wsi_tomcat']['instances']['default']['user']['disable_admin_users'] = false
 
