@@ -16,6 +16,8 @@ dist: trusty
 
 before_install:
   - sudo usermod -p "`openssl passwd -1 'travis'`" travis
+  - echo "rubygems 2.7.5 - https://github.com/berkshelf/berkshelf/issues/1744"
+  - gem update --system 2.7.5
 
 script:
   - bundle install
