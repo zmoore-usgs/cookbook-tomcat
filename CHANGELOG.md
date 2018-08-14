@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Updated
 - [jmorris@usgs.gov] - Updated kitchen YAML so all test suites can converge
+- [jmorris@usgs.gov] - Updated provider to look for certs in Java 10+ location
 
 ## [1.2.0] - 2017-05-18
 ### Updated

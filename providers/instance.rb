@@ -209,10 +209,15 @@ def load_service_definitions_and_keys(service_definitions)
       end
 
       # create truststore
+      cacerts_loc = if ::File.exist?("#{node['java']['java_home']}/jre/lib/security/cacerts")
+                      "#{node['java']['java_home']}/jre/lib/security/cacerts"
+                    else
+                      "#{node['java']['java_home']}/lib/security/cacerts"
+                    end
       bash 'make_truststore' do
         cwd ssl_dir
         code <<-EOH
-        cp #{node['java']['java_home']}/jre/lib/security/cacerts #{ssl_dir}/truststore
+        cp #{cacerts_loc} #{ssl_dir}/truststore
         keytool -storepasswd -keystore truststore -storepass changeit -new #{keystore_password}
         EOH
         sensitive true
