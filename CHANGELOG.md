@@ -5,12 +5,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
-## [1.2.1] - 2017-08-14
+## [1.2.1] - 2017-08-15
 ### Updated
 - [jmorris@usgs.gov] - Updated kitchen YAML so all test suites can converge
 - [jmorris@usgs.gov] - Updated provider to look for certs in Java 10+ location
 - [jmorris@usgs.gov] - Updated tomcat ERB file and defaulted endorsed_dirs to empty string
 - [jmorris@usgs.gov] - Changed defaults for ...['cors']['allowed']['origins'] to be the empty string and ...['cors']['allowed']['support_credentials'] to be false. This should match the defaults set by tomcat
+- [jmorris@usgs.gov] - Changed default tomcat version to be 8.5.32
 
 ## [1.2.0] - 2017-05-18
 ### Updated
