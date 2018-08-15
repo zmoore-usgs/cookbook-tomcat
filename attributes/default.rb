@@ -17,7 +17,7 @@ default['wsi_tomcat']['deploy']['remove_unlisted_applications'] = true
 # Set the version of Tomcat to install
 # Note: This cookbook has been tested against the Tomcat 7.x and 8.0.x versions.
 # 8.5.x and 9.x have not yet been tested
-default['wsi_tomcat']['version'] = '8.0.41'
+default['wsi_tomcat']['version'] = '8.5.32'
 
 # APR Installation - Both attributes used by the install_apr recipe
 default['wsi_tomcat']['apr']['apr_version'] = '1.5.2'
@@ -46,7 +46,7 @@ default['wsi_tomcat']['file']['archive']['mirrors'] = [
 # MacOS example:
 # openssl dgst -sha256 apache-tomcat-8.0.36.tar.gz
 # SHA256(apache-tomcat-8.0.36.tar.gz)= 7963464d86faf8416b92fb2b04c70da9759c7c332e1700c1e9f581883b4db664
-default['wsi_tomcat']['file']['archive']['checksum'] = 'a57204b5434755b5767299bbcd32e3afd2d6327cafa6b8372077f824aa7176d7'
+default['wsi_tomcat']['file']['archive']['checksum'] = '8f69bb5d86813cc7a9e7dcfa1d7722e7f35cdd7600c319590e5728e037df0947'
 
 # Some credentials are stored in an encrypted data bag
 default['wsi_tomcat']['data_bag_config']['bag_name'] = 'wsi_tomcat-_default'
@@ -72,7 +72,7 @@ default['wsi_tomcat']['data_bag_config']['credentials_attribute'] = 'credentials
 # user = Defines credentials for various tomcat users
 # See http://tomcat.apache.org/tomcat-7.0-doc/manager-howto.html#Configuring_Manager_Application_Access
 default['wsi_tomcat']['instances']['default']['cors']['enabled'] = true
-default['wsi_tomcat']['instances']['default']['cors']['allowed']['origins'] = '*'
+default['wsi_tomcat']['instances']['default']['cors']['allowed']['origins'] = ''
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['methods'] = %w[
   GET
   POST
@@ -89,7 +89,7 @@ default['wsi_tomcat']['instances']['default']['cors']['allowed']['headers'] = %w
 ]
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['exposed_headers'] = []
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['preflight_maxage'] = 1800
-default['wsi_tomcat']['instances']['default']['cors']['allowed']['support_credentials'] = true
+default['wsi_tomcat']['instances']['default']['cors']['allowed']['support_credentials'] = false
 default['wsi_tomcat']['instances']['default']['cors']['allowed']['filter'] = '/*'
 default['wsi_tomcat']['instances']['default']['user']['disable_admin_users'] = false
 
