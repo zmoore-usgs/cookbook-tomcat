@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## [1.2.2] - 2017-08-15
+### Updated
+- [jmorris@usgs.gov] - Updated metadata.platforms so cookbook could be uploaded to chef server
+
 ## [1.2.1] - 2017-08-15
 ### Updated
 - [jmorris@usgs.gov] - Updated kitchen YAML so all test suites can converge
